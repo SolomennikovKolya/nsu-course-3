@@ -1,0 +1,41 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "(gdb) Launch", // Имя конфигурации, отображаемое в списке
+			"type": "cppdbg", // Указывает, что это C++ отладчик
+			"request": "launch", // Тип конфигурации (launch означает запуск программы)
+			"program": "${workspaceFolder}/main.out", // Путь к исполняемому файлу
+			"args": [
+				"224.0.0.1"
+			], // Аргументы, которые нужно передать программе (можно указать)
+			"stopAtEntry": false, // Останавливать ли выполнение на точке входа
+			"cwd": "${workspaceFolder}", // Текущая рабочая директория для программы
+			"environment": [], // Переменные окружения (если необходимо)
+			"externalConsole": false, // Показывать ли внешний терминал
+			"MIMode": "gdb", // Используемый отладчик (GDB для Linux/MinGW)
+			"setupCommands": [
+				{
+					"description": "Enable pretty-printing for gdb",
+					"text": "-enable-pretty-printing",
+					"ignoreFailures": true
+				}
+			],
+			"preLaunchTask": "build", // Задача перед запуском (например, компиляция программы)
+			"miDebuggerPath": "/usr/bin/gdb", // Путь к GDB (или MinGW gdb в Windows)
+			"miDebuggerArgs": "",
+			"targetArchitecture": "x86_64", // Целевая архитектура (обычно x86_64)
+			"logging": {
+				"moduleLoad": false,
+				"trace": false,
+				"engineLogging": false,
+				"programOutput": true,
+				"exceptions": false
+			},
+			"launchCompleteCommand": "exec-run",
+			"sourceFileMap": {
+				"/mnt/c": "C:\\"
+			}
+		}
+	]
+}
