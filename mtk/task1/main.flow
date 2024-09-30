@@ -1,0 +1,10 @@
+import string;
+
+main() {
+	arr_int: [int] = [1, 2, 3];
+	arr_str: [string] = map(arr_int, i2s);
+	ans: string = strGlue(arr_str, ", ");
+	println(ans);
+
+    quit(0);
+}
