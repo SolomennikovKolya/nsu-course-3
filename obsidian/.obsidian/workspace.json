@@ -1,0 +1,190 @@
+{
+  "main": {
+    "id": "2e387ef8cf33e6ed",
+    "type": "split",
+    "children": [
+      {
+        "id": "bb6ecfa8f56559ea",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0e84991b19ef2c6e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Учёба/ПРЕДМЕТЫ.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "800dd5128d954cad",
+    "type": "split",
+    "children": [
+      {
+        "id": "708523f8770e42f2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ab492f493902713f",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "b38897fbab132379",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "68057413d6cc7e4e",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "aa24cd5cc83811c8",
+    "type": "split",
+    "children": [
+      {
+        "id": "833af4668d4a28a1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "79fe7f8a03193101",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Учёба/ПРЕДМЕТЫ.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "3be9adca97dd016a",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Учёба/ПРЕДМЕТЫ.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "58291ab39fa3fafe",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "5a1d66ea3d6af9a2",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Учёба/ПРЕДМЕТЫ.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "markdown-importer:Open format converter": false
+    }
+  },
+  "active": "0e84991b19ef2c6e",
+  "lastOpenFiles": [
+    "Учёба/Объектно-ориентированный анализ и дизайн.md",
+    "Учёба/Методы транслации и компиляции.md",
+    "Учёба/Вычислительная математика.md",
+    "Учёба/ВКР.md",
+    "Учёба/Базы данных.md",
+    "Учёба/ПРЕДМЕТЫ.md",
+    "Учёба/Основы операционных систем.md",
+    "Учёба/Электротехника и электроника.md",
+    "Учёба/Сети и телекоммуникации.md",
+    "Cache/Pasted image 20240929224740.png",
+    "Cache/Pasted image 20240929224705.png",
+    "Темки/Крипта.md",
+    "Темки/Идеи.md",
+    "Разное/Покупки.md",
+    "Темки/Прокси + VPN.md",
+    "Темки/Экономика.md",
+    "Программирование/GO.md",
+    "Cache/Pasted image 20240926104431.png",
+    "Cache/Pasted image 20240926104417.png",
+    "Cache/Pasted image 20240926104350.png",
+    "Cache/Pasted image 20240926104341.png",
+    "Cache/Pasted image 20240926100353.png",
+    "Cache/Pasted image 20240926095813.png",
+    "Cache/Pasted image 20240925185006.png",
+    "Cache/Pasted image 20240925184944.png",
+    "Разное",
+    "Bought.md",
+    "Программирование/Стек.md",
+    "Разное/Моды Майн.md",
+    "Программирование",
+    "Разное/Мотивация.md",
+    "Cache",
+    "Учёба/ЧЕКЛИСТ.md",
+    "Untitled.canvas",
+    "2024-09-11.md",
+    "Учёба",
+    "Темки"
+  ]
+}
