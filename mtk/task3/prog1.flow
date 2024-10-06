@@ -1,0 +1,17 @@
+import runtime;
+
+fib(n : int) -> [int] {
+	if (n == 1) {
+		[0];
+	} else if (n == 2) {
+		[0, 1];
+	} else {
+		prevArr = fib(n - 1);
+		arrayPush(prevArr, prevArr[n - 2] + prevArr[n - 3]);
+	}
+}
+
+main() {
+	println(fib(10));
+	quit(0);
+}

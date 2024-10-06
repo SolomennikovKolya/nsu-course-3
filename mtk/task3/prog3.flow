@@ -1,0 +1,26 @@
+import runtime;
+
+fib(n : int) -> [int] {
+	res : ref [int] = ref [];
+	fibHelper(n, res);
+	^res;
+}
+
+fibHelper(n : int, res : ref [int]) -> void {
+	if (n == 1) {
+		res := [0];
+		{}
+	} else if (n == 2) {
+		res := [0, 1];
+		{}
+	} else {
+		fibHelper(n - 1, res);
+		refArrayPush(res, ^res[n - 2] + ^res[n - 3]);
+		{}
+	}
+}
+
+main() {
+	println(fib(10));
+	quit(0);
+}
