@@ -213,8 +213,8 @@ std::string get_sender_addr_str(sockaddr_storage &sender_addr)
 
 int main(int argc, char *argv[])
 {
-    int sock_in;                                     // Принимающий сокет
-    int sock_out;                                    // Отправляющий сокет
+    int sock_in = -1;                                // Принимающий сокет
+    int sock_out = -1;                               // Отправляющий сокет
     std::map<std::string, clock_t> live_copies = {}; // Живые копии программы. Хранит (адрес : время добавления в словарь)
     char buffer[MESSAGE_LEN + 1];                    // Буфер для получения сообщений
 
@@ -283,6 +283,8 @@ int main(int argc, char *argv[])
     catch (const std::runtime_error *e)
     {
         std::cerr << e->what() << std::endl;
+        close(sock_in);
+        close(sock_out);
         return 1;
     }
 
