@@ -78,7 +78,7 @@ func handleClient(conn net.Conn) {
 		return
 	}
 
-	// Получение размера файла
+	// Вычисление размера полученного файла
 	fileInfo, err := os.Stat(filenameToSave)
 	if err != nil {
 		fmt.Println("ошибка при получении информации о файле:", err)

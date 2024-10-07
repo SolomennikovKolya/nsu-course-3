@@ -51,7 +51,7 @@ func dataExchange(conn net.Conn, filePath string) error {
 		return fmt.Errorf("ошибка при отправке названия файла: %w", err)
 	}
 
-	// Получение размера файла
+	// Вычисление размера файла
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
 		return fmt.Errorf("ошибка при получении информации о файле: %w", err)
@@ -66,7 +66,7 @@ func dataExchange(conn net.Conn, filePath string) error {
 		return fmt.Errorf("ошибка при отправке размера файла: %w", err)
 	}
 
-	// Отправка файла
+	// Открытие файла
 	file, err := os.Open(filePath)
 	if err != nil {
 		return fmt.Errorf("ошибка при открытии файла: %w", err)
