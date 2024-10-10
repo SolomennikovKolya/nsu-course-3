@@ -9,6 +9,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 )
@@ -139,7 +140,7 @@ func handleClient(conn net.Conn, clientNum int) {
 		return
 	}
 	filename := string(buf)
-	filenameToSave := "uploads/" + filename
+	filenameToSave := "uploads/" + filepath.Base(filename)
 
 	// Приём размера файла
 	buf = make([]byte, 64)
@@ -159,7 +160,7 @@ func handleClient(conn net.Conn, clientNum int) {
 	defer file.Close()
 
 	// Приём файла (копирование данные из соединения в файл) + вывод скорости
-	customReader := &CustomReader{r: conn}
+	customReader := &CustomReader{r: conn, bytesRead: 0}
 	limitedReader := io.LimitReader(customReader, fileSize)
 	stopChan := make(chan struct{})
 	go trackSpeed(customReader, clientNum, stopChan)
