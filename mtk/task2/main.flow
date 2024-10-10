@@ -1,0 +1,9 @@
+import runtime;
+
+main()
+{
+    arr = [1, 2, 3];
+    sum = fold(arr, 0, \s, x -> s + x);
+    println(sum);
+    quit(0);
+}

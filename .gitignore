@@ -1,1 +1,8 @@
-.obsidian/
+/obsidian
+!/obsidian/Учёба/
+!/obsidian/Учёба/**
+!/obsidian/Программирование/
+!/obsidian/Программирование/**
+
+/networks/task2/server/uploads
+/networks/task2/client/data

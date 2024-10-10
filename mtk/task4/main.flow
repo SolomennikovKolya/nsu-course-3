@@ -1,0 +1,46 @@
+import runtime;
+import ds/tree;
+import ds/tuples;
+
+createTree(i : int, n : int, arr : [int], tree : ref Tree<int, [int]>) -> void {
+	if (i < n) {
+		key = arr[i];
+		switch(lookupTree(^tree, key)) {
+			None(): tree := setTree(^tree, key, [i]);
+			Some(value): tree := setTree(^tree, key, arrayPush(value, i));
+		}
+		createTree(i + 1, n, arr, tree);
+	}
+}
+
+calculateAns(i : int, n : int, m : int, arr : [int], tree : ref Tree<int, [int]>, ans : ref [Pair<int, int>]) -> void {
+	if (i < n) {
+		key = arr[i];
+		switch(lookupTree(^tree, m - arr[i])) {
+			Some(matchToKey): {
+				newPairs : [Pair<int, int>] = fold(matchToKey, [], \tmpArr, j -> arrayPush(tmpArr, Pair(i, j)));
+				ans := concat(^ans, newPairs);
+				calculateAns(i + 1, n, m, arr, tree, ans);
+			}
+			None(): {}
+		}
+	}
+}
+
+inds(arr : [int], m : int) -> [Pair<int, int>] {
+	n = length(arr);
+	tree : ref Tree<int, [int]> = ref makeTree();
+	createTree(0, n, arr, tree);
+
+	ans : ref [Pair<int, int>] = ref [];
+	calculateAns(0, n, m, arr, tree, ans);
+	^ans;
+}
+
+main() {
+	arr = [1, 5, 7, -1, 5];
+	ans = inds(arr, 6);
+	println(ans);
+
+	quit(0);
+}

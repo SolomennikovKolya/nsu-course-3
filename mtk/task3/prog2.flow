@@ -1,0 +1,20 @@
+import runtime;
+
+// Хвостовая рекурсия
+fib(n : int) -> [int] {
+    fibHelper(0, 1, n, []);
+}
+
+// Вспомогательная функция
+fibHelper(x1 : int, x2 : int, count : int, res : [int]) -> [int] {
+	if (count == 0) {
+		res;
+	} else {
+		fibHelper(x2, x1 + x2, count - 1, arrayPush(res, x1));
+	}
+}
+
+main() {
+	println(fib(10));
+	quit(0);
+}
