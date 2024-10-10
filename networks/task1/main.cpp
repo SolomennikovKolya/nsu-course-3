@@ -1,18 +1,19 @@
 #include <arpa/inet.h> // Для sockaddr_in и inet_addr
-#include <cstring>     // Для memset
-#include <fcntl.h>     // Для функции fcntl
+#include <chrono>
+#include <cstring> // Для memset
+#include <fcntl.h> // Для функции fcntl
 #include <iostream>
 #include <map>
 #include <string>
 #include <sys/socket.h> // Для сокетов
-#include <time.h>
-#include <unistd.h> // Для close
+#include <unistd.h>     // Для close
 
 const int PORT = 8080;                                 // Порт принимающего сокета (он же порт для мультикаст группы)
 const double HEARTBEAT_DT = 1.0;                       // Время между отправками сообщений
 const double TTL = 2.0;                                // Промежуток времени, пока найденные копии программы будут считаться живыми
 const char *MESSAGE = "Hello, мир, manera крутит мир"; // Сообщение которое будет периодически отправляться
 const int MESSAGE_LEN = strlen(MESSAGE);               // Длина сообщения
+const int TIMEOUT = 500000;                            // Таймаут для recvfrom
 
 // Структурка для хранения мультикаст адреса (IPv4 или IPv6)
 struct multicast_addr
@@ -94,12 +95,12 @@ int setup_sock_in(const multicast_addr &mult_addr)
         throw new std::runtime_error("Ошибка при установке параметров сокета");
 
     // Настройка сокета на неблокирующий режим
-    int flags = fcntl(sock_in, F_GETFL, 0);
-    if (flags == -1)
-        throw new std::runtime_error("Ошибка при считывании флагов сокета");
-    flags |= O_NONBLOCK;
-    if (fcntl(sock_in, F_SETFL, flags) == -1)
-        throw new std::runtime_error("Ошибка при попытке поставить неблокирующий режим для сокета");
+    // int flags = fcntl(sock_in, F_GETFL, 0);
+    // if (flags == -1)
+    //     throw new std::runtime_error("Ошибка при считывании флагов сокета");
+    // flags |= O_NONBLOCK;
+    // if (fcntl(sock_in, F_SETFL, flags) == -1)
+    //     throw new std::runtime_error("Ошибка при попытке поставить неблокирующий режим для сокета");
 
     // Привязка сокета ко всем интерфейсам IPv6 и IPv4
     sockaddr_in6 sock_in_addr;
@@ -129,6 +130,13 @@ int setup_sock_in(const multicast_addr &mult_addr)
         if (setsockopt(sock_in, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, &mreq6, sizeof(mreq6)) < 0)
             throw std::runtime_error("Ошибка при присоединении к multicast группе");
     }
+
+    // Установка таймаута
+    struct timeval timeout;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = TIMEOUT;
+    if (setsockopt(sock_in, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout)) < 0)
+        throw std::runtime_error("Ошибка при установке таймаута");
 
     return sock_in;
 }
@@ -211,12 +219,20 @@ std::string get_sender_addr_str(sockaddr_storage &sender_addr)
         throw new std::runtime_error("sender_addr.ss_family должен быть либо AF_INET, либо AF_INET6");
 }
 
+// Возвращает количество секунд с начальной точки до текущего времени
+int get_elapsed_time(std::chrono::_V2::steady_clock::time_point start)
+{
+    auto end = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    return int(duration.count() / 1000);
+}
+
 int main(int argc, char *argv[])
 {
-    int sock_in = -1;                                // Принимающий сокет
-    int sock_out = -1;                               // Отправляющий сокет
-    std::map<std::string, clock_t> live_copies = {}; // Живые копии программы. Хранит (адрес : время добавления в словарь)
-    char buffer[MESSAGE_LEN + 1];                    // Буфер для получения сообщений
+    int sock_in = -1;                                                                   // Принимающий сокет
+    int sock_out = -1;                                                                  // Отправляющий сокет
+    std::map<std::string, std::chrono::_V2::steady_clock::time_point> live_copies = {}; // Живые копии программы. Хранит (адрес : время добавления в словарь)
+    char buffer[MESSAGE_LEN + 1];                                                       // Буфер для получения сообщений
 
     try
     {
@@ -237,9 +253,9 @@ int main(int argc, char *argv[])
                 throw new std::runtime_error("Ошибка отправки сообщения");
 
             bool changed = false; // Чтобы отслеживать, были ли изменения за текущий цикл
-            time_t heartbeat_start_time = clock();
+            auto heartbeat_start_time = std::chrono::steady_clock::now();
 
-            while (double(clock() - heartbeat_start_time) / CLOCKS_PER_SEC < HEARTBEAT_DT)
+            while (get_elapsed_time(heartbeat_start_time) < HEARTBEAT_DT)
             {
                 sockaddr_storage sender_addr;
                 socklen_t sender_addr_len = sizeof(sender_addr);
@@ -257,13 +273,13 @@ int main(int argc, char *argv[])
 
                 if (live_copies.find(sender_addr_str) == live_copies.end())
                     changed = true;
-                live_copies[sender_addr_str] = clock();
+                live_copies[sender_addr_str] = std::chrono::steady_clock::now();
             }
 
             // Удаляем записи о живых копиях, у которых истекло время
             for (auto it = live_copies.begin(); it != live_copies.end();)
             {
-                if (double(clock() - it->second) / CLOCKS_PER_SEC > TTL)
+                if (get_elapsed_time(it->second) > TTL)
                 {
                     it = live_copies.erase(it);
                     changed = true;
