@@ -21,9 +21,7 @@ void *mythread(void *arg)
 	local_var++;
 	global_var++;
 
-	while (1)
-	{
-	}
+	sleep(100);
 
 	return NULL;
 }
@@ -59,6 +57,6 @@ int main()
 		printf("tids[%d] = %lu\n", i, tids[i]);
 	printf("\n");
 
-	// pthread_exit(0);
+	// pthread_exit(NULL);
 	return 0;
 }
