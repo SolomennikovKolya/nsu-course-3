@@ -1,0 +1,96 @@
+{
+	"hits": [
+		{
+			"point": {
+				"lat": 57.6446653,
+				"lng": 61.3816989
+			},
+			"extent": [
+				61.3733519,
+				57.6433676,
+				61.3899539,
+				57.6452824
+			],
+			"name": "Полевая",
+			"country": "Россия",
+			"countrycode": "RU",
+			"osm_id": 261059025,
+			"osm_type": "W",
+			"osm_key": "waterway",
+			"osm_value": "stream"
+		},
+		{
+			"point": {
+				"lat": 56.0704861,
+				"lng": 63.5729182
+			},
+			"extent": [
+				63.5628595,
+				56.0642439,
+				63.5895435,
+				56.0749104
+			],
+			"name": "Верхняя Полевая",
+			"country": "Россия",
+			"countrycode": "RU",
+			"state": "Курганская область",
+			"postcode": "641801",
+			"osm_id": 122395414,
+			"osm_type": "W",
+			"osm_key": "place",
+			"osm_value": "village"
+		},
+		{
+			"point": {
+				"lat": 60.1036107,
+				"lng": 41.3331182
+			},
+			"extent": [
+				41.3267538,
+				60.0722393,
+				41.3580806,
+				60.137806
+			],
+			"name": "Полевая Бохтюга",
+			"country": "Россия",
+			"countrycode": "RU",
+			"osm_id": 16105878,
+			"osm_type": "R",
+			"osm_key": "waterway",
+			"osm_value": "stream"
+		},
+		{
+			"point": {
+				"lat": 54.6878754,
+				"lng": 20.7315633
+			},
+			"name": "Полевая",
+			"country": "Россия",
+			"countrycode": "RU",
+			"osm_id": 5163766466,
+			"osm_type": "N",
+			"osm_key": "natural",
+			"osm_value": "peak"
+		},
+		{
+			"point": {
+				"lat": 56.4584267,
+				"lng": 60.1091649
+			},
+			"extent": [
+				60.0682666,
+				56.4438497,
+				60.1451966,
+				56.4607741
+			],
+			"name": "Полевая",
+			"country": "Россия",
+			"countrycode": "RU",
+			"osm_id": 40510561,
+			"osm_type": "W",
+			"osm_key": "waterway",
+			"osm_value": "river"
+		}
+	],
+	"locale": "default"
+}

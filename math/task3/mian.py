@@ -1,52 +1,34 @@
 from typing import List, Tuple
 
-N: int = 5
-EPSILON: float = 0.1
-GAMMA: float = 0.1
+N: int
+EPSILON: float
+GAMMA: float
 
-def getTestData(testNum: int) -> Tuple[List[List[float]], List[float]]:
+def getTestData(ci, di, ei, fi) -> Tuple[List[List[float]], List[float]]:
     A = [[0.0] * N for i in range(N)]
     f = [0.0] * N
     
-    match testNum:
-        case 1:
-            for row in range(N):
-                for col in range(N):
-                    if row == col:
-                        A[row][col] = 2.0
-                    elif row == col + 1 or row + 1 == col:
-                        A[row][col] = -1.0
-            for i in range(N):
-                f[i] = 2.0
-        
-        case 2:
-            for row in range(N):
-                for col in range(N):
-                    if row == col:
-                        A[row][col] = 2.0
-                    elif row == col + 1 or row + 1 == col:
-                        A[row][col] = -1.0
-            for i in range(N):
-                f[i] = 2.0 + EPSILON
-        
-        case 3:
-            for row in range(N):
-                for col in range(N):
-                    if row == col:
-                        A[row][col] = float(2 * (row + 1)) + GAMMA
-                    elif row == col + 1 or row + 1 == col:
-                        A[row][col] = -1.0
-            for i in range(N):
-                f[i] = 2.0 * (row + 2.0) + GAMMA
+    if GAMMA == 0:
+        for i in range(2, N + 1):
+            A[i - 1][i - 2] = ci
+        for i in range(1, N + 1):
+            A[i - 1][i - 1] = di
+        for i in range(1, N):
+            A[i - 1][i] = ei
+        for i in range(N):
+            f[i] = fi + EPSILON
+    
+    else:
+        for row in range(N):
+            for col in range(N):
+                if row == col:
+                    A[row][col] = float(2 * (row + 1)) + GAMMA
+                elif row == col + 1 or row + 1 == col:
+                    A[row][col] = -1.0
+        for i in range(N):
+            f[i] = 2.0 * (i + 2.0) + GAMMA
 
     return A, f
-
-def printMatrix(A: List[List[float]]) -> None:
-    s = [[str(e) for e in row] for row in A]
-    lens = [max(map(len, col)) for col in zip(*s)]
-    fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
-    table = [fmt.format(*row) for row in s]
-    print('\n'.join(table))
 
 def calculateX(A: List[List[float]], f: List[float]) -> List[float]:
     c = [None, None] + [A[i - 1][i - 2] for i in range(2, N + 1)]
@@ -69,7 +51,13 @@ def calculateX(A: List[List[float]], f: List[float]) -> List[float]:
     return x[1:]
 
 if __name__ == "__main__":
-    testNum = int(input("Номер теста: "))
-    A, f = getTestData(testNum)
+    
+    N, EPSILON, GAMMA = 7, 0, 3
+    ai, bi, ci, fi = -1, 2, -1, 2
+    A, f = getTestData(ai, bi, ci, fi)
+    
     x = calculateX(A, f)
-    print(x)
+    
+    # print(x)
+    for xi in x:
+        print("{:.8f}".format(xi), end=" ")

@@ -1,0 +1,3 @@
+expr = term:e1 '+' expr:e2 { Sum(:e1, :e2) } | term;
+term = factor:e1 '*' term:e2 { Mul(:e1, :e2) } | factor;
+factor = ('0'-'9')+$d { Int(s2i($d)) } | '(' expr:e ')' { Paren(:e) };
