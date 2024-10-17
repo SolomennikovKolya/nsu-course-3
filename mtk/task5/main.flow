@@ -1,0 +1,46 @@
+import string;
+import lingo/pegcode/driver;
+
+Exp ::= Sum, Mul, Int, Paren;
+Sum : (e1 : Exp, e2 : Exp);
+Mul : (e1 : Exp, e2 : Exp);
+Int : (val : int);
+Paren : (e1 : Exp); // выражение в скобках
+
+grammar = compilePegGrammar("#include grammar.lingo");
+
+calculate(e: Exp) -> int {
+    switch(e) {
+        Sum(e1, e2): calculate(e1) + calculate(e2);
+        Mul(e1, e2): calculate(e1) * calculate(e2);
+        Int(val): val;
+		Paren(e1): calculate(e1);
+    }
+}
+
+backToStr(e: Exp) -> string {
+	switch(e) {
+        Sum(e1, e2): backToStr(e1) + "+" + backToStr(e2);
+        Mul(e1, e2): backToStr(e1) + "*" + backToStr(e2);
+        Int(val): i2s(val);
+		Paren(e1): "(" + backToStr(e1) + ")";
+    }
+}
+
+main() {
+	testInput: string = "(1+2)*3";
+    res = parsic(grammar, testInput, defaultPegActions);
+
+	println(res);
+	println(backToStr(res) + "=" + i2s(calculate(res)));
+
+    quit(0);
+}
+
+/*
+Код:
+getUrlParameters("param1");
+
+Консоль: 
+prog.flow --param1=1-2-3 
+*/
