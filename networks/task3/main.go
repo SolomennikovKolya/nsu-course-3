@@ -31,9 +31,8 @@ type Data struct {
 	locations        []Location // Список локаций
 	selectedLocation int        // Номер локации в locations, уоторая сейчас выбрана
 	weather          Weather    // Погода в выбранной локации
-	places           []Place    // Названия интересные места
-	// placeDetails     map[int]string // Описания мест
-	mutex sync.Mutex
+	places           []Place    // Интересные места
+	mutex            sync.Mutex
 }
 
 func (data *Data) getSelectedLocationName() string {
@@ -147,7 +146,7 @@ func loop(window *app.Window) error {
 func run() {
 	window := new(app.Window) // Создание нового окна:
 	window.Option(app.Title("Places Finder"))
-	window.Option(app.Size(unit.Dp(400), unit.Dp(600)))
+	window.Option(app.Size(unit.Dp(600), unit.Dp(800)))
 
 	err := loop(window) // Эта функция должна выполняться бесконечно, пока программа работает
 	if err != nil {

@@ -124,7 +124,6 @@ func getPlaceDetails(data *Data, placeID int, placeNum int) {
 	data.mutex.Lock()
 	if placeNum < len(data.places) && data.places[placeNum].ID == placeID {
 		data.places[placeNum].Details = description
-		fmt.Println(placeNum, placeID, description, data.places[placeNum].Details)
 	}
 	data.mutex.Unlock()
 }
