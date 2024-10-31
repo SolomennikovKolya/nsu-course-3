@@ -1,13 +1,8 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"os"
-	"strconv"
 	"sync"
 
 	"image/color"
@@ -27,97 +22,30 @@ const (
 	defaultInputLocationNameText = "Введите название локации..."
 	graphhopperURL               = "https://graphhopper.com/api/1/geocode"
 	graphhopperKEY               = "34e2aa3d-458f-4dec-978c-8f4045d876b6"
+	openweatherURL               = "https://api.openweathermap.org/data/2.5/weather"
+	openweatherKEY               = "688ffe0da9e16360228d1cb034013087"
+	kudagoURL                    = "https://kudago.com/public-api/v1.2/places/"
 )
 
-type Point struct {
-	Lat float64 `json:"lat"`
-	Lng float64 `json:"lng"`
+type Data struct {
+	locations        []Location // Список локаций
+	selectedLocation int        // Номер локации в locations, уоторая сейчас выбрана
+	weather          Weather    // Погода в выбранной локации
+	places           []Place    // Интересные места
+	mutex            sync.Mutex
 }
 
-type Location struct {
-	Point       Point     `json:"point"`
-	Extent      []float64 `json:"extent,omitempty"`
-	Name        string    `json:"name"`
-	Country     string    `json:"country"`
-	City        string    `json:"city"`
-	CountryCode string    `json:"countrycode"`
-	State       string    `json:"state,omitempty"`
-	Street      string    `json:"street"`
-	Postcode    string    `json:"postcode,omitempty"`
-	OsmID       int64     `json:"osm_id"`
-	OsmType     string    `json:"osm_type"`
-	OsmKey      string    `json:"osm_key"`
-	OsmValue    string    `json:"osm_value"`
-}
-
-type Response struct {
-	Hits   []Location `json:"hits"`
-	Locale string     `json:"locale"`
-}
-
-// Получение вариантов локации по описанию
-func getLocations(description string, locations []Location, mutex *sync.Mutex) {
-	request, err := http.NewRequest("GET", graphhopperURL, nil)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Ошибка при создании GET запроса:", err)
-		return
+func (data *Data) getSelectedLocationName() string {
+	if data.selectedLocation != -1 {
+		return data.locations[data.selectedLocation].Name
+	} else {
+		return ""
 	}
-	query := request.URL.Query()
-	query.Add("q", description)
-	query.Add("limit", strconv.Itoa(maxLocationsNum))
-	query.Add("key", graphhopperKEY)
-	request.URL.RawQuery = query.Encode()
-
-	response, err := http.DefaultClient.Do(request)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Ошибка при отправки GET запроса:", err)
-		return
-	}
-	defer response.Body.Close()
-
-	responseBytes, err := io.ReadAll(response.Body)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Ошибка при чтении байтов из responseBytes:", err)
-		return
-	}
-
-	var responseDecoded Response
-	err = json.Unmarshal(responseBytes, &responseDecoded)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Ошибка при парсинге JSON:", err)
-		return
-	}
-
-	if len(responseDecoded.Hits) == 0 {
-		fmt.Fprintln(os.Stderr, "Нет результатов по данному описанию локации")
-		return
-	}
-
-	mutex.Lock()
-	copy(locations, responseDecoded.Hits)
-	mutex.Unlock()
-}
-
-func locationToText(location *Location) string {
-	ans := location.Name
-	if location.Country != "" {
-		ans += "\n" + location.Country
-	}
-	if location.City != "" {
-		ans += "\n" + location.City
-	}
-	if location.State != "" {
-		ans += "\n" + location.State
-	}
-	if location.Street != "" {
-		ans += "\n" + location.Street
-	}
-	ans += "\n(" + strconv.FormatFloat(location.Point.Lat, 'f', -1, 64) + ", " + strconv.FormatFloat(location.Point.Lng, 'f', -1, 64) + ")"
-	return ans
 }
 
 // Логика работы (обработка событий + отрисовка)
 func loop(window *app.Window) error {
+
 	// Тема (шрифт, цвета и т.д.)
 	theme := material.NewTheme()
 	theme.Palette.ContrastBg = color.NRGBA{R: 51, G: 173, B: 255, A: 255}
@@ -139,12 +67,7 @@ func loop(window *app.Window) error {
 	}
 
 	// Данные, которые могут изменяться из разных горутин
-	locations := make([]Location, maxLocationsNum)
-	selectedLocation := -1
-	// var weather string                         // Погода в локации
-	// var placeNames [maxPlacesNum]string        // Названия интересные места
-	// var placeDescriptions [maxPlacesNum]string // Описания интересных мест
-	var mutex sync.Mutex // Мьютекс для безопасного изменения и получения данных
+	data := Data{locations: make([]Location, maxLocationsNum), selectedLocation: -1}
 
 	for {
 		// .(type) - это type assertion (утверждение типа).
@@ -165,9 +88,8 @@ func loop(window *app.Window) error {
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						inputEvent, _ := locationNameInput.Update(gtx)
 						if e, ok := inputEvent.(widget.SubmitEvent); ok {
-							go getLocations(e.Text, locations, &mutex)
+							go getLocations(e.Text, &data)
 							locationNameInput.SetText("")
-							selectedLocation = -1
 						}
 						return material.Editor(theme, locationNameInput, defaultInputLocationNameText).Layout(gtx)
 					}),
@@ -175,16 +97,17 @@ func loop(window *app.Window) error {
 					// Список найденных локаций
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return material.List(theme, locationsList).Layout(gtx, maxLocationsNum, func(gtx layout.Context, i int) layout.Dimensions {
-							mutex.Lock()
-							locationName := locations[i].Name
-							buttonText := locationToText(&locations[i])
-							mutex.Unlock()
+							data.mutex.Lock()
+							locationName := data.locations[i].Name
+							buttonText := getLocationText(data.locations[i])
+							data.mutex.Unlock()
 
 							if locationName != "" {
 								btn := material.Button(theme, locationButtons[i], buttonText)
 								if locationButtons[i].Clicked(gtx) {
-									selectedLocation = i
-									fmt.Printf("Выбрана локация: %s\n", buttonText)
+									data.selectedLocation = i
+									go getWeather(&data)
+									go getPlaces(&data)
 								}
 								return btn.Layout(gtx)
 							} else {
@@ -202,11 +125,12 @@ func loop(window *app.Window) error {
 					// Плашка с текстом
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						fullText := ""
-						if selectedLocation != -1 {
-							mutex.Lock()
-							fullText = "Локация: " + locations[selectedLocation].Name
-							mutex.Unlock()
-						}
+						data.mutex.Lock()
+						fullText += "Локация: " + data.getSelectedLocationName() + "\n"
+						fullText += "Погода: " + weatherToText(data.weather) + "\n"
+						fullText += "Места: \n" + placesToText(data.places) + "\n"
+						data.mutex.Unlock()
+
 						title := material.H6(theme, fullText)
 						title.Alignment = text.Start
 						return title.Layout(gtx)
@@ -219,12 +143,10 @@ func loop(window *app.Window) error {
 	}
 }
 
-// Запуск приложения
 func run() {
-	// Создание нового окна:
-	window := new(app.Window)
+	window := new(app.Window) // Создание нового окна:
 	window.Option(app.Title("Places Finder"))
-	window.Option(app.Size(unit.Dp(400), unit.Dp(600)))
+	window.Option(app.Size(unit.Dp(600), unit.Dp(800)))
 
 	err := loop(window) // Эта функция должна выполняться бесконечно, пока программа работает
 	if err != nil {
@@ -235,6 +157,6 @@ func run() {
 }
 
 func main() {
-	go run()
+	go run()   // Запуск приложения
 	app.Main() // Запуск основного цикла событий
 }
