@@ -4,6 +4,23 @@
 		"pthread.h": "c",
 		"sig_atomic_t.h": "c",
 		"sigset_t.h": "c",
-		"stdio.h": "c"
+		"stdio.h": "c",
+		"stdlib.h": "c",
+		"mythread.h": "c",
+		"sched.h": "c",
+		"cpu-set.h": "c",
+		"struct_timespec.h": "c",
+		"time_t.h": "c",
+		"endian.h": "c",
+		"types.h": "c",
+		"*.tcc": "c",
+		"syscall.h": "c",
+		"unistd.h": "c",
+		"unistd_64.h": "c",
+		"ucontext.h": "c",
+		"array": "c",
+		"string_view": "c",
+		"initializer_list": "c",
+		"utility": "c"
 	}
 }
