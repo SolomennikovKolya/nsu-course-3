@@ -21,6 +21,9 @@
 		"array": "c",
 		"string_view": "c",
 		"initializer_list": "c",
-		"utility": "c"
+		"utility": "c",
+		"mythread_map.h": "c",
+		"string": "c",
+		"mythreadmap.h": "c"
 	}
 }

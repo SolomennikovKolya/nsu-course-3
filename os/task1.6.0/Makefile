@@ -7,7 +7,7 @@ OBJECTS = $(SOURCES:.c=.o)
 
 # Объявляем зависимость от библиотеки
 LIBRARY = mythread/libmythread.so
-LIB_SOURCES = mythread/mythread.c
+LIB_SOURCES = mythread/mythread.c mythread/mythreadmap.c
 
 all: run
 

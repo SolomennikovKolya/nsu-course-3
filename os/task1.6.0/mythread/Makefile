@@ -1,8 +1,8 @@
 CC = gcc
-CFLAGS = -fPIC -Wall -pthread
+CFLAGS = -fPIC -pthread -D_GNU_SOURCE
 LDFLAGS = -shared
 LIBNAME = libmythread.so
-SOURCES = mythread.c
+SOURCES = mythread.c mythreadmap.c
 OBJECTS = $(SOURCES:.c=.o)
 
 all: $(LIBNAME)
@@ -10,6 +10,7 @@ all: $(LIBNAME)
 $(LIBNAME): $(OBJECTS)
 	$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
 
+# Транслирует все исходники в объектники
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
