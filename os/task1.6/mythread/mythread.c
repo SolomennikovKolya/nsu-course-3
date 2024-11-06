@@ -1,70 +1,36 @@
 #include "mythread.h"
-
 #include <errno.h>
 #include <fcntl.h>
+#include <linux/futex.h>
 #include <linux/sched.h>
 #include <sched.h>
-#include <signal.h>
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/syscall.h>
+#include <sys/time.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 #include <unistd.h>
 
-#define STACK_SIZE 1024 * 1024 // 64КБ
-#define PAGE_SIZE 4096		   // 4Б (одна страница)
+#define PAGE_SIZE 4096 // 4 КБ (одна страница)
+#define STACK_SIZE (PAGE_SIZE * 10)
 #define SUCCESS 0
 #define FAILURE -1
 
-// Создание стека для потока
-void *create_stack(int id)
+/* Ждёт изменения futexp:
+если *futex != val, то сразу возвращает управление,
+если *futex == val, то поток блокируется, пока значение *futex не изменится и поток не будет пробуждён */
+static int futex_wait(int *futexp, int val)
 {
-	char stack_filename[20];
-	snprintf(stack_filename, sizeof(stack_filename), "stack-%d", id);
-
-	int stack_fd = open(stack_filename, O_RDWR | O_CREAT, 0660);
-	if (stack_fd == -1)
-	{
-		perror("Ошибка открытия файла для ассоциации со стеком");
-		return NULL;
-	}
-	if (ftruncate(stack_fd, STACK_SIZE) == -1)
-	{
-		perror("Ошибка изменения размера файла стека");
-		close(stack_fd);
-		return NULL;
-	}
-
-	// void *stack = mmap(NULL, STACK_SIZE, PROT_NONE, MAP_PRIVATE, stack_fd, 0);
-	void *stack = mmap(NULL, STACK_SIZE, PROT_NONE, MAP_SHARED, stack_fd, 0);
-	close(stack_fd);
-	if (stack == MAP_FAILED || stack == NULL)
-	{
-		perror("Ошибка при выделении нового региона для стека");
-		return NULL;
-	}
-
-	int err = mprotect(stack + PAGE_SIZE, STACK_SIZE - PAGE_SIZE, PROT_READ | PROT_WRITE);
-	if (err == -1)
-	{
-		return NULL;
-	}
-	memset(stack + PAGE_SIZE, 0, STACK_SIZE - PAGE_SIZE);
-
-	return stack;
+	return syscall(SYS_futex, futexp, FUTEX_WAIT, val, NULL, NULL, 0);
 }
 
-// Освобождение стека
-void free_stack(void *stack)
+// Пробуждает (выводит из состояния SLEEP) 1 поток, который ждёт изменений *futexp
+static int futex_wake(int *futexp)
 {
-	// if (munmap(stack, STACK_SIZE) == -1)
-	// {
-	// 	perror("Ошибка при освобождении стека");
-	// }
-	printf("munmap success\n");
+	return syscall(SYS_futex, futexp, FUTEX_WAKE, 1, NULL, NULL, 0);
 }
 
 // Обёртка над начальной функцией потока
@@ -73,70 +39,77 @@ static int start_routine_wrapper(void *thread_iter)
 	mythread_t thread = (mythread_t)thread_iter;
 	void *(*start_routine)(void *) = thread->start_routine;
 	void *arg = thread->arg;
-	getcontext(&(thread->before_start_routine));
 
-	// printf("star routine\n");
-	start_routine(arg);
-	// printf("finish routine\n");
+	thread->retval = start_routine(arg);
 
-	// if (!thread->canceled)
-	// {
-	// 	start_routine(arg);
-	// }
-	// thread->finished = 1;
-	// while (!thread->joined)
-	// {
-	// 	sleep(1);
-	// }
+	thread->finished = 1;
+	thread->futex_finished_var = 1;
+	futex_wake(&thread->futex_finished_var);
 
+	while (thread->joined == 0)
+	{
+		futex_wait(&thread->futex_joined_var, 0);
+	}
+
+	free(thread->stack);
 	free(thread);
-	free_stack(thread->stack);
 
 	return 0;
 }
 
 int mythread_create(mythread_t *thread_res, void *(*start_routine)(void *), void *arg)
 {
-	// Создаём стек для потока
-	// thread->stack = malloc(STACK_SIZE);
-	// if (thread->stack == NULL)
-	// {
-	// 	perror("Ошибка при создании стека");
-	// 	free(thread);
-	// 	return FAILURE;
-	// }
-	void *stack = create_stack(0);
+	void *stack = malloc(PAGE_SIZE);
 	if (stack == NULL)
 	{
-		perror("Ошибка при создании стека");
+		fprintf(stderr, "Ошибка выделения памяти для скета потока\n");
 		return FAILURE;
 	}
 
-	mythread_t thread = (mythread_t)stack;
+	mythread_t thread = malloc(sizeof(mythread_struct_t));
+	if (thread == NULL)
+	{
+		fprintf(stderr, "Ошибка выделения памяти для управляющей структуры потока\n");
+		free(stack);
+		return FAILURE;
+	}
 	thread->start_routine = start_routine;
 	thread->arg = arg;
 	thread->stack = stack;
+	thread->finished = 0;
+	thread->joined = 0;
+	thread->futex_finished_var = 0;
+	thread->futex_joined_var = 0;
 
-	/* Создаём новый поток
-	CLONE_VM - общий адресное пространство памяти
-	CLONE_FS - общий файловый системный контекст
-	CLONE_FILES - общий набор открытых файлов
-	CLONE_SIGHAND - общий обработчик сигналов
-	CLONE_THREAD - определяет, что дочерний поток является частью того же процесса (потока)
-	CLONE_SYSVSEM - разделение системных семафор SysV с родительским процессом */
-	int pid = clone(start_routine_wrapper, (char *)stack + STACK_SIZE,
-					CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_THREAD | CLONE_SYSVSEM, thread);
-	if (pid == -1)
+	thread->tid = clone(start_routine_wrapper, stack + STACK_SIZE, CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_THREAD | CLONE_SYSVSEM, thread);
+	if (thread->tid == -1)
 	{
-		perror("Ошибка clone() при создать поток");
-		free_stack(stack);
+		perror("Ошибка clone при создании потока");
+		free(stack);
 		free(thread);
 		return FAILURE;
 	}
 
-	thread->pid = pid;
-
 	*thread_res = thread;
+	return SUCCESS;
+}
+
+int mythread_join(mythread_t thread, void **ret)
+{
+	if (thread->joined)
+	{
+		fprintf(stderr, "Ошибка при присоединении потока. Поток уже был присоединён\n");
+		return FAILURE;
+	}
+
+	while (thread->finished == 0)
+	{
+		futex_wait(&thread->futex_finished_var, 0);
+	}
+
+	thread->joined = 1;
+	thread->futex_joined_var = 1;
+	futex_wake(&thread->futex_joined_var);
 
 	return SUCCESS;
 }

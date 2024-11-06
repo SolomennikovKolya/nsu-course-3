@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -g -shared -Wl,-soname,libmythread.so -o lib/libmythread.so CMakeFiles/mythread.dir/mythread/mythread.c.o 

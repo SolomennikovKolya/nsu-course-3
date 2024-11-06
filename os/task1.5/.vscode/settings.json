@@ -1,0 +1,7 @@
+{
+	"files.associations": {
+		"mman.h": "c",
+		"syscall.h": "c",
+		"signal.h": "c"
+	}
+}
