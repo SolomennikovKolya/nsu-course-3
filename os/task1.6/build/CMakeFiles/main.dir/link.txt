@@ -1,0 +1,1 @@
+/usr/bin/cc -g CMakeFiles/main.dir/src/main.c.o -o bin/main  -Wl,-rpath,/home/uikvel/github/nsu-course-3/os/task1.6/build/lib lib/libmythread.so 
