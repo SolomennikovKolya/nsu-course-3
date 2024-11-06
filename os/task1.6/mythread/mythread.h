@@ -1,9 +1,6 @@
 #ifndef MYTHREAD_H
 #define MYTHREAD_H
 
-// #include <sys/types.h>
-// #include <ucontext.h>
-
 // Управляющая структура потока
 typedef struct
 {
@@ -12,11 +9,10 @@ typedef struct
 	void *retval;					// Результат стартовой функции
 	void *stack;					// Указатель на начало стека
 	int tid;						// Идентификатор потока
-	int pid;						// Идентификатор процесса
-	int finished;					// Завершён поток или нет
-	int joined;						// Присоединён поток или нет
-									// int canceled;					// Отменён поток или нет
-									// ucontext_t before_start_routine; // Контекст процессора перед запуском рутины
+	volatile int finished;			// Завершёна ли поточная функция или нет
+	volatile int joined;			// Присоединён поток или нет
+	int futex_finished_var;			// Переменная, которую будет ожидать futex при ожидании изменения переменной finished
+	int futex_joined_var;			// Переменная, которую будет ожидать futex при ожидании изменения переменной joined
 } mythread_struct_t;
 
 // Указатель на управляющую структуру потока
@@ -34,9 +30,6 @@ int mythread_create(mythread_t *thread, void *(*start_routine)(void *), void *ar
 `thread` - идентификатор ожидаемого потока
 `ret`    - значение, которое вернул ожидаемый поток
 Возвращает: успех/неудача (0 либо -1) */
-int pthread_join(mythread_t thread, void **ret);
-
-// Возвращает идентификатор текущего потока
-// int mythread_self(void);
+int mythread_join(mythread_t thread, void **ret);
 
 #endif
