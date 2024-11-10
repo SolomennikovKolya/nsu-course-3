@@ -18,7 +18,7 @@ calculateAns(i : int, n : int, m : int, arr : [int], tree : ref Tree<int, [int]>
 		key = arr[i];
 		switch(lookupTree(^tree, m - arr[i])) {
 			Some(matchToKey): {
-				newPairs : [Pair<int, int>] = fold(matchToKey, [], \tmpArr, j -> arrayPush(tmpArr, Pair(i, j)));
+				newPairs : [Pair<int, int>] = fold(matchToKey, [], \tmpArr, j -> if (i > j) arrayPush(tmpArr, Pair(i, j)) else tmpArr);
 				ans := concat(^ans, newPairs);
 				calculateAns(i + 1, n, m, arr, tree, ans);
 			}

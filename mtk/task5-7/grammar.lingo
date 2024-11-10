@@ -1,0 +1,7 @@
+expr = ws term:e1 ws '+' ws expr:e2 { Sum(:e1, :e2) } | ws term;
+term = ws factor:e1 ws '*' ws term:e2 { Mul(:e1, :e2) } | ws factor;
+factor = ws digit+$d { Int(s2i($d)) } | ws '(' expr:e ')' { Paren(:e) };
+
+digit = '0'-'9';
+ws = s*;
+s = " " | "\t" | "\n";

@@ -1,0 +1,135 @@
+import string;
+import lingo/pegcode/driver;
+
+arithmGrammar = compilePegGrammar("#include grammarArithmetic.lingo");
+rpnGrammar = compilePegGrammar("#include grammarRPN.lingo");
+
+Exp ::= Add, Mul, Int, Invalid;
+Add : (e1 : Exp, e2 : Exp);
+Mul : (e1 : Exp, e2 : Exp);
+Int : (i : int);
+Invalid : ();
+
+RPNToken ::= IntToken, AddToken, MulToken;
+IntToken : (i : int);
+AddToken : ();
+MulToken : ();
+
+// алгоритм для перевода массива RST токенов в дерево
+handleRPNToken(stack: [Exp], token: RPNToken) -> [Exp] {
+    switch(token) {
+        IntToken(i): arrayPush(stack, Int(i));
+        AddToken(): {
+            if (length(stack) < 2) {
+                [Invalid()];
+            } else {
+                operand1: Exp = stack[length(stack) - 1];
+                tmp1: [Exp] = removeIndex(stack, length(stack) - 1);
+                operand2: Exp = tmp1[length(tmp1) - 1];
+                tmp2: [Exp] = removeIndex(tmp1, length(tmp1) - 1);
+                arrayPush(tmp2, Add(operand2, operand1));
+            }
+        }
+        MulToken(): {
+            if (length(stack) < 2) {
+                [Invalid()];
+            } else {
+                operand1: Exp = stack[length(stack) - 1];
+                tmp1: [Exp] = removeIndex(stack, length(stack) - 1);
+                operand2: Exp = tmp1[length(tmp1) - 1];
+                tmp2: [Exp] = removeIndex(tmp1, length(tmp1) - 1);
+                arrayPush(tmp2, Mul(operand2, operand1));
+            }
+        }
+    } 
+}
+
+// дерево -> значение выражения
+getValue(e: Exp) -> int {
+    switch(e) {
+        Add(e1, e2): getValue(e1) + getValue(e2);
+        Mul(e1, e2): getValue(e1) * getValue(e2);
+        Int(i): i;
+        Invalid(): 0;
+    }
+}
+
+// дерево -> RPN строка
+getRPNRepr(e: Exp) -> string {
+    switch(e) {
+        Add(e1, e2): getRPNRepr(e1) + " " + getRPNRepr(e2) + " +";
+        Mul(e1, e2): getRPNRepr(e1) + " " + getRPNRepr(e2) + " *";
+        Int(i): i2s(i);
+        Invalid(): "Invalid string";
+    }
+}
+
+// дерево -> арифметическая строка
+getArithmRepr(e: Exp) -> string {
+    switch(e) {
+        Add(e1, e2): "(" + getArithmRepr(e1) + " + " + getArithmRepr(e2) + ")";
+        Mul(e1, e2): "(" + getArithmRepr(e1) + " * " + getArithmRepr(e2) + ")";
+        Int(i): i2s(i);
+        Invalid(): "Invalid string";
+    }
+}
+
+// массив RST токенов -> дерево
+parseFromRPNTokens(tokens: [flow]) -> Exp {
+    finalTokens: [Exp] = fold(tokens[0], [], handleRPNToken);
+
+    if (length(finalTokens) != 1) {
+        Invalid();
+    } else {
+        finalTokens[0];
+    }
+}
+
+specialPegActions = {
+    t = setTree(defaultPegActions.t, "parseFromRPNTokens", parseFromRPNTokens);
+    SemanticActions(t);
+}
+
+// RPN строка -> значение 
+calcRPN(rpn: string) -> int {
+    getValue(parsic(rpnGrammar, rpn, specialPegActions));
+}
+
+// арифметическая строка -> значение 
+calcArithm(arithm: string) -> int {
+    getValue(parsic(arithmGrammar, arithm, defaultPegActions));
+}
+
+// арифметическая строка -> RPN строка
+arithmToRPN(arithm: string) -> string {
+    getRPNRepr(parsic(arithmGrammar, arithm, defaultPegActions));
+}
+
+// RPN строка -> арифметическая строка
+RPNToArithm(rpn: string) -> string {
+    getArithmRepr(parsic(rpnGrammar, rpn, specialPegActions));
+}
+
+main() {
+    RPNString: string = " 4 2 3 + * ";
+
+    RPNExpression: Exp = parsic(rpnGrammar, RPNString, specialPegActions);
+    println(RPNExpression);
+
+    RPNvalue: int = getValue(RPNExpression);
+    println(RPNvalue);
+
+    arithmString: string = RPNToArithm(RPNString);
+    println(arithmString);
+
+    arithmValue: int = calcArithm(arithmString);
+    println(arithmValue);
+
+    RPNFromArithmString: string = arithmToRPN(arithmString);
+    println(RPNFromArithmString);
+
+    RPNFromArithmValue: int = calcRPN(RPNFromArithmString);
+    println(RPNFromArithmValue);
+
+    quit(0);
+}

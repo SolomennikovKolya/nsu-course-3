@@ -51,7 +51,7 @@ def main():
     
     # Реальное значение интеграла
     real_int, real_int_error = quad(func, A, B)
-    print(f"Реальное значение интеграла: {real_int:.10f} ± {real_int_error:.10f}")
+    print(f"Реальное значение интеграла: {real_int:.15f} ± {real_int_error:.15f}")
     print("")
     
     # Формула трапеций
@@ -60,10 +60,10 @@ def main():
     trapezoidal_s3 = trapezoidal_integral(A, B, func, N * 4)
     trapezoidal_runge = runge(trapezoidal_s1, trapezoidal_s2, trapezoidal_s3)
     trapezoidal_runge_error = runge_error(trapezoidal_s1, trapezoidal_s2, trapezoidal_runge)
-    print(f"Формула трапеций:       {trapezoidal_s1:.10f}")
-    print(f"Разность:               {abs(real_int - trapezoidal_s1):.10f}")
-    print(f"Порядок точности:       {trapezoidal_runge:.10f}")
-    print(f"Оценка ошибки:          {trapezoidal_runge_error:.10f}")
+    print(f"Формула трапеций:       {trapezoidal_s1:.15f}")
+    print(f"Разность:               {abs(real_int - trapezoidal_s1):.15f}")
+    print(f"Порядок точности:       {trapezoidal_runge:.15f}")
+    print(f"Оценка ошибки:          {trapezoidal_runge_error:.15f}")
     print("")
 
     # Формула Симпсона
@@ -72,10 +72,10 @@ def main():
     simpson_s2 = simpson_integral(A, B, func, N * 4)
     simpson_runge = runge(simpson_s1, simpson_s2, simpson_s3)
     simpson_runge_error = runge_error(simpson_s1, simpson_s2, simpson_runge)
-    print(f"Формула Симпсона:       {simpson_s1:.10f}")
-    print(f"Разность:               {abs(real_int - simpson_s1):.10f}")
-    print(f"Порядок точности:       {simpson_runge:.10f}")
-    print(f"Оценка ошибки:          {simpson_runge_error:.10f}")
+    print(f"Формула Симпсона:       {simpson_s1:.15f}")
+    print(f"Разность:               {abs(real_int - simpson_s1):.15f}")
+    print(f"Порядок точности:       {simpson_runge:.15f}")
+    print(f"Оценка ошибки:          {simpson_runge_error:.15f}")
     print("")
 
     # Формула Симпсона 3/8
@@ -84,10 +84,10 @@ def main():
     simpson38_s3 = simpson38_integral(A, B, func, N * 4)
     simpson38_runge = runge(simpson38_s1, simpson38_s2, simpson38_s3)
     simpson38_runge_error = runge_error(simpson38_s1, simpson38_s2, simpson38_runge)
-    print(f"Формула Симпсона 3/8:   {simpson38_s1:.10f}")
-    print(f"Разность:               {abs(real_int - simpson38_s1):.10f}")
-    print(f"Порядок точности:       {simpson38_runge:.10f}")
-    print(f"Оценка ошибки:          {simpson38_runge_error:.10f}")
+    print(f"Формула Симпсона 3/8:   {simpson38_s1:.15f}")
+    print(f"Разность:               {abs(real_int - simpson38_s1):.15f}")
+    print(f"Порядок точности:       {simpson38_runge:.15f}")
+    print(f"Оценка ошибки:          {simpson38_runge_error:.15f}")
     print("")
 
 if __name__ == "__main__":
