@@ -1,7 +1,6 @@
 <?php
 require_once 'connection.php';
 
-
 $commissioner_id = $_GET['commissioner_id'] ?? null;
 if (!$commissioner_id) {
     die("Ошибка: Не указан ID коммивояжера.");

@@ -2,7 +2,6 @@
 CREATE TABLE IF NOT EXISTS commissioners (
     id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(255) NOT NULL,
-    efficiency DECIMAL(10, 2) DEFAULT 0,
     address VARCHAR(255),
     phone VARCHAR(15) NOT NULL
 );

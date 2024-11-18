@@ -1,3 +1,4 @@
+-- Отключение проверки внешних ключей, чтобы не вылезали ошибки связанные с нарушением целостности ссылок
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS products_returned;

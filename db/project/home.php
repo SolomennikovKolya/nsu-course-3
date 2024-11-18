@@ -14,8 +14,10 @@
     </header>
 
     <section>
+        <a href="index.php" class="home-button">Выйти</a><br><br>
+
         <h2>Топ сотрудников</h2>
-        <button onclick="window.location.href='php/leaders.php'">Топ по эффективности</button>
+        <button onclick="window.location.href='php/leaders.php'">Топ по эффективности</button><br><br>
         <h2>Добавить новые данные</h2>
         <div class="form-container">
             <form action="php/add_commissioner.php" method="POST">
@@ -70,7 +72,8 @@
         <div class="tab-content active" id="commissioners">
             <h3>Коммивояжеры</h3>
             <div class="filter-sort">
-                <input type="text" id="commissioners-search" placeholder="Фильтр по Ф.И.О." oninput="filterTable('commissioners')">
+                <input type="text" id="commissioners-search" placeholder="Фильтр по Ф.И.О."
+                    oninput="filterTable('commissioners')">
             </div>
             <table>
                 <thead>
@@ -102,7 +105,8 @@
         <div class="tab-content" id="products">
             <h3>Товары</h3>
             <div class="filter-sort">
-                <input type="text" id="products-search" placeholder="Фильтр по названию" oninput="filterTable('products')">
+                <input type="text" id="products-search" placeholder="Фильтр по названию"
+                    oninput="filterTable('products')">
                 <select id="products-unit-filter" onchange="filterTable('products')">
                     <option value="">Все единицы</option>
                     <option value="шт">Штука</option>
@@ -149,7 +153,8 @@
         <div class="tab-content" id="trips">
             <h3>Командировки</h3>
             <div class="filter-sort">
-                <input type="text" id="trips-search" placeholder="Фильтр по Ф.И.О. коммивояжера" oninput="filterTable('trips')">
+                <input type="text" id="trips-search" placeholder="Фильтр по Ф.И.О. коммивояжера"
+                    oninput="filterTable('trips')">
                 <input type="date" id="trips-start-date" placeholder="От даты" onchange="filterByDate()">
                 <input type="date" id="trips-end-date" placeholder="До даты" onchange="filterByDate()">
             </div>
