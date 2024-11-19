@@ -10,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute(['commissioner_id' => $commissioner_id, 'start_date' => $start_date, 'end_date' => $end_date]);
     $count = $stmt->fetchColumn();
 
+    // Проверяется чтобы такой командировки еще не было в таблице
     if ($count == 0) {
-
         $sql = "INSERT INTO business_trips (commissioner_id, start_date, end_date) VALUES (:commissioner_id, :start_date, :end_date)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['commissioner_id' => $commissioner_id, 'start_date' => $start_date, 'end_date' => $end_date]);

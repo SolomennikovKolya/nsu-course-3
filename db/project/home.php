@@ -1,3 +1,5 @@
+<!-- Основная страница админа -->
+
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -9,15 +11,20 @@
 </head>
 
 <body>
+    <!-- Большой заголовок -->
     <header>
         <h1>Система для учета коммивояжеров</h1>
     </header>
 
     <section>
+        <!-- Кнопка возвращения на index страницу -->
         <a href="index.php" class="home-button">Выйти</a><br><br>
 
+        <!-- Кнопка для перехода на страницу лидеров по эффективности -->
         <h2>Топ сотрудников</h2>
         <button onclick="window.location.href='php/leaders.php'">Топ по эффективности</button><br><br>
+
+        <!-- Формы для добавления коммивояжеров, товаров и командировок  -->
         <h2>Добавить новые данные</h2>
         <div class="form-container">
             <form action="php/add_commissioner.php" method="POST">
@@ -59,9 +66,10 @@
         </div>
     </section>
 
-
+    <!-- Секция данных -->
     <section>
         <h2>Данные</h2>
+        <!-- Вкладки (табы) -->
         <div class="tabs">
             <button class="tab-button active" data-tab="commissioners">Коммивояжеры</button>
             <button class="tab-button" data-tab="products">Товары</button>
@@ -88,6 +96,7 @@
                     <?php
                     require_once 'php/connection.php';
                     $stmt = $pdo->query("SELECT * FROM commissioners");
+                    // Печать по одной строке
                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                         echo "<tr data-phone='{$row['phone']}'>
                                 <td>{$row['id']}</td>
@@ -139,7 +148,7 @@
             </table>
         </div>
 
-        <!-- Модальное окно -->
+        <!-- Модальное окно. Сюда джава скрипт будет писать инфу -->
         <div id="report-modal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
@@ -188,6 +197,7 @@
         </div>
     </section>
 
+    <!-- Этот код устанавливает функциональность для работы с модальным окном и кнопками, которые показывают подробный отчет -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const buttons = document.querySelectorAll('.tab-button');
@@ -246,16 +256,21 @@
             });
         });
 
-
+        // Фильтрация соответствующей таблицы (в зависимости от открытой вкладки). Скрывает ненужные элементы
         function filterTable(tab) {
+            // Получаем текст из поля ввода поиска
             const searchValue = document.getElementById(`${tab}-search`).value.toLowerCase();
+            // Получаем список строк таблицы
             const rows = document.querySelectorAll(`#${tab}-table tr`);
 
             if (tab === 'products') {
                 const unitFilter = document.getElementById('products-unit-filter').value;
                 rows.forEach(row => {
+                    // Проверяем, содержит ли текст строки искомое значение
                     const nameMatch = row.innerText.toLowerCase().includes(searchValue);
+                    // Проверяем, соответствует ли единица измерения строке в фильтре (или фильтр не указан)
                     const unitMatch = unitFilter === "" || row.getAttribute('data-unit') === unitFilter;
+                    // Отображение или скрытие строки
                     row.style.display = nameMatch && unitMatch ? '' : 'none';
                 });
             } else if (tab === 'trips') {
@@ -271,6 +286,7 @@
             }
         }
 
+        // Фильтрация командировок по дате
         function filterByDate() {
             const startDate = document.getElementById('trips-start-date').value;
             const endDate = document.getElementById('trips-end-date').value;
@@ -299,6 +315,7 @@
             });
         }
 
+        // Сортировка товаров по цене
         function sortTable(tab, colIndex) {
             const table = document.querySelector(`#${tab}-table`);
             const rows = Array.from(table.querySelectorAll('tr'));

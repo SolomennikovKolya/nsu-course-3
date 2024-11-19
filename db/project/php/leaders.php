@@ -1,3 +1,5 @@
+<!-- Топ по эффективности -->
+
 <?php
 require_once 'connection.php';
 
@@ -59,7 +61,7 @@ $commissioners = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <tbody>
                 <?php foreach ($commissioners as $commissioner):
                     $efficiency = $commissioner['revenue'] / $commissioner['total_taken_price'] * 100;
-                ?>
+                    ?>
                     <tr>
                         <td><?= htmlspecialchars($commissioner['full_name']) ?></td>
                         <td><?= number_format($commissioner['revenue'], 2, '.', '') ?></td>
