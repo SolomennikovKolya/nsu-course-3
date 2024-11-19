@@ -1,0 +1,40 @@
+import calcSimplification;
+
+export {
+    differentiation(ex : Expr, var : Var) -> Expr; // Дифференцирование по переменной var
+}
+
+// Дифференцирование по переменной var
+differentiation(ex : Expr, var : Var) -> Expr {
+    switch (ex) {
+        Mul(a, b) : 
+            simplification( Sum(
+                simplification( Mul(differentiation(a, var), b) ), 
+                simplification( Mul(a, differentiation(b, var)) ))
+            );
+        Sum(a, b) : 
+            simplification( Sum(
+                differentiation(a, var), 
+                differentiation(b, var))
+            );
+        Sub(a, b) : 
+            simplification( Sub(
+                differentiation(a, var), 
+                differentiation(b, var))
+            );
+        Div(a, b) : 
+            simplification( Div(
+                simplification( Sub(
+                    simplification( Mul(differentiation(a, var), b) ), 
+                    simplification( Mul(a, differentiation(b, var))) ) ), 
+                simplification( Mul(b, b) ))
+            );
+        Var(a) : 
+            if (a == var.val) Int(1)
+            else Int(0);
+        Int(a) : 
+            Int(0);
+        Neg(a) : 
+            simplification( Neg(differentiation(a, var)) );
+    }
+}

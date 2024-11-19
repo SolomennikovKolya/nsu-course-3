@@ -1,0 +1,41 @@
+import calcRat;
+import calcDiff;
+import calcPolynomRat;
+import calcSimplification;
+
+main() {
+    // Здесь ни##я не работает)))
+
+	// println("Polynom test:");
+	// testPolynom1 = "((((a + 1) / (7 * c)) * ((7 + (6 * c)) / x)) / ((3 * (a + 1)) / (x * x)))";
+    // println("polynom: " + ratPolynom2s(calculatePolynomRatArr(parse(testPolynom1), makeTree(), [Var("a"), Var("c")], Var("x"))));
+
+	// testPolynom2 = "((((x - 6) / (6 * y)) / (((x * x) - (y * y)) / y)) * (((x * x) + ((2 * (x * y)) + (y * y))) / x))";
+    // println("polynom: " + ratPolynom2s(calculatePolynomRatArr(parse(testPolynom2), makeTree(), [Var("y")], Var("x"))));
+
+	// testPolynom3 = "((((9 * (x * x)) - 4) / ((3 * x) + 2)) + (3 * x))";
+    // println("polynom: " + ratPolynom2s(calculatePolynomRatArr(parse(testPolynom3), makeTree(), [Var("x")], Var("x"))));
+
+	// testPolynom4 = "(((4 * (a * a)) - 9) * ((1 / ((2 * a) - 3)) - (1 / ((2 * a) + 3))))";
+    // println("polynom: " + ratPolynom2s(calculatePolynomRatArr(parse(testPolynom4), makeTree(), [], Var("a"))));
+
+	println("\nSimplification test:");
+	testSimplification1 = "(-(2*((3*x)-(2*y)))-(5*((2*y)-(3*x))))";
+    println("Simplied fucn: " + ratPolynom2s(calculatePolynomRatArr(parse(testSimplification1), makeTree(), [Var("y")], Var("x"))));
+
+	testSimplification2 = "(((5-x)*(5+x))+((x-3)*(x-3)))";
+    println("Simplied fucn: " + ratPolynom2s(calculatePolynomRatArr(parse(testSimplification2), makeTree(), [], Var("x"))));
+
+	// testSimplification2 = "(x * 0)";
+    // println("Differencial fucn: " + ratPolynom2s(calculatePolynomRatArr(parse(testSimplification2), makeTree(), [], Var("x"))));
+
+	// testSimplification3 = "(x + x)";
+    // println("Differencial fucn: " + ratPolynom2s(calculatePolynomRatArr(parse(testSimplification3), makeTree(), [], Var("x"))));
+
+	println("\nDifferentiation test:");
+    testDifferential = "((((x*x)+(7*(x*(x*(y*(y*y))))))+y)+4)";
+    println("Differencial fucn: " + expr2s(differentiation(parse(testDifferential), Var("x"))) + "\n");
+    println("Differencial fucn: " + expr2s(differentiation(parse(testDifferential), Var("y"))) + "\n");
+
+    quit(0);
+}

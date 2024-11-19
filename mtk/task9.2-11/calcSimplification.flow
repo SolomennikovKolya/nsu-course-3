@@ -1,0 +1,285 @@
+import calcRat;
+import math/math;
+
+export {
+	simplification(ex : Expr) -> Expr; // Упрощение рационального выражения
+}
+
+// Упрощение рационального выражения
+simplification(ex : Expr) -> Expr {
+    switch (ex) {
+		Mul(a, b) : 
+            if (a == Int(0) || b == Int(0)) Int(0)
+            else if (a == Int(1)) simplification( b )
+            else if (b == Int(1)) simplification( a )
+            else if (a.structname == "Neg") {
+                tNeg = cast(a : Expr -> Neg);
+                simplification( Neg(Mul(tNeg.val, b) ));
+            } 
+            else if (b.structname == "Neg") {
+                tNeg = cast(b : Expr -> Neg);
+                simplification( Neg(Mul(a, tNeg.val) ));
+            } 
+            else if (a.structname == "Int" && b.structname == "Mul") {
+                tInt = cast(a : Expr -> Int);
+                tMul = cast(b : Expr -> Mul);
+                if (tMul.lVal.structname == "Int") {
+                    tInt2 = cast(tMul.lVal : Expr -> Int);
+                    simplification( Mul(Int(tInt.val * tInt2.val), tMul.rVal) );
+                } else if (tMul.rVal.structname == "Int") {
+                    tInt2 = cast(tMul.rVal : Expr -> Int);
+                    simplification( Mul(Int(tInt.val * tInt2.val), tMul.lVal) );
+                } else {
+                    Mul(a, b);
+                }
+            }
+            else if (a.structname == "Mul" && b.structname == "Int") {
+                simplification( Mul(b, a) )
+            }
+            else if (a.structname == "Int" && b.structname == "Int") {
+                tInt  = cast(a : Expr -> Int);
+                tInt2 = cast(b : Expr -> Int);
+                Int(tInt.val * tInt2.val);
+            }
+            // else if (a.structname == "Sum" && b.structname == "Sum") {
+            //     tSum = cast(a : Expr -> Sum);
+            //     tSum2 = cast(b : Expr -> Sum);
+            //     simplification( Sum(
+            //         simplification( Sum(
+            //             simplification( Mul(tSum.lVal, tSum2.lVal) ),
+            //             simplification( Mul(tSum.lVal, tSum2.rVal))) ),
+            //         simplification( Sum(
+            //             simplification( Mul(tSum.rVal, tSum2.lVal) ),
+            //             simplification( Mul(tSum.rVal, tSum2.rVal))) )
+            //     ));
+            // }
+            // else if (a.structname == "Sub" && b.structname == "Sub") {
+            //     tSub = cast(a : Expr -> Sub);
+            //     tSub2 = cast(b : Expr -> Sub);
+            //     simplification( Sub(
+            //         simplification( Sum(
+            //             simplification( Mul(tSub.lVal, tSub2.lVal) ),
+            //             simplification( Mul(tSub.rVal, tSub2.rVal))) ),
+            //         simplification( Sum(
+            //             simplification( Mul(tSub.lVal, tSub2.rVal) ),
+            //             simplification( Mul(tSub.rVal, tSub2.lVal))) )
+            //     ));
+            // }
+            // else if (a.structname == "Sum" && b.structname == "Sub") {
+            //     tSum = cast(a : Expr -> Sum);
+            //     tSub = cast(b : Expr -> Sub);
+            //     simplification( Sub(
+            //         simplification( Sum(
+            //             simplification( Mul(tSum.lVal, tSub.lVal) ),
+            //             simplification( Mul(tSum.rVal, tSub.lVal))) ),
+            //         simplification( Sum(
+            //             simplification( Mul(tSum.lVal, tSub.rVal) ),
+            //             simplification( Mul(tSum.rVal, tSub.rVal))) )
+            //     ));
+            // }
+            // else if (a.structname == "Sub" && b.structname == "Sum") {
+            //     simplification( Mul(b, a) );
+            // }
+            else if (a.structname == "Mul" && b.structname == "Mul") {
+                tMul = cast(a : Expr -> Mul);
+                tMul2 = cast(b : Expr -> Mul);
+                simplification( Mul(
+                    simplification( Mul(
+                        simplification( tMul ),
+                        simplification( tMul2.lVal ))),
+                    simplification( tMul2.rVal )
+                ));
+            }
+            else if (a.structname == "Mul" && b.structname == "Sum") {
+                tMul = cast(a : Expr -> Mul);
+                tSum = cast(b : Expr -> Sum);
+                simplification( Sum(
+                    simplification( Mul(
+                        simplification( tMul ),
+                        simplification( tSum.lVal ))),
+                    simplification( Mul(
+                        simplification( tMul ),
+                        simplification( tSum.rVal )))
+                ));
+            }
+            else if (a.structname == "Sum" && b.structname == "Mul") {
+                simplification( Mul(b,a) );
+            }
+            else if (a.structname == "Sum" || b.structname == "Sum") {
+                if (a.structname == "Sum") {
+                    tSum = cast(a : Expr -> Sum);
+                    simplification( Sum(
+                        simplification( Mul(tSum.lVal, b) ),
+                        simplification( Mul(tSum.rVal, b) )
+                    ));
+                } else {
+                    tSum = cast(b : Expr -> Sum);
+                    simplification( Sum(
+                        simplification( Mul(a, tSum.lVal) ),
+                        simplification( Mul(a, tSum.rVal) )
+                    ));
+                }
+            }
+            // ???
+            else if (a.structname == "Sub" || b.structname == "Sub") {
+                if (a.structname == "Sub") {
+                    tSub = cast(a : Expr -> Sub);
+                    simplification( Sub(
+                        simplification( Mul(tSub.lVal, b) ),
+                        simplification( Mul(tSub.rVal, b) )
+                    ));
+                } else {
+                    tSub = cast(b : Expr -> Sub);
+                    simplification( Sub(
+                        simplification( Mul(a, tSub.lVal) ),
+                        simplification( Mul(a, tSub.rVal) )
+                    ));
+                }
+            }
+            else Mul(a, b);
+		Sum(a, b) :
+            if (a == Int(0)) simplification( b )
+            else if (b == Int(0)) simplification( a ) 
+            else if (a == b) simplification( Mul(Int(2), a) )
+            else if (a.structname == "Neg" && b.structname == "Neg") {
+                tNeg  = cast(a : Expr -> Neg);
+                tNeg2 = cast(b : Expr -> Neg);
+                Neg(simplification( Sum(tNeg.val, tNeg2.val) ));
+            }
+            else if (b.structname == "Neg") {
+                tNeg = cast(b : Expr -> Neg);
+                simplification( Sub(a, tNeg.val) );
+            }
+            else if (a.structname == "Int" && b.structname == "Int") {
+                tInt  = cast(a : Expr -> Int);
+                tInt2 = cast(b : Expr -> Int);
+                Int(tInt.val + tInt2.val);
+            }
+            else if (a.structname == "Sum" && b.structname == "Int") {
+                tSum = cast(a : Expr -> Sum);
+                tInt = cast(b : Expr -> Int);
+                if (tSum.lVal.structname == "Int") {
+                    tInt2 = cast(tSum.lVal : Expr -> Int);
+                    simplification( Sum(Int(tInt2.val + tInt.val), tSum.rVal) );
+                } else if (tSum.rVal.structname == "Int") {
+                    tInt2 = cast(tSum.rVal : Expr -> Int);
+                    simplification( Sum(tSum.lVal, Int(tInt2.val + tInt.val)) );
+                } else {
+                    Sum(a, b);
+                }
+            }
+            else if (a.structname == "Int" && b.structname == "Sum") {
+                simplification ( Sum(b, a) );
+            }
+            else if (a.structname == "Sub" && b.structname == "Int") {
+                tSub = cast(a : Expr -> Sub);
+                tInt = cast(b : Expr -> Int);
+                if (tSub.lVal.structname == "Int") {
+                    tInt2 = cast(tSub.lVal : Expr -> Int);
+                    simplification( Sum(Int(tInt.val + tInt2.val), tSub.rVal) );
+                } else if (tSub.rVal.structname == "Int") {
+                    tInt2 = cast(tSub.rVal : Expr -> Int);
+                    simplification( Sum(tSub.lVal, Int(tInt.val - tInt2.val)) );
+                } else {
+                    Sum(a, b);
+                }
+            }
+            else if (a.structname == "Int" && b.structname == "Sub") {
+                simplification( Sum(b, a) );
+            }
+            else if (a.structname == "Sum" && b.structname == "Sum") {
+                tSum = cast(a : Expr -> Sum);
+                tSum2 = cast(b : Expr -> Sum);
+                simplification( Sum(
+                    simplification( Sum(
+                        simplification( a ),
+                        simplification( tSum2.lVal ))),
+                    simplification( tSum2.rVal )
+                ));
+            }
+            else Sum(a, b);
+        Div(a, b) : 
+            if (a == Int(0)) Int(0)
+            else if (a == b) Int(1)
+            else if (a.structname == "Int" && b.structname == "Int") {
+                tInt  = cast(a : Expr -> Int);
+                tInt2 = cast(b : Expr -> Int);
+                nod = iabs(gcd(tInt.val, tInt2.val));
+                Div(Int(tInt.val / nod), Int(tInt2.val / nod));
+            }
+            else Div(a, b);
+        Sub(a, b) :
+            if (a == Int(0)) Neg(simplification( b ))
+            else if (b == Int(0)) simplification( a ) 
+            else if (a == b) Int(0)
+            else if (a.structname == "Neg" && b.structname == "Neg") {
+                tNeg  = cast(a : Expr -> Neg);
+                tNeg2 = cast(b : Expr -> Neg);
+                simplification(Sub(tNeg2.val, tNeg.val));
+            }
+            else if (b.structname == "Neg") {
+                tNeg = cast(b : Expr -> Neg);
+                simplification( Sum(a, tNeg.val) );
+            }
+            else if (a.structname == "Int" && b.structname == "Int") {
+                tInt  = cast(a : Expr -> Int);
+                tInt2 = cast(b : Expr -> Int);
+                Int(tInt.val - tInt2.val);
+            }
+            else if (a.structname == "Sum" && b.structname == "Int") {
+                tSum = cast(a : Expr -> Sum);
+                tInt = cast(b : Expr -> Int);
+                if (tSum.lVal.structname == "Int") {
+                    tInt2 = cast(tSum.lVal : Expr -> Int);
+                    simplification( Sum(Int(tInt2.val - tInt.val), tSum.rVal) );
+                } else if (tSum.rVal.structname == "Int") {
+                    tInt2 = cast(tSum.rVal : Expr -> Int);
+                    simplification( Sum(tSum.lVal, Int(tInt2.val - tInt.val)) );
+                } else {
+                    Sum(a, b);
+                }
+            }
+            else if (a.structname == "Int" && b.structname == "Sum") {
+                simplification ( Sum(b, a) );
+            }
+            else if (a.structname == "Sub" && b.structname == "Int") {
+                tSub = cast(a : Expr -> Sub);
+                tInt = cast(b : Expr -> Int);
+                if (tSub.lVal.structname == "Int") {
+                    tInt2 = cast(tSub.lVal : Expr -> Int);
+                    simplification( Sum(Int(tInt.val - tInt2.val), tSub.rVal) );
+                } else if (tSub.rVal.structname == "Int") {
+                    tInt2 = cast(tSub.rVal : Expr -> Int);
+                    simplification( Sum(tSub.lVal, Int(tInt.val + tInt2.val)) );
+                } else {
+                    Sum(a, b);
+                }
+            }
+            else if (a.structname == "Int" && b.structname == "Sub") {
+                simplification( Sum(b, a) );
+            }
+            else if (a.structname == "Sum" && b.structname == "Sum") {
+                tSum = cast(a : Expr -> Sum);
+                tSum2 = cast(b : Expr -> Sum);
+                simplification( Sub(
+                    simplification( Sub(
+                        simplification( a ),
+                        simplification( tSum2.lVal ))),
+                    simplification( tSum2.rVal )
+                ));
+            }
+            else Sub(a, b);
+        Neg(a) :
+            if (a == Int(0)) a
+            else if (a.structname == "Neg") {
+                tNeg = cast(a : Expr -> Neg);
+                simplification( tNeg.val );
+            }
+            else Neg(simplification( a ));
+        Int(a) :
+            if (a < 0) Neg(Int(-a))
+            else Int(a);
+        Var(a) :
+            Var(a);
+	}
+}

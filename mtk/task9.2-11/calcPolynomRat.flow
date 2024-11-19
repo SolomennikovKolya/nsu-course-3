@@ -1,0 +1,297 @@
+import calcSimplification;
+
+export {
+    // Рациональный полином (отношение двух многочленов, где многочлен в числителе имеет меньшую степень, чем многочлен в знаменателе)
+    ratPolynom : (numerator : Expr, denominator : Expr);
+
+    sumRatPolynom(l : Maybe<ratPolynom>, r : Maybe<ratPolynom>, var : Var)  -> Maybe<ratPolynom>; // Сумма рациональных полиномов
+    subRatPolynom(l : Maybe<ratPolynom>, r : Maybe<ratPolynom>, var : Var)  -> Maybe<ratPolynom>; // Разность рациональных полиномов
+    mulRatPolynom(l : Maybe<ratPolynom>, r : Maybe<ratPolynom>, var : Var)  -> Maybe<ratPolynom>; // Произведение рациональных полиномов
+    divRatPolynom(l : Maybe<ratPolynom>, r : Maybe<ratPolynom>, var : Var)  -> Maybe<ratPolynom>; // Частное рациональных полиномов
+    ratPolynom2s(rat : Maybe<ratPolynom>)                                   -> string;            // Строковое представление рационального полинома
+    calculatePolynomRat(v : Expr, params : Tree<string, ratNum>, var : Var) -> Maybe<ratPolynom>; // Преобразует рациональное выражение в рационалный полином с упрощением по переменной var
+    simplificationRat(rat : Maybe<ratPolynom>, var : Var)                   -> Maybe<ratPolynom>; // Упрощение рационального полинома по переменной var
+    ratPolynom2Expr(rat : ratPolynom)                                       -> Expr;              // Рациональный полином -> рациональное выражение
+    calculatePolynomRatArr(v : Expr, params : Tree<string, ratNum>, vars : [Var], resVar : Var) -> Maybe<ratPolynom>; // Преобразует рациональное выражение в рационалный полином с упрощением по переменным vars и var
+}
+
+// Упрощение рационального полинома по переменной var
+simplificationRat(rat : Maybe<ratPolynom>, var : Var) -> Maybe<ratPolynom> {
+    switch (rat) {
+        Some(v) : {
+            numerator = v.numerator;
+            denominator = v.denominator;
+            tr = makeTree();
+            trNum = polynom2tree(numerator, tr, var);
+            trDen = polynom2tree(denominator, tr, var);
+
+            newTrees = treeCutting(trNum, trDen);
+            
+            newNumerator = tree2polynom(newTrees.first, var);
+            newDenominator = tree2polynom(newTrees.second, var);
+
+            Some(ratPolynom(newNumerator, newDenominator));
+        }
+        None() : None();
+    }
+}
+
+// Упрощение выражения вида tree1/tree2
+treeCutting(tree1 : Tree<int, Expr>, tree2 : Tree<int, Expr>) -> Pair<Tree<int, Expr>, Tree<int, Expr>> {
+    t1 = switch(popmin(tree1)) {
+            PopResult(k, v, rest) : Pair(k, v);
+            EmptyPopResult()      : Pair(0, Int(1));
+        }
+    t2 = switch(popmin(tree2)) {
+            PopResult(k, v, rest) : Pair(k, v);
+            EmptyPopResult()      : Pair(0, Int(1));
+        }
+
+    intTest = fold(getTreeValues(tree1), 1, \acc, elem -> {
+        if (acc == 0) 0
+        else if (elem.structname != "Int") 0
+        else 1
+        })
+    intTest2 = fold(getTreeValues(tree2), 1, \acc, elem -> {
+        if (acc == 0) 0
+        else if (elem.structname != "Int") 0
+        else 1
+        })
+    
+    if (intTest + intTest2 == 2) {
+        nod = gcdA(concat(map(getTreeValues(tree1), \t -> 
+                            {tInt = cast(t : Expr -> Int);
+                             tInt.val}),
+                          map(getTreeValues(tree2), \t -> 
+                            {tInt = cast(t : Expr -> Int);
+                             tInt.val})));
+
+        mn = min(t1.first, t2.first);
+        res1 = foldTree(tree1, makeTree(), \k,v,res -> setTree(res, k - mn, {
+            tInt = cast(v : Expr -> Int);
+            Int(tInt.val / nod) 
+            }));
+        res2 = foldTree(tree2, makeTree(), \k,v,res -> setTree(res, k - mn, {
+            tInt = cast(v : Expr -> Int);
+            Int(tInt.val / nod) 
+            }));
+        Pair(res1, res2);
+    } else {
+        mn = min(t1.first, t2.first);
+        res1 = foldTree(tree1, makeTree(), \k,v,res -> setTree(res, k - mn, v));
+        res2 = foldTree(tree2, makeTree(), \k,v,res -> setTree(res, k - mn, v));
+        Pair(res1, res2);
+    }
+}
+
+// Раскладывает полином в дерево мономов в виде (степень переменной -> коэффициент)
+// Здесь дерево выполняет роль словаря: ключ - степень переменной var в каждом мономе, значение — коэффициент монома в полиноме
+// При этом дерево отсортировано по ключам из за свойств дерева
+// Пример: polynom2tree("3x^2 + 2x − 5", makeTree(), Var(x)) вернёт Tree<int, Expr>:{2→Int(3), 1→Int(2), 0→Neg(Int(5))}
+polynom2tree(ex : Expr, tree : Tree<int, Expr>, var : Var) -> Tree<int, Expr> {
+    switch (ex) {
+		Mul(a, b) : {
+            p = getMonomialOrder(ex, var);
+            switch (lookupTree(tree, p.first)) {
+                Some(v) : setTree(tree, p.first, simplification( Sum(p.second, v) ));
+                None() : setTree(tree, p.first, p.second);
+            }
+        }
+		Sum(a, b) : {
+            tr = polynom2tree(a, tree, var);
+            polynom2tree(b, tr, var);
+        }
+        Div(a, b) : tree;
+        Sub(a, b) : {
+            tr = polynom2tree(b, tree, var);
+            mTr = foldTree(tr, makeTree(), \k,v,res -> setTree(res, k, simplification( Neg(v) )));
+            polynom2tree(a, mTr, var);
+        }
+        Neg(a)    : {
+            tr = polynom2tree(a, tree, var);
+            foldTree(tr, makeTree(), \k,v,res -> setTree(res, k, simplification( Neg(v) )));
+        }
+        Int(a)    : switch(lookupTree(tree, 0)) {
+                        Some(v) : setTree(tree, 0, simplification( Sum(v, ex) ));
+                        None() : setTree(tree, 0, ex);
+                    }
+        Var(a)    : if (ex == var) switch(lookupTree(tree, 1)) {
+                            Some(v) : setTree(tree, 1, simplification( Sum(v, Int(1)) ));
+                            None() : setTree(tree, 1, Int(1));
+                        }
+                    else switch(lookupTree(tree, 0)) {
+                            Some(v) : setTree(tree, 0, simplification( Sum(v, ex)) );
+                            None() : setTree(tree, 0, ex);
+                        }
+	}
+}
+
+// Дерево -> полином
+tree2polynom(tree : Tree<int, Expr>, var : Var) -> Expr {
+    switch (popmin(tree)) {
+        PopResult(k, v, rest) : simplification( Sum(tree2polynom(rest, var), getMonomial(k, v, var)) );
+        EmptyPopResult()      : Int(0);
+    }
+}
+
+// Возвращает моном value*var^order
+getMonomial(order : int, value : Expr, var : Var) -> Expr {
+    if (order <= 0) value
+    else simplification( Mul(getMonomial(order - 1, value, var), var) ); 
+}
+
+// Возвращает порядок переменной var в мономе (одночлене) ex и оставшееся выражение (часть выражения без учета переменной var в ее степени)
+// Например getMonomialOrder(Mul(Int(3), Mul(Var(x), Var(x))), Var(x)) вернёт (2, Int(3)) (то есть 3x^2 = x^2 * Int(3))
+getMonomialOrder(ex : Expr, var : Var) -> Pair<int, Expr> {
+    switch (ex) {
+        Int(a)    : Pair(0, ex);
+        Neg(a)    : {
+            tPair = getMonomialOrder(a, var);
+            Pair(tPair.first, simplification( Neg(tPair.second)) );
+        }
+        Sum(a, b) : Pair(0, ex); // В мономе не может быть суммы
+        Sub(a, b) : Pair(0, ex); // В мономе не может быть разности
+        Div(a, b) : Pair(0, ex); // В мономе не может быть деления
+        Mul(a, b) : {
+            m1 = getMonomialOrder(a, var);
+            m2 = getMonomialOrder(b, var);
+            Pair(m1.first + m2.first, simplification( Mul(m1.second, m2.second)) );
+        };
+        Var(a) : if (ex == var) Pair(1, Int(1))
+                 else Pair(0, ex);
+    }
+}
+
+// Сумма рациональных полиномов с упрощением по переменной var
+sumRatPolynom(l : Maybe<ratPolynom>, r : Maybe<ratPolynom>, var : Var) -> Maybe<ratPolynom> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratPolynom(Int(0),Int(0)));
+        newR = either(r, ratPolynom(Int(0),Int(0)));
+
+        if (newL.numerator == Int(0)) r
+        else if (newR.numerator == Int(0)) l
+        else simplificationRat(Some(ratPolynom(
+            simplification(Sum(
+                simplification(Mul(newL.numerator, newR.denominator)), 
+                simplification(Mul(newR.numerator, newL.denominator)))), 
+            simplification(Mul(newL.denominator, newR.denominator)))), var);
+    } else {
+        None();
+    }
+}
+
+subRatPolynom(l : Maybe<ratPolynom>, r : Maybe<ratPolynom>, var : Var) -> Maybe<ratPolynom> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratPolynom(Int(0),Int(0)));
+        newR = either(r, ratPolynom(Int(0),Int(0)));
+
+        if (newL.numerator == Int(0)) mulRatPolynom(Some(ratPolynom(Neg(Int(1)), Int(1))), r, var)
+        else if (newR.numerator == Int(0)) l
+        else simplificationRat(Some( ratPolynom(
+                        simplification( Sub(
+                            simplification( Mul(newL.numerator, newR.denominator) ), 
+                            simplification( Mul(newR.numerator, newL.denominator) )) ), 
+                        simplification( Mul(newL.denominator, newR.denominator) ))), var);
+    } else {
+        None();
+    }
+}
+
+mulRatPolynom(l : Maybe<ratPolynom>, r : Maybe<ratPolynom>, var : Var) -> Maybe<ratPolynom> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratPolynom(Int(0),Int(0)));
+        newR = either(r, ratPolynom(Int(0),Int(0)));
+
+        if (newL.numerator == Int(0) || newR.numerator == Int(0))
+            Some(ratPolynom(Int(0), Int(1)))
+        else
+            simplificationRat(Some( ratPolynom(
+                        simplification( Mul(newL.numerator, newR.numerator) ), 
+                        simplification( Mul(newL.denominator, newR.denominator) ))), var);
+    } else {
+        None();
+    }
+}
+
+divRatPolynom(l : Maybe<ratPolynom>, r : Maybe<ratPolynom>, var : Var) -> Maybe<ratPolynom> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratPolynom(Int(0),Int(0)));
+        newR = either(r, ratPolynom(Int(0),Int(0)));
+
+        if (newL.numerator == Int(0))
+            Some(ratPolynom(Int(0), Int(1)))
+        else
+            simplificationRat(Some( ratPolynom(
+                        simplification( Mul(newL.numerator, newR.denominator) ), 
+                        simplification( Mul(newL.denominator, newR.numerator) ))), var);
+    } else {
+        None();
+    }
+}
+
+// Преобразует рациональное выражение в рационалный полином с упрощением по переменным vars и var
+calculatePolynomRatArr(v : Expr, params : Tree<string, ratNum>, vars : [Var], resVar : Var) -> Maybe<ratPolynom> {
+    // Применяет calculatePolynomRat к выражению v по каждой переменной из vars
+    newV = fold(vars, v, \acc, elem -> ratPolynom2Expr(either(calculatePolynomRat(acc, params, elem), ratPolynom(Int(0), Int(0)))));
+    calculatePolynomRat(newV, params, resVar);
+}
+
+// Преобразует рациональное выражение в рационалный полином с упрощением по переменной var
+calculatePolynomRat(v : Expr, params : Tree<string, ratNum>, var : Var) -> Maybe<ratPolynom> {
+    switch (v) {
+        Sum(a, b) : 
+            sumRatPolynom(
+                calculatePolynomRat(a, params, var), 
+                calculatePolynomRat(b, params, var),
+                var
+            );
+        Mul(a, b) : 
+            mulRatPolynom(
+                calculatePolynomRat(a, params, var), 
+                calculatePolynomRat(b, params, var),
+                var
+            );
+        Div(a, b) : 
+            divRatPolynom(
+                calculatePolynomRat(a, params, var), 
+                calculatePolynomRat(b, params, var),
+                var
+            );
+        Sub(a, b) : 
+            subRatPolynom(
+                calculatePolynomRat(a, params, var),
+                calculatePolynomRat(b, params, var),
+                var
+            );
+        Neg(a) : 
+            mulRatPolynom(
+                Some(ratPolynom(Neg(Int(1)), Int(1))), 
+                calculatePolynomRat(a, params, var),
+                var
+            );
+        Int(a) : 
+            Some(ratPolynom(Int(a), Int(1)));
+        Var(a) : 
+            switch(lookupTree(params, a)) {
+                Some(p) : Some(ratPolynom(Int(p.numerator), Int(p.denominator)));
+                None()  : Some(ratPolynom(v, Int(1)));
+            }
+    }
+}
+
+// Строковое представление рационального полинома
+ratPolynom2s(rat : Maybe<ratPolynom>) -> string {
+    if (isSome(rat)) {
+        newRat = either(rat, ratPolynom(Int(0),Int(0)));
+        if (newRat.denominator == Int(0)) "Division by zero..."
+        else if (newRat.denominator == Int(1)) expr2s(newRat.numerator)
+        else expr2s(newRat.numerator) + "/" + expr2s(newRat.denominator);
+    } else {
+        "Calculate error...";
+    }
+}
+
+// Рациональный полином -> рациональное выражение
+ratPolynom2Expr(rat : ratPolynom) -> Expr {
+    Div(rat.numerator, rat.denominator);
+}

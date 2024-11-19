@@ -1,0 +1,148 @@
+import string;
+import lingo/pegcode/driver;
+import ds/tree;
+import math/math;
+
+export {
+    // Рациональное выражение (в виде дерева)
+    Expr ::= Sum, Sub, Mul, Div, Neg, Var, Int;
+        Sum : (lVal : Expr, rVal : Expr);
+        Sub : (lVal : Expr, rVal : Expr);
+        Mul : (lVal : Expr, rVal : Expr);
+        Div : (lVal : Expr, rVal : Expr);
+        Neg : (val : Expr);
+        Var : (val : string);
+        Int : (val : int);
+
+    // Рациональное число вида numerator/denominator
+    ratNum : (numerator : int, denominator : int);
+
+    // Операции с рациональными числами и выражениями:
+    sumRatNum(l : Maybe<ratNum>, r : Maybe<ratNum>)       -> Maybe<ratNum>; // Сумма рациональных чисел:                ((a/b) + (c/d))
+    subRatNum(l : Maybe<ratNum>, r : Maybe<ratNum>)       -> Maybe<ratNum>; // Разность рациональных чисел:             ((a/b) - (c/d))
+    mulRatNum(l : Maybe<ratNum>, r : Maybe<ratNum>)       -> Maybe<ratNum>; // Произведение рациональных чисел:         ((a/b) * (c/d))
+    divRatNum(l : Maybe<ratNum>, r : Maybe<ratNum>)       -> Maybe<ratNum>; // Частное рациональных чисел:              ((a/b) / (c/d))
+    ratNum2s(rat : Maybe<ratNum>)                         -> string;        // Рациональное число -> строковое представление рационального числа
+    parse(str : string)                                   -> Expr;          // Строковое представление рационального выражения -> рациональное выражение
+    expr2s(v : Expr)                                      -> string;        // Рациональное выражение -> строковое представление рационального выражения
+    calculateRat(v : Expr, params : Tree<string, ratNum>) -> Maybe<ratNum>; // Рациональное выражение -> результат рационального выражения (рациональное число)
+}
+
+// Сумма рациональных чисел: ((a/b) + (c/d))
+sumRatNum(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratNum(0,0));
+        newR = either(r, ratNum(0,0));
+
+        nok = lcm(newL.denominator, newR.denominator);
+        newNumerator = nok / newL.denominator * newL.numerator + nok / newR.denominator * newR.numerator;
+        newDenominator = nok;
+
+        nod = iabs(gcd(newNumerator, newDenominator));
+        Some(ratNum(newNumerator / nod, newDenominator / nod));
+    } else {
+        None();
+    }
+}
+
+// Разность рациональных чисел: ((a/b) - (c/d))
+subRatNum(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratNum(0,0));
+        newR = either(r, ratNum(0,0));
+
+        nok = lcm(newL.denominator, newR.denominator);
+        newNumerator = nok / newL.denominator * newL.numerator - nok / newR.denominator * newR.numerator;
+        newDenominator = nok;
+
+        nod = iabs(gcd(newNumerator, newDenominator));
+        Some(ratNum(newNumerator / nod, newDenominator / nod));
+    } else {
+        None();
+    }
+}
+
+// Произведение рациональных чисел: ((a/b) * (c/d))
+mulRatNum(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratNum(0,0));
+        newR = either(r, ratNum(0,0));
+
+        nodAD = iabs(gcd(newL.numerator, newR.denominator));
+        nodBC = iabs(gcd(newL.denominator, newR.numerator));
+        newNumerator = newL.numerator / nodAD * newR.numerator / nodBC;
+        newDenominator = newL.denominator / nodBC * newR.denominator / nodAD;
+
+        nod = iabs(gcd(newNumerator, newDenominator));
+        Some(ratNum(newNumerator / nod, newDenominator / nod));
+    } else {
+        None();
+    }
+}
+
+// Частное рациональных чисел: ((a/b) / (c/d))
+divRatNum(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratNum(0,0));
+        newR = either(r, ratNum(0,0));
+
+        nodAC = iabs(gcd(newL.numerator, newR.numerator));
+        nodBD = iabs(gcd(newL.denominator, newR.denominator));
+        newNumerator = newL.numerator / nodAC * newR.denominator / nodBD;
+        newDenominator = newL.denominator / nodBD * newR.numerator / nodAC;
+
+        if (newDenominator == 0) {
+            println("Division by zero...");
+            None();
+        } else {
+            nod = iabs(gcd(newNumerator, newDenominator));
+            Some(ratNum(newNumerator / nod, newDenominator / nod));
+        }
+    } else {
+        None();
+    }
+}
+
+// Рациональное число -> строковое представление рационального числа
+ratNum2s(rat : Maybe<ratNum>) -> string {
+    if (isSome(rat)) {
+        newRat = either(rat, ratNum(0,0));
+        if (newRat.denominator == 0) "Division by zero..."
+        else if (newRat.denominator == 1) i2s(newRat.numerator)
+        else i2s(newRat.numerator) + "/" + i2s(newRat.denominator);
+    } else {
+        "Calculate error...";
+    }
+}
+
+// Строковое представление рационального выражения -> рациональное выражение
+parse(str : string) -> Expr {
+	grammar = compilePegGrammar("#include grammar.lingo");
+    parsic(grammar, str, defaultPegActions);
+}
+
+// Рациональное выражение -> строковое представление рационального выражения
+expr2s(v : Expr) -> string {
+    switch (v) {
+		Mul(a, b) : "(" + expr2s(a) + "*" + expr2s(b) + ")";
+		Sum(a, b) : "(" + expr2s(a) + "+" + expr2s(b) + ")";
+        Div(a, b) : "(" + expr2s(a) + "/" + expr2s(b) + ")";
+        Sub(a, b) : "(" + expr2s(a) + "-" + expr2s(b) + ")";
+        Neg(a)    : "(-" + expr2s(a) + ")";
+        Int(a)    : i2s(a);
+        Var(a)    : a;
+	}
+}
+
+// Рациональное выражение -> результат рационального выражения (рациональное число)
+calculateRat(v : Expr, params : Tree<string, ratNum>) -> Maybe<ratNum> {
+    switch (v) {
+        Sum(a, b) : sumRatNum(calculateRat(a, params), calculateRat(b, params));
+        Mul(a, b) : mulRatNum(calculateRat(a, params), calculateRat(b, params));
+        Div(a, b) : divRatNum(calculateRat(a, params), calculateRat(b, params));
+        Sub(a, b) : subRatNum(calculateRat(a, params), calculateRat(b, params));
+        Neg(a)    : mulRatNum(Some(ratNum(-1, 1)), calculateRat(a, params)); 
+        Int(a)    : Some(ratNum(a, 1));
+        Var(a)    : lookupTree(params, a);
+    }
+}

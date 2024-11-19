@@ -1,0 +1,415 @@
+import string;
+import lingo/pegcode/driver;
+import ds/tree;
+import math/math;
+import sys/system;
+
+/* =================================================
+   |      Работа с рациональными выражениями       |
+   ================================================= */
+
+// Рациональное выражение
+Expr ::= Sum, Mul, Sub, Div, Int, Var, Pow, Neg, Invalid;
+	Sum : (lVal : Expr, rVal : Expr);
+	Mul : (lVal : Expr, rVal : Expr);
+	Sub : (lVal : Expr, rVal : Expr);
+	Div : (lVal : Expr, rVal : Expr);
+    Pow : (lVal : Expr, rVal : Expr);
+	Var : (val : string);
+	Int : (val : int);
+	Neg : (val : Expr);
+    Invalid();
+
+// Рациональное число вида numerator/denominator
+ratNum : (numerator : int, denominator : int);
+
+// Сумма рациональных чисел: (a/b + c/d)
+sumRatNum(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratNum(0,0));
+        newR = either(r, ratNum(0,0));
+
+        nok = lcm(newL.denominator, newR.denominator);
+        newNumerator = nok / newL.denominator * newL.numerator + nok / newR.denominator * newR.numerator;
+        newDenominator = nok;
+
+        nod = iabs(gcd(newNumerator, newDenominator));
+        Some(ratNum(newNumerator / nod, newDenominator / nod));
+    } else {
+        None();
+    }
+}
+
+// Разность рациональных чисел: (a/b - c/d)
+subRatNum(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratNum(0,0));
+        newR = either(r, ratNum(0,0));
+
+        nok = lcm(newL.denominator, newR.denominator);
+        newNumerator = nok / newL.denominator * newL.numerator - nok / newR.denominator * newR.numerator;
+        newDenominator = nok;
+
+        nod = iabs(gcd(newNumerator, newDenominator));
+        Some(ratNum(newNumerator / nod, newDenominator / nod));
+    } else {
+        None();
+    }
+}
+
+// Произведение рациональных чисел: (a/b * c/d)
+mulRatNum(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratNum(0,0));
+        newR = either(r, ratNum(0,0));
+
+        nodAD = iabs(gcd(newL.numerator, newR.denominator));
+        nodBC = iabs(gcd(newL.denominator, newR.numerator));
+        newNumerator = newL.numerator / nodAD * newR.numerator / nodBC;
+        newDenominator = newL.denominator / nodBC * newR.denominator / nodAD;
+
+        nod = iabs(gcd(newNumerator, newDenominator));
+        Some(ratNum(newNumerator / nod, newDenominator / nod));
+    } else {
+        None();
+    }
+}
+
+// Частное рациональных чисел: (a/b / c/d)
+divRatNum(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratNum(0,0));
+        newR = either(r, ratNum(0,0));
+
+        nodAC = iabs(gcd(newL.numerator, newR.numerator));
+        nodBD = iabs(gcd(newL.denominator, newR.denominator));
+        newNumerator = newL.numerator / nodAC * newR.denominator / nodBD;
+        newDenominator = newL.denominator / nodBD * newR.numerator / nodAC;
+
+        if (newDenominator == 0) {
+            println("Division by zero...");
+            None();
+        } else {
+            nod = iabs(gcd(newNumerator, newDenominator));
+            Some(ratNum(newNumerator / nod, newDenominator / nod));
+        }
+    } else {
+        None();
+    }
+}
+
+// double -> ratNum методом приближения через непрерывные дроби
+// double2ratNum(val: double, epsilon: double, num1 : int, denom1 : int, num2 : int, denom2 : int) -> ratNum {
+//     intPart = floor(val);
+//     approxNum = num1 * intPart + num2;
+//     approxDenom = denom1 * intPart + denom2;
+
+//     if (abs(val - i2d(approxNum) / i2d(approxDenom)) < epsilon) {
+//         ratNum(approxNum, approxDenom);
+//     } else {
+//         double2ratNum(1.0 / (val - i2d(intPart)), epsilon, approxNum, approxDenom, num1, denom1);
+//     }
+// }
+
+// double -> ratNum
+double2ratNum(val: double) -> ratNum {
+    precision = 100000;
+    newNumerator = round(val * i2d(precision));
+    newDenominator = precision;
+    nod = iabs(gcd(newNumerator, newDenominator));
+    ratNum(newNumerator / nod, newDenominator / nod);
+}
+
+// Возведение в степень рациональных чисел: ((a/b) ^ (c/d))
+powRatNum(l : Maybe<ratNum>, r : Maybe<ratNum>) -> Maybe<ratNum> {
+    if (isSome(l) && isSome(r)) {
+        newL = either(l, ratNum(0,0));
+        newR = either(r, ratNum(0,0));
+
+        if (newR.numerator == 0) {
+            Some(ratNum(1, 1));
+        } else if (newR.denominator == 1) {
+            newNumerator = pow(newL.numerator, newR.numerator);
+            newDenominator = pow(newL.denominator, newR.numerator);
+            Some(ratNum(newNumerator, newDenominator));
+        } else {
+            n1 : double = i2d(newL.numerator) / i2d(newL.denominator);
+            n2 : double = i2d(newR.numerator) / i2d(newR.denominator);
+            resDouble = dpow(n1, n2);
+            // res = double2ratNum(resDouble, 0.1, 1, 0, 0, 1);
+            res = double2ratNum(resDouble);
+
+            nod = iabs(gcd(res.numerator, res.denominator));
+            newNumerator = res.numerator;
+            newDenominator = res.denominator;
+            Some(ratNum(newNumerator, newDenominator));
+        }
+    } else {
+        None();
+    }
+}
+
+// Рациональное число -> строковое представление
+ratNum2s(rat : Maybe<ratNum>) -> string {
+    if (isSome(rat)) {
+        newRat = either(rat, ratNum(0,0));
+        if (newRat.denominator == 0) "Division by zero..."
+        else if (newRat.denominator == 1) i2s(newRat.numerator)
+        else i2s(newRat.numerator) + "/" + i2s(newRat.denominator);
+    } else {
+        "Calculate error...";
+    }
+}
+
+// Строковое представление -> рациональное выражение
+parse(str : string) -> Expr {
+	grammar = compilePegGrammar("#include grammar.lingo");
+    parsic(grammar, str, defaultPegActions);
+}
+
+// Рациональное выражение -> строковое представление
+expr2s(v : Expr) -> string {
+    switch (v) {
+		Mul(a, b) : "(" + expr2s(a) + "*" + expr2s(b) + ")";
+		Sum(a, b) : "(" + expr2s(a) + "+" + expr2s(b) + ")";
+        Div(a, b) : "(" + expr2s(a) + "/" + expr2s(b) + ")";
+        Sub(a, b) : "(" + expr2s(a) + "-" + expr2s(b) + ")";
+        Pow(a, b) : "(" + expr2s(a) + "^" + expr2s(b) + ")";
+        Neg(a)    : "(-" + expr2s(a) + ")";
+        Int(a)    : i2s(a);
+        Var(a)    : a;
+        Invalid() : "Invalid";
+	}
+}
+
+// Рациональное выражение -> результат рационального выражения (рациональное число)
+calculateRat(v : Expr, params : Tree<string, ratNum>) -> Maybe<ratNum> {
+    switch (v) {
+        Sum(a, b) : sumRatNum(calculateRat(a, params), calculateRat(b, params));
+        Mul(a, b) : mulRatNum(calculateRat(a, params), calculateRat(b, params));
+        Div(a, b) : divRatNum(calculateRat(a, params), calculateRat(b, params));
+        Sub(a, b) : subRatNum(calculateRat(a, params), calculateRat(b, params));
+        Pow(a, b) : powRatNum(calculateRat(a, params), calculateRat(b, params));
+        Neg(a)    : mulRatNum(Some(ratNum(-1, 1)), calculateRat(a, params)); 
+        Int(a)    : Some(ratNum(a, 1));
+        Var(a)    : lookupTree(params, a);
+        Invalid() : None();
+    }
+}
+
+/* =================================================
+   |             Работа с параметрами              |
+   ================================================= */
+
+// Параметры
+ParamExpr ::= ParamPair, Param;
+	ParamPair : (param : Param, next : ParamExpr);
+	Param : (name : string, a : int, b : int);
+
+// Выражение из параметров -> дерево параметров
+paramExpr2tree(pe : ParamExpr) -> Tree<string, ratNum>
+{
+    switch (pe) {
+        ParamPair(param, next) : setTree(paramExpr2tree(next), param.name, ratNum(param.a, param.b));
+        Param(name, a, b) : setTree(makeTree(), name, ratNum(a, b));
+    }
+}
+
+// Строка входных параметров -> дерево <параметр, значение>
+parseInputParams(inputParam : string) -> Tree<string, ratNum> {
+    if (inputParam == "")
+    {
+        makeTree();
+    } else {
+        grammar = compilePegGrammar("#include grammarParams.lingo");
+        paramExpr = parsic(grammar, inputParam, defaultPegActions);
+        paramExpr2tree(paramExpr);
+    }
+}
+
+/* =================================================
+   |                 Работа с RPN                  |
+   ================================================= */
+
+RPNToken ::= IntToken, VarToken, SumToken, MulToken, SubToken, DivToken, PowToken, NegToken;
+    IntToken : (val : int);
+    VarToken : (name: string);
+    SumToken : ();
+    MulToken : ();
+    SubToken : ();
+    NegToken : ();
+    DivToken : ();
+    PowToken : ();
+
+// Рациональное выражение -> RPN строка
+expr2rpn(e: Expr) -> string {
+    switch (e) {
+		Mul(a, b) : expr2rpn(a) + " " + expr2rpn(b) + " *";
+		Sum(a, b) : expr2rpn(a) + " " + expr2rpn(b) + " +";
+        Div(a, b) : expr2rpn(a) + " " + expr2rpn(b) + " /";
+        Sub(a, b) : expr2rpn(a) + " " + expr2rpn(b) + " -";
+        Pow(a, b) : expr2rpn(a) + " " + expr2rpn(b) + " ^";
+        Neg(a)    : expr2rpn(a) + " ~";
+        Int(a)    : i2s(a);
+        Var(a)    : a;
+        Invalid() : "";
+	}
+}
+
+// Алгоритм для перевода массива RST токенов в рациональное выражение
+handleRPNToken(stack: [Expr], token: RPNToken) -> [Expr] {
+    switch(token) {
+        IntToken(i): arrayPush(stack, Int(i));
+        VarToken(i): arrayPush(stack, Var(i));
+        SumToken(): {
+            if (length(stack) < 2) {
+                [Invalid()];
+            } else {
+                operand1: Expr = stack[length(stack) - 1];
+                tmp1: [Expr] = removeIndex(stack, length(stack) - 1);
+                operand2: Expr = tmp1[length(tmp1) - 1];
+                tmp2: [Expr] = removeIndex(tmp1, length(tmp1) - 1);
+                arrayPush(tmp2, Sum(operand2, operand1));
+            }
+        }
+        MulToken(): {
+            if (length(stack) < 2) {
+                [Invalid()];
+            } else {
+                operand1: Expr = stack[length(stack) - 1];
+                tmp1: [Expr] = removeIndex(stack, length(stack) - 1);
+                operand2: Expr = tmp1[length(tmp1) - 1];
+                tmp2: [Expr] = removeIndex(tmp1, length(tmp1) - 1);
+                arrayPush(tmp2, Mul(operand2, operand1));
+            }
+        }
+        SubToken(): {
+            if (length(stack) < 2) {
+                [Invalid()];
+            } else {
+                operand1: Expr = stack[length(stack) - 1];
+                tmp1: [Expr] = removeIndex(stack, length(stack) - 1);
+                operand2: Expr = tmp1[length(tmp1) - 1];
+                tmp2: [Expr] = removeIndex(tmp1, length(tmp1) - 1);
+                arrayPush(tmp2, Sub(operand2, operand1));
+            }
+        }
+        DivToken(): {
+            if (length(stack) < 2) {
+                [Invalid()];
+            } else {
+                operand1: Expr = stack[length(stack) - 1];
+                tmp1: [Expr] = removeIndex(stack, length(stack) - 1);
+                operand2: Expr = tmp1[length(tmp1) - 1];
+                tmp2: [Expr] = removeIndex(tmp1, length(tmp1) - 1);
+                arrayPush(tmp2, Div(operand2, operand1));
+            }
+        }
+        PowToken(): {
+            if (length(stack) < 2) {
+                [Invalid()];
+            } else {
+                operand1: Expr = stack[length(stack) - 1];
+                tmp1: [Expr] = removeIndex(stack, length(stack) - 1);
+                operand2: Expr = tmp1[length(tmp1) - 1];
+                tmp2: [Expr] = removeIndex(tmp1, length(tmp1) - 1);
+                arrayPush(tmp2, Pow(operand2, operand1));
+            }
+        }
+        NegToken(): {
+            if (length(stack) < 1) {
+                [Invalid()];
+            } else {
+                operand1: Expr = stack[length(stack) - 1];
+                tmp1: [Expr] = removeIndex(stack, length(stack) - 1);
+                arrayPush(tmp1, Neg(operand1));
+            }
+        }
+    } 
+}
+
+// Массив RST токенов -> рациональное выражение
+parseFromRPNTokens(tokens: [flow]) -> Expr {
+    finalTokens: [Expr] = fold(tokens[0], [], handleRPNToken);
+
+    if (length(finalTokens) != 1) {
+        Invalid();
+    } else {
+        finalTokens[0];
+    }
+}
+
+// Специальное действие, которое будет выполняться при парсинге
+specialPegActions = {
+    t = setTree(defaultPegActions.t, "parseFromRPNTokens", parseFromRPNTokens);
+    SemanticActions(t);
+}
+
+// RPN строка -> рациональное выражение
+parseRPN(str : string) -> Expr {
+	grammar = compilePegGrammar("#include grammarRPN.lingo");
+    parsic(grammar, str, specialPegActions);
+}
+
+// RPN строка -> значение выражения
+calculateRPN(rpnStr: string, params : Tree<string, ratNum>) -> Maybe<ratNum> {
+    calculateRat(parseRPN(rpnStr), params);
+}
+
+// Строковое рациональное выражение -> RPN строка
+rat2rpn(ratExprStr: string) -> string {
+    expr2rpn(parse(ratExprStr));
+}
+
+// RPN строка -> строковое рациональное выражение
+rpn2rat(rpnStr: string) -> string {
+    expr2s(parseRPN(rpnStr));
+}
+
+/* =================================================
+   |                     Main                      |
+   ================================================= */
+
+main() {
+    // testInput = "(((1 / 2) * (3 - 1)) + ((-1) ^ 3))";
+    
+    // ratExpr = parse(testInput);
+    // println("Calculated ratExpr: " + ratNum2s(calculateRat(ratExpr, makeTree())));
+
+    // rpnStr = rat2rpn(testInput);
+    // println("RPN: " + rpnStr);
+
+    // rpnExpr = parseRPN(rpnStr);
+    // println("Calculated RPN: " + ratNum2s(calculateRat(rpnExpr, makeTree())));
+
+	print("Enter the expression: ");
+    input: string = rtrim2(readUntil("\n"), "\n");
+
+    println("Enter the parameters: ");
+    inputParamsStr: string = rtrim2(readUntil("\n"), "\n");
+    params = parseInputParams(inputParamsStr);
+
+    expr = parse(input);
+    println("Calculated expr: " + ratNum2s(calculateRat(expr, params)));
+
+    rpnStr = rat2rpn(input);
+    println("RPN: " + rpnStr);
+
+    rpnExpr = parseRPN(rpnStr);
+    println("Calculated RPN: " + ratNum2s(calculateRat(rpnExpr, params)));
+
+    quit(0);
+}
+
+/*
+Пример:
+$ Enter the expression: (((a1 / a2) * (a3 - 1)) + ((-1) ^ 3))
+$ Enter the parameters: a1=1 a2=2 a3=3
+$ Должно вывести: 0
+
+$ Enter the expression: ((a/(b^c))-((d*e)-(a*(c^(3^4)))))
+$ Enter the parameters: a=1 b=2 c=3 d=4 e=5
+$ Calculated expr: -1418992263/8
+$ RPN: a b c ^ / d e * a c 3 4 ^ ^ * - -
+$ Calculated RPN: -1418992263/8
+*/
