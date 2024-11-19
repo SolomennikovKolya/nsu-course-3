@@ -1,5 +1,7 @@
 #include "mythread.h"
+#include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <syscall.h>
 #include <unistd.h>
 
@@ -19,13 +21,13 @@ int main()
 		return 1;
 	}
 
-	sleep(1);
+	mythread_detach(thread);
 
-	if (mythread_join(thread, NULL))
-	{
-		fprintf(stderr, "Ошибка при присоединении потока\n");
-		return 1;
-	}
+	// if (mythread_join(thread, NULL))
+	// {
+	// 	fprintf(stderr, "Ошибка при присоединении потока\n");
+	// 	return 1;
+	// }
 
 	// mythread_t t1, t2, t3;
 	// mythread_create(&t1, test_routine, NULL);
@@ -36,5 +38,6 @@ int main()
 	// mythread_join(t2, NULL);
 	// mythread_join(t3, NULL);
 
-	return 0;
+	// usleep(500000);
+	syscall(SYS_exit, 0);
 }

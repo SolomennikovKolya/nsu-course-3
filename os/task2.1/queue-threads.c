@@ -90,7 +90,7 @@ int main()
 
 	printf("main [%d %d %d]\n", getpid(), getppid(), gettid());
 
-	q = queue_init(1000000);
+	q = queue_init(10000);
 
 	err = pthread_create(&tid, NULL, reader, q);
 	if (err)
@@ -99,7 +99,7 @@ int main()
 		return -1;
 	}
 
-	sched_yield(); // Поток добровольно уступает оставшееся время своего кванта, давая другим потокам возможность быть выполненными.
+	// sched_yield(); // Поток добровольно уступает оставшееся время своего кванта, давая другим потокам возможность быть выполненными.
 
 	err = pthread_create(&tid, NULL, writer, q);
 	if (err)

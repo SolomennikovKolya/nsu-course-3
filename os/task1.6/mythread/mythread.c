@@ -46,6 +46,13 @@ static int start_routine_wrapper(void *thread_iter)
 	thread->futex_finished_var = 1;
 	futex_wake(&thread->futex_finished_var);
 
+	if (thread->detached)
+	{
+		free(thread->stack);
+		free(thread);
+		return 0;
+	}
+
 	while (thread->joined == 0)
 	{
 		futex_wait(&thread->futex_joined_var, 0);
@@ -53,7 +60,6 @@ static int start_routine_wrapper(void *thread_iter)
 
 	free(thread->stack);
 	free(thread);
-
 	return 0;
 }
 
@@ -77,9 +83,11 @@ int mythread_create(mythread_t *thread_res, void *(*start_routine)(void *), void
 	thread->arg = arg;
 	thread->stack = stack;
 	thread->finished = 0;
-	thread->joined = 0;
 	thread->futex_finished_var = 0;
+	thread->joined = 0;
+	thread->joining_is_pending = 0;
 	thread->futex_joined_var = 0;
+	thread->detached = 0;
 
 	thread->tid = clone(start_routine_wrapper, stack + STACK_SIZE, CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_THREAD | CLONE_SYSVSEM, thread);
 	if (thread->tid == -1)
@@ -98,9 +106,16 @@ int mythread_join(mythread_t thread, void **ret)
 {
 	if (thread->joined)
 	{
-		fprintf(stderr, "Ошибка при присоединении потока. Поток уже был присоединён\n");
+		return SUCCESS;
+	}
+
+	if (thread->joining_is_pending)
+	{
+		fprintf(stderr, "Ошибка при присоединении потока. Поток уже присоединяется к другому процессу\n");
 		return FAILURE;
 	}
+
+	thread->joining_is_pending = 1;
 
 	while (thread->finished == 0)
 	{
@@ -110,6 +125,20 @@ int mythread_join(mythread_t thread, void **ret)
 	thread->joined = 1;
 	thread->futex_joined_var = 1;
 	futex_wake(&thread->futex_joined_var);
+
+	return SUCCESS;
+}
+
+int mythread_detach(mythread_t thread)
+{
+	thread->detached = 1;
+
+	if (thread->finished)
+	{
+		thread->joined = 1;
+		thread->futex_joined_var = 1;
+		futex_wake(&thread->futex_joined_var);
+	}
 
 	return SUCCESS;
 }
