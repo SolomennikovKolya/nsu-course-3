@@ -1,0 +1,1 @@
+/usr/bin/cc -g CMakeFiles/main.dir/main.c.o -o main  -Wl,-rpath,/home/uikvel/github/nsu-course-3/os/task1.7/build libuthread.so 
