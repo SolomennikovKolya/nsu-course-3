@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/uikvel/github/nsu-course-3/os/task1.7/build",
+  "command": "/usr/bin/cc -Duthread_EXPORTS -I/home/uikvel/github/nsu-course-3/os/task1.7/uthread -g -fPIC -o CMakeFiles/uthread.dir/uthread/uthread.c.o -c /home/uikvel/github/nsu-course-3/os/task1.7/uthread/uthread.c",
+  "file": "/home/uikvel/github/nsu-course-3/os/task1.7/uthread/uthread.c"
+},
+{
+  "directory": "/home/uikvel/github/nsu-course-3/os/task1.7/build",
+  "command": "/usr/bin/cc  -I/home/uikvel/github/nsu-course-3/os/task1.7/uthread -g -fPIE -o CMakeFiles/main.dir/main.c.o -c /home/uikvel/github/nsu-course-3/os/task1.7/main.c",
+  "file": "/home/uikvel/github/nsu-course-3/os/task1.7/main.c"
+}
+]

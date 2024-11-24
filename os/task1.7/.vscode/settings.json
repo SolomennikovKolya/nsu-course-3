@@ -1,0 +1,8 @@
+{
+	"files.associations": {
+		"mman.h": "c",
+		"signal.h": "c",
+		"uthread.h": "c"
+	},
+	"C_Cpp.errorSquiggles": "disabled"
+}

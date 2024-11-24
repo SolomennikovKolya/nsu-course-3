@@ -1,0 +1,4 @@
+/home/uikvel/github/nsu-course-3/os/task1.7/build/CMakeFiles/uthread.dir
+/home/uikvel/github/nsu-course-3/os/task1.7/build/CMakeFiles/main.dir
+/home/uikvel/github/nsu-course-3/os/task1.7/build/CMakeFiles/edit_cache.dir
+/home/uikvel/github/nsu-course-3/os/task1.7/build/CMakeFiles/rebuild_cache.dir
