@@ -71,6 +71,11 @@ int my_mutex_lock(my_mutex_t *mutex)
 	{
 		expected = 0; // Сброс ожидания для повторной проверки
 
+		if (atomic_load(&mutex->owner) == tid)
+		{
+			return ERR_PERM;
+		}
+
 		// Если мьютекс заблокирован, ждём через futex
 		if (futex_wait(&mutex->futex, 0) && errno != EAGAIN)
 		{

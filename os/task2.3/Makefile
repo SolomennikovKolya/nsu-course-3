@@ -13,7 +13,7 @@ INCLUDE_DIR="."
 
 # Параметры программы
 STORAGE_SIZE=1000
-SWAP_CHANCE=1000
+SWAP_CHANCE=1
 
 all: ${TARGET_1} ${TARGET_2} ${TARGET_3}
 

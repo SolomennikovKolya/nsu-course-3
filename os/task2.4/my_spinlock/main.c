@@ -12,7 +12,7 @@ my_spinlock_t lock;
 
 void *thread_func(void *arg)
 {
-	int local_sum = 0;
+	// int local_sum = 0;
 	for (int i = 0; i < iterations_num; i++)
 	{
 		my_spin_lock(&lock);
@@ -30,9 +30,9 @@ void *thread_func(void *arg)
 		// }
 	}
 
-	my_spin_lock(&lock);
-	shared_sum += local_sum;
-	my_spin_unlock(&lock);
+	// my_spin_lock(&lock);
+	// shared_sum += local_sum;
+	// my_spin_unlock(&lock);
 
 	printf("Thread %lld finished\n", (long long)arg);
 	return NULL;

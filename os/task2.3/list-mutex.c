@@ -1,5 +1,6 @@
 #define _GNU_SOURCE
 #include <pthread.h>
+#include <stdatomic.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,16 +9,16 @@
 
 #define MAX_STRING_LENGTH 100 // Максимальная длина строки в ноде
 int storage_size;			  // Кол-во нод в списке
-int swap_chance;			  // Шанс обмена соседних нод будет 1 / SWAP_CHANCE
+int swap_chance;			  // Шанс обмена соседних нод
 
-int inc_count = 0;	// Кол-во нод, идущих по возрастанию
-int inc_iters = 0;	// Кол-во итераций счётчика нод, удущих по возрастанию
-int dec_count = 0;	// Кол-во нод, идущих по убыванию
-int dec_iters = 0;	// Кол-во итераций счётчика нод, удущих по убыванию
-int eq_count = 0;	// Кол-во одинаковых соседних нод
-int eq_iters = 0;	// Кол-во итераций счётчика одинаковых соседних нод
-int swap_count = 0; // Кол-во свапов
-int swap_iters = 0; // Кол-во итераций свапальщика
+int inc_count = 0;		   // Кол-во нод, идущих по возрастанию
+int inc_iters = 0;		   // Кол-во итераций счётчика нод, удущих по возрастанию
+int dec_count = 0;		   // Кол-во нод, идущих по убыванию
+int dec_iters = 0;		   // Кол-во итераций счётчика нод, удущих по убыванию
+int eq_count = 0;		   // Кол-во одинаковых соседних нод
+int eq_iters = 0;		   // Кол-во итераций счётчика одинаковых соседних нод
+int swap_count = 0;		   // Кол-во свапов
+atomic_int swap_iters = 0; // Кол-во итераций свапальщика
 
 // Нода связного списка
 typedef struct _node_t
@@ -177,7 +178,7 @@ void *swap_routine(void *args)
 		while (prev->next != NULL)
 		{
 			// Нужно ли переставлять соседние ноды
-			if (rand() % swap_chance != 0)
+			if ((rand() % 100) > swap_chance)
 			{
 				cur = prev->next;
 				pthread_mutex_lock(&cur->sync);
@@ -209,7 +210,7 @@ void *swap_routine(void *args)
 		}
 
 		pthread_mutex_unlock(&prev->sync);
-		++swap_iters;
+		atomic_fetch_add(&swap_iters, 1);
 	}
 }
 
@@ -221,7 +222,7 @@ void *print_routine(void *args)
 	{
 		sleep(1);
 		printf("%d\t\t%d\t\t%d\t\t%d\t\t%d\n",
-			   inc_iters, dec_iters, eq_iters, swap_iters, inc_count + dec_count + eq_count);
+			   inc_iters, dec_iters, eq_iters, atomic_load(&swap_iters), inc_count + dec_count + eq_count);
 	}
 }
 
