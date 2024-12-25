@@ -1,0 +1,1 @@
+/usr/bin/cc  -g -Wall -g CMakeFiles/proxy.out.dir/proxy.c.o -o proxy.out  -lpthread -lcurl 

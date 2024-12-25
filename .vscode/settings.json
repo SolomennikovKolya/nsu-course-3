@@ -3,6 +3,8 @@
 		"errno.h": "c",
 		"stdio.h": "c",
 		"string.h": "c",
-		"stdlib.h": "c"
+		"stdlib.h": "c",
+		"netdb.h": "c",
+		"cerrno": "c"
 	}
 }
