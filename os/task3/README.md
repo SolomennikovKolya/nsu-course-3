@@ -24,7 +24,6 @@
 ### Тестирование
 - `curl -x http://localhost:8080 http://example.com` - всё должно успешно сработать
 - `curl --proxy http://localhost:8080 https://api.ipify.org` - данный запрос не должен отработать, т.к. он использует метод CONNECT
-- Можно настроить Firefox на работу с http прокси и полазить по страницам (например lib.ru)
-- Если порт 8080 занят, то:
-	- `sudo lsof -i :8080` - отобразить процессы, работающие на порту 8080
-	- `sudo kill <pid>` - снять процесс с выполнения
+- `curl -O -x localhost:8080 http://parallels.nsu.ru/~fat/Linux/flashplayer11_b1_install_lin_64_071311.tar.gz` - скачивание небольшого файла через прокси
+- `curl -O -x localhost:8080 http://parallels.nsu.ru/~fat/Linux/altlinux-7.0.5-centaurus-x86_64-ru-live-cd.iso` - скачивание большого файла
+- Можно настроить Firefox на работу с http прокси и полазить по страницам (например http://lib.ru)

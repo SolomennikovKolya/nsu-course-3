@@ -47,6 +47,7 @@ void *clean_cache_entry(CacheEntry *cache)
 	cache->is_loading = 0;
 	cache->client_count = 0;
 	printf("SUCCESS\n");
+	return NULL;
 }
 
 void *cache_cleanup(void *arg)
@@ -95,7 +96,7 @@ CacheEntry *add_to_cache(const char *url)
 		if (cache[i].response == NULL)
 		{
 			strcpy(cache[i].url, url);
-			cache[i].response = malloc(BUFFER_SIZE);
+			cache[i].response = (char *)malloc(BUFFER_SIZE);
 			cache[i].size = BUFFER_SIZE;
 			cache[i].loaded_size = 0;
 			cache[i].is_loading = 1;
@@ -118,7 +119,7 @@ void update_cache(CacheEntry *cache_entry, const char *data, size_t size)
 	cache_entry->last_access_time = time(NULL);
 	if (cache_entry->loaded_size + size > cache_entry->size)
 	{
-		cache_entry->response = realloc(cache_entry->response, cache_entry->loaded_size + size);
+		cache_entry->response = (char *)realloc(cache_entry->response, cache_entry->loaded_size + size);
 		cache_entry->size = cache_entry->loaded_size + size;
 	}
 	memcpy(cache_entry->response + cache_entry->loaded_size, data, size);
@@ -158,8 +159,8 @@ void *download_to_cache(void *cache_entry_ptr)
 	if (server == NULL)
 	{
 		perror("Ошибка разрешения хоста");
-		mark_cache_complete(cache_entry_ptr);
-		clean_cache_entry(cache_entry_ptr);
+		mark_cache_complete(cache_entry);
+		clean_cache_entry(cache_entry);
 		return NULL;
 	}
 
@@ -346,7 +347,7 @@ int main()
 	{
 		struct sockaddr_in client_addr;
 		socklen_t client_addr_len = sizeof(client_addr);
-		int *client_socket = malloc(sizeof(int));
+		int *client_socket = (int *)malloc(sizeof(int));
 
 		*client_socket = accept(server_fd, (struct sockaddr *)&client_addr, &client_addr_len);
 		if (*client_socket < 0)

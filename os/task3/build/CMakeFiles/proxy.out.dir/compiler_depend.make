@@ -94,6 +94,7 @@ CMakeFiles/proxy.out.dir/proxy.c.o: ../proxy.c \
   /usr/include/x86_64-linux-gnu/bits/cpu-set.h \
   /usr/include/x86_64-linux-gnu/bits/setjmp.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+  /usr/lib/gcc/x86_64-linux-gnu/11/include/stdatomic.h \
   /usr/include/stdlib.h \
   /usr/include/x86_64-linux-gnu/bits/waitflags.h \
   /usr/include/x86_64-linux-gnu/bits/waitstatus.h \
@@ -121,6 +122,8 @@ CMakeFiles/proxy.out.dir/proxy.c.o: ../proxy.c \
 /usr/include/x86_64-linux-gnu/bits/waitflags.h:
 
 /usr/include/stdlib.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/stdatomic.h:
 
 /usr/include/x86_64-linux-gnu/bits/setjmp.h:
 
