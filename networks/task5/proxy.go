@@ -107,12 +107,12 @@ func readAddr(conn net.Conn) (string, uint16, error) {
 		if _, err := io.ReadFull(conn, domain); err != nil {
 			return "", 0, fmt.Errorf("expected %d bytes (domain): %w", domainSizeBuf[0], err)
 		}
-		// addr = string(domain)
-		var err error
-		addr, err = resolveDomain(string(domain))
-		if err != nil {
-			return "", 0, err
-		}
+		addr = string(domain)
+		// var err error
+		// addr, err = resolveDomain(string(domain))
+		// if err != nil {
+		// 	return "", 0, err
+		// }
 	default:
 		return "", 0, errors.New("unsupported address type")
 	}
@@ -148,7 +148,7 @@ func convertAddrToBytes(addr net.Addr) []byte {
 		byte(tcpAddr.Port >> 8),
 		byte(tcpAddr.Port & 0xFF),
 	}
-	addrBytes = append(addrBytes, portBytes...) // Многоточие означает разпоковку среза
+	addrBytes = append(addrBytes, portBytes...) // Многоточие означает распаковку среза
 
 	return addrBytes
 }
@@ -179,15 +179,13 @@ func handleRequest(clientConn net.Conn) (net.Conn, error) {
 	if err != nil {
 		return nil, fmt.Errorf("address reading error: %w", err)
 	}
-	fmt.Println("serverAddr: ", serverAddr)
-	fmt.Println("serverPort: ", serverPort)
+	// fmt.Println("serverAddr: ", serverAddr)
+	// fmt.Println("serverPort: ", serverPort)
 
 	serverConn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", serverAddr, serverPort))
 	if err != nil {
-		localAddr := convertAddrToBytes(serverConn.LocalAddr())
-		response := []byte{VERSION_SOCKS5, REQUEST_FAILURE, 0}
-		response = append(response, localAddr...)
-		_, err = clientConn.Write(response)
+		response := []byte{VERSION_SOCKS5, REQUEST_FAILURE, 0, 1, 0, 0, 0, 0, 0, 0}
+		clientConn.Write(response)
 		return nil, fmt.Errorf("server connection error: %w", err)
 	}
 
@@ -196,7 +194,11 @@ func handleRequest(clientConn net.Conn) (net.Conn, error) {
 	// fmt.Println("localAddr: ", localAddr)
 	response := []byte{VERSION_SOCKS5, REQUEST_GRANTED, 0}
 	response = append(response, localAddr...)
-	clientConn.Write(response)
+	_, err = clientConn.Write(response)
+	if err != nil {
+		defer serverConn.Close()
+		return nil, fmt.Errorf("error: %w", err)
+	}
 
 	return serverConn, nil
 }
@@ -212,10 +214,12 @@ func transfer(clientConn, serverConn net.Conn, clientNum int) {
 	go func() {
 		defer wg.Done()
 		writtenToServer, _ = io.Copy(serverConn, clientConn)
+		clientConn.(*net.TCPConn).CloseWrite()
 	}()
 	go func() {
 		defer wg.Done()
 		writtenToClient, _ = io.Copy(clientConn, serverConn)
+		serverConn.(*net.TCPConn).CloseWrite()
 	}()
 
 	wg.Wait()
@@ -231,13 +235,13 @@ func handleClient(clientConn net.Conn, clientNum int) {
 	defer fmt.Printf("client_%d finish\n", clientNum)
 
 	if err := handleGreeting(clientConn); err != nil {
-		log.Println("Greeting failed:", err)
+		log.Println("greeting failed:", err)
 		return
 	}
 
 	serverConn, err := handleRequest(clientConn)
 	if err != nil {
-		log.Println("Request handling failed:", err)
+		log.Println("handle request failed:", err)
 		return
 	}
 	defer serverConn.Close()
@@ -271,6 +275,4 @@ func main() {
 	}
 }
 
-// 192.168.0.101:1080
 // curl --socks5-hostname PROXY_HOST:PROXY_PORT https://api.ipify.org
-// curl --socks5-hostname 192.168.0.101:1080 https://api.ipify.org
