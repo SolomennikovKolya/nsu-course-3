@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/uikvel/github/nsu-course-3/os/task3/build",
+  "command": "/usr/bin/cc  -I/home/uikvel/github/nsu-course-3/os/task3  -g -Wall -g -o CMakeFiles/proxy.out.dir/proxy.c.o -c /home/uikvel/github/nsu-course-3/os/task3/proxy.c",
+  "file": "/home/uikvel/github/nsu-course-3/os/task3/proxy.c"
+}
+]

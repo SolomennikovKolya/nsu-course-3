@@ -1,0 +1,3 @@
+/home/uikvel/github/nsu-course-3/os/task3/build/CMakeFiles/proxy.out.dir
+/home/uikvel/github/nsu-course-3/os/task3/build/CMakeFiles/edit_cache.dir
+/home/uikvel/github/nsu-course-3/os/task3/build/CMakeFiles/rebuild_cache.dir
