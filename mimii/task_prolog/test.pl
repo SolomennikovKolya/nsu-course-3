@@ -1,4 +1,4 @@
-killer(butch).
+Killer(butch).
 married(mia,marcellus).
 married(marcellus,mia).
 dead(zed).
