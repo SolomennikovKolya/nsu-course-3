@@ -2,49 +2,50 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from scipy.stats import entropy
 from sklearn.preprocessing import KBinsDiscretizer
-import math
+from sklearn.tree import DecisionTreeClassifier
 from tabulate import tabulate
 
 
 def get_data() -> pd.DataFrame:
     """Получение датасета из csv файлов"""
-    df1 = pd.read_csv("data/winequality-red.csv", sep=";",
-                      encoding="utf-8", header=0, na_values=["NA", "N/A"])
-    df2 = pd.read_csv("data/winequality-white.csv", sep=";",
-                      encoding="utf-8", header=0, na_values=["NA", "N/A"])
+    data1 = pd.read_csv("data/winequality-red.csv", sep=";",
+                        encoding="utf-8", header=0, na_values=["NA", "N/A"])
+    data2 = pd.read_csv("data/winequality-white.csv", sep=";",
+                        encoding="utf-8", header=0, na_values=["NA", "N/A"])
 
-    df1.insert(len(df1.columns) - 1, 'color', 0)
-    df2.insert(len(df2.columns) - 1, 'color', 1)
+    data1.insert(len(data1.columns) - 1, 'color', 0)
+    data2.insert(len(data2.columns) - 1, 'color', 1)
 
-    combined_df = pd.concat([df1, df2], axis=0)
-    shuffled_df = combined_df.sample(frac=1).reset_index(drop=True)
-    return shuffled_df
+    combined_data = pd.concat([data1, data2], axis=0)
+    shuffled_data = combined_data.sample(frac=1).reset_index(drop=True)
+    return shuffled_data
 
 
-def clean_data(df: pd.DataFrame) -> pd.DataFrame:
+def clean_data(data: pd.DataFrame) -> pd.DataFrame:
     """Чистка и восстановление данных"""
     # Заполняем пропущенные данные (mean - мат ожидание)
-    df.fillna(df.mean(), inplace=True)
+    data.fillna(data.mean(), inplace=True)
 
     # Удаляем дубликаты
-    df.drop_duplicates(inplace=True)
+    data.drop_duplicates(inplace=True)
 
     # Нормализация всех числовых столбцов
-    # df = (df - df.min()) / (df.max() - df.min())
+    # data = (data - data.min()) / (data.max() - data.min())
 
     # Дискретизация некатегориальных данных
     chunks_num = 10
-    for feature in df.columns.drop(['color', 'quality']):
-        normalized_column = (df[feature] - df[feature].min()) / \
-            (df[feature].max() - df[feature].min())
-        df[feature] = np.floor(normalized_column * chunks_num).astype(int)
-    # show_chunks_distribution(df, chunks_num)
+    for feature in data.columns.drop(['color', 'quality']):
+        normalized_column = (data[feature] - data[feature].min()) / \
+            (data[feature].max() - data[feature].min())
+        data[feature] = np.floor(normalized_column * chunks_num).astype(int)
+    # show_chunks_distribution(data, chunks_num)
 
     # Удаляем сильно коррелирующие признаки
-    # df.drop('color', axis=1, inplace=True)
-    # df.drop('total sulfur dioxide', axis=1, inplace=True)
-    return df
+    # data.drop('color', axis=1, inplace=True)
+    # data.drop('total sulfur dioxide', axis=1, inplace=True)
+    return data
 
 
 def show_density(s: pd.Series, name: str = "") -> None:
@@ -54,13 +55,14 @@ def show_density(s: pd.Series, name: str = "") -> None:
     plt.show()
 
 
-def show_chunks_distribution(df: pd.DataFrame, chunks_num: int) -> None:
+def show_chunks_distribution(data: pd.DataFrame, chunks_num: int) -> None:
     """Построение графика распределения данных по чанкам для каждого признака"""
     feature_bin_counts = pd.DataFrame(
-        index=df.columns, columns=range(chunks_num))
-    for feature in df.columns:
+        index=data.columns, columns=range(chunks_num))
+    for feature in data.columns:
         for bin in range(chunks_num):
-            feature_bin_counts.loc[feature, bin] = (df[feature] == bin).mean()
+            feature_bin_counts.loc[feature, bin] = (
+                data[feature] == bin).mean()
 
     plt.figure(figsize=(10, 6))
     sns.heatmap(feature_bin_counts.astype(float), annot=True,
@@ -94,15 +96,15 @@ def pearson_correlation(x: pd.Series, y: pd.Series) -> float:
     return cov / (std_x * std_y)
 
 
-def custom_corr(df: pd.DataFrame) -> pd.DataFrame:
+def custom_corr(data: pd.DataFrame) -> pd.DataFrame:
     """Построение матрицы корреляции"""
-    columns = df.columns
+    columns = data.columns
     corr_matrix = pd.DataFrame(index=columns, columns=columns)
 
     for col1 in columns:
         for col2 in columns:
             corr_matrix.loc[col1, col2] = pearson_correlation(
-                df[col1], df[col2])
+                data[col1], data[col2])
     corr_matrix = corr_matrix.astype(float)
     return corr_matrix
 
@@ -116,7 +118,7 @@ def show_heatmap(corr_matrix: pd.DataFrame) -> None:
     plt.show()
 
 
-def entropy(target_col: pd.Series) -> float:
+def entropy_manual(target_col: pd.Series) -> float:
     """Вычисляет энтропию для целевого столбца"""
     # Получаем уникальные значения и их частоты
     values, counts = np.unique(target_col, return_counts=True)
@@ -126,16 +128,16 @@ def entropy(target_col: pd.Series) -> float:
     return -np.sum(probabilities * np.log2(probabilities))
 
 
-def information_gain(data: pd.DataFrame, feature: str, target: str) -> float:
+def information_gain_manual(data: pd.DataFrame, feature: str, target: str) -> float:
     """Вычисляет информационный выигрыш для конкретного признака feature относительно целевого признака target"""
     # Энтропия исходного набора данных
-    total_entropy = entropy(data[target])
+    total_entropy = entropy_manual(data[target])
     # Вычисляем средневзвешенную энтропию после разделения
     values, counts = np.unique(data[feature], return_counts=True)
     weighted_entropy = 0.0
     for v, c in zip(values, counts):
         subset = data[data[feature] == v]
-        weighted_entropy += (c / len(data)) * entropy(subset[target])
+        weighted_entropy += (c / len(data)) * entropy_manual(subset[target])
     # Information Gain
     return total_entropy - weighted_entropy
 
@@ -149,33 +151,65 @@ def split_information(data: pd.DataFrame, feature: str) -> float:
 
 def gain_ratio(data: pd.DataFrame, feature: str, target: str) -> float:
     """Вычисляет Gain Ratio для признака feature относительно целевого признака target"""
-    ig = information_gain(data, feature, target)
+    ig = information_gain_manual(data, feature, target)
     si = split_information(data, feature)
     return ig / si if si != 0 else 0.0
 
 
-def most_important_features(data: pd.DataFrame) -> None:
+def gain_ratio_tree(data: pd.DataFrame, feature: str, target: str) -> float:
+    """Вычисляет Gain Ratio для указанного признака с использованием дерева решений"""
+    X = data[[feature]]
+    y = data[target]
+
+    # Создаём модель дерева решений и обучаем
+    clf = DecisionTreeClassifier(criterion='entropy')
+    clf.fit(X, y)
+
+    # Важность признака, которая по сути является Information Gain
+    ig = clf.feature_importances_[0]
+
+    # Энтропия признака
+    value_counts = np.bincount(X.values.flatten())
+    probs = value_counts / value_counts.sum()  # Нормализация частот
+    feature_entropy = entropy(probs, base=2)  # Вычисляем энтропию
+
+    return ig / feature_entropy if feature_entropy != 0 else 0
+
+
+def most_important_features(data: pd.DataFrame, manual: bool = True) -> None:
     """Находит наиболее важные признаки для разделения по целевой переменной"""
-    # Вычисляем Gain Ratio для каждого признака
     # Целевая переменная - качество вина
     target = 'quality'
+
+    # Вычисляем Gain Ratio для каждого признака
     all_gr = []
-    for feature in df.columns.drop([target]):
-        gr = gain_ratio(df, feature, target)
-        all_gr.append((gr, feature))
+    for feature in data.columns.drop([target]):
+        if manual:
+            gr = gain_ratio(data, feature, target)
+            all_gr.append((gr, feature))
+        else:
+            gr = gain_ratio_tree(data, feature, target)
+            all_gr.append((gr, feature))
     all_gr.sort(reverse=True)
 
+    # Вывод таблицы
     table_data = [(feature, f"{gr:.4f}") for gr, feature in all_gr]
     print(tabulate(table_data, headers=[
           "Признак", "Gain Ratio"], tablefmt="pretty"))
 
 
-if __name__ == "__main__":
-    df = get_data()
-    df = clean_data(df)
+def main():
+    data = get_data()
+    data = clean_data(data)
 
-    # print(df)
-    # show_density(df['fixed acidity'])
-    # show_heatmap(df.corr())
-    # show_heatmap(custom_corr(df))
-    most_important_features(df)
+    # print(data)
+    # show_density(data['fixed acidity'])
+    # show_heatmap(data.corr())
+    # show_heatmap(custom_corr(data))
+    # most_important_features(data)
+    most_important_features(data, True)
+    most_important_features(data, False)
+
+
+if __name__ == "__main__":
+    main()
