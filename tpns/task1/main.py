@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import entropy
 from sklearn.preprocessing import KBinsDiscretizer
+from sklearn.feature_selection import mutual_info_classif
 from sklearn.tree import DecisionTreeClassifier
 from tabulate import tabulate
 
@@ -96,8 +97,8 @@ def pearson_correlation(x: pd.Series, y: pd.Series) -> float:
     return cov / (std_x * std_y)
 
 
-def custom_corr(data: pd.DataFrame) -> pd.DataFrame:
-    """Построение матрицы корреляции"""
+def corr_manual(data: pd.DataFrame) -> pd.DataFrame:
+    """Построение матрицы корреляции вручную"""
     columns = data.columns
     corr_matrix = pd.DataFrame(index=columns, columns=columns)
 
@@ -142,17 +143,17 @@ def information_gain_manual(data: pd.DataFrame, feature: str, target: str) -> fl
     return total_entropy - weighted_entropy
 
 
-def split_information(data: pd.DataFrame, feature: str) -> float:
+def split_information_manual(data: pd.DataFrame, feature: str) -> float:
     """Вычисляет Split Information для признака feature"""
     values, counts = np.unique(data[feature], return_counts=True)
     probabilities = counts / len(data)
     return -np.sum(probabilities * np.log2(probabilities))
 
 
-def gain_ratio(data: pd.DataFrame, feature: str, target: str) -> float:
+def gain_ratio_manual(data: pd.DataFrame, feature: str, target: str) -> float:
     """Вычисляет Gain Ratio для признака feature относительно целевого признака target"""
     ig = information_gain_manual(data, feature, target)
-    si = split_information(data, feature)
+    si = split_information_manual(data, feature)
     return ig / si if si != 0 else 0.0
 
 
@@ -171,7 +172,21 @@ def gain_ratio_tree(data: pd.DataFrame, feature: str, target: str) -> float:
     # Энтропия признака
     value_counts = np.bincount(X.values.flatten())
     probs = value_counts / value_counts.sum()  # Нормализация частот
-    feature_entropy = entropy(probs, base=2)  # Вычисляем энтропию
+    feature_entropy = entropy(probs, base=2)
+
+    return ig / feature_entropy if feature_entropy != 0 else 0
+
+
+def gain_ratio_func(data: pd.DataFrame, feature: str, target: str) -> float:
+    """Вычисляет Gain Ratio для указанного признака с библиотечных функций"""
+    # Вычисляем Information Gain (аналог mutual information)
+    X = data[[feature]]
+    y = data[target]
+
+    ig = mutual_info_classif(X, y, discrete_features=True)[0]
+    value_counts = np.bincount(X.values.flatten())
+    probs = value_counts / value_counts.sum()
+    feature_entropy = entropy(probs, base=2)
 
     return ig / feature_entropy if feature_entropy != 0 else 0
 
@@ -185,10 +200,11 @@ def most_important_features(data: pd.DataFrame, manual: bool = True) -> None:
     all_gr = []
     for feature in data.columns.drop([target]):
         if manual:
-            gr = gain_ratio(data, feature, target)
+            gr = gain_ratio_manual(data, feature, target)
             all_gr.append((gr, feature))
         else:
-            gr = gain_ratio_tree(data, feature, target)
+            # gr = gain_ratio_tree(data, feature, target)
+            gr = gain_ratio_func(data, feature, target)
             all_gr.append((gr, feature))
     all_gr.sort(reverse=True)
 
@@ -205,8 +221,7 @@ def main():
     # print(data)
     # show_density(data['fixed acidity'])
     # show_heatmap(data.corr())
-    # show_heatmap(custom_corr(data))
-    # most_important_features(data)
+    # show_heatmap(corr_manual(data))
     most_important_features(data, True)
     most_important_features(data, False)
 
