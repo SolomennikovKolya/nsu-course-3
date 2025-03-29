@@ -1,20 +1,14 @@
 [Main]
 FileType=CIR
-Version=11.01
+Version=12.00
 Program=Micro-Cap
 Component Version=10.00
 Shape Version=11.00
-Screen=1920,1080
-MCAPVersion=11.2.0.3
+Screen=1536,960
+MCAPVersion=12.2.0.5
 Key ID=Demo
-NLCnt=23
-TXCnt=11
-
-[shapedef]
-Name=Absolute
-Root="Plt.root",0,0,0
-Line=40,0,56,-16
-Line=40,0,24,-16
+NLCnt=15
+TXCnt=3
 
 [shapedef]
 Name=Amp
@@ -61,15 +55,6 @@ Name=Minus.root
 Line=-2,0,2,0
 
 [shapedef]
-Name=Plt.root
-Rectangle=16,-24,64,24
-FColor=None
-Line=0,0,16,0
-Line=22,0,58,0
-Line=40,-18,40,18
-Line=64,0,80,0
-
-[shapedef]
 Name=Plus.root
 Line=-2,0,2,0
 Line=0,-2,0,2
@@ -95,22 +80,11 @@ Root="Plus.root",41,7,0
 Current=32,16,16,16
 
 [compdef]
-Name=Ground
-Definition=Ground
-Shape=Ground
-Mask=1793
-Used=199
-memo=Ground
-Label Offset=0,0,0,0
-PinCnt=1
-Pin="PinA",0,0,-3,-7
-
-[compdef]
 Name=Voltage Source
 Definition=VSpice
 Shape=SPICE_V
 Mask=4865
-Used=23
+Used=51
 memo=Voltage Source
 Label Offset=19,13,15,13
 PinCnt=2
@@ -118,16 +92,15 @@ Pin="Plus",6,0,-5,-6
 Pin="Minus",0,0,-20,-6
 
 [compdef]
-Name=F
-Definition=Macro
-Shape=FofS
-Mask=20480
-Used=2
-memo=Transfer Function Macro
-Label Offset=22,-14,-20,60
-PinCnt=2
-Pin="PinA",a,0,0,-11,-4
-Pin="PinB",a,20,0,-8,-4
+Name=Ground
+Definition=Ground
+Shape=Ground
+Mask=1793
+Used=273
+memo=Ground
+Label Offset=0,0,0,0
+PinCnt=1
+Pin="PinA",0,0,-3,-7
 
 [compdef]
 Name=Sub
@@ -155,28 +128,30 @@ Pin="PinA",a,0,0,-12,-3
 Pin="PinB",a,9,0,-12,-3
 
 [compdef]
-Name=Abs
+Name=F
 Definition=Macro
-Shape=Absolute
+Shape=FofS
 Mask=20480
-Used=5
-memo=Absolute Value Macro
-Label Offset=20,25,28,28
+memo=Transfer Function Macro
+Label Offset=22,-14,-20,60
 PinCnt=2
-Pin="PinA",a,0,0,-11,-3
-Pin="PinB",a,10,0,-6,-3
+Pin="PinA",a,0,0,-11,-4
+Pin="PinB",a,20,0,-8,-4
 
 [Circuit]
-Window Placement=2,3, -1,-1, -8,-31, 0,0,1102,491
+Window Placement=2,3, -1,-1, -8,-31, 0,0,1327,376
 Default Object=Color=#000080
 Default Object Font=Height=-15,FStyle=0,Color=#000080,Name=Arial
 Default Object Apply Border To Text=No
 Default Object Apply Fill To Text=No
+Default Object GridSnap=No
 NodeVoltageFormat=3
+CurrentFormat=3
+PowerFormat=3
 PathDelayFormat=3
 WarningFormat=3
 GridTextFormulaFormat=3
-Window Placement in Transient Analysis=2,3, 0,616, -8,-31, 97,371,1395,862
+Window Placement in Transient Analysis=2,3, -1,-1, -8,-31, 78,78,1371,600
 SpiceType=AMBIGUOUS
 Title_Block_Border=None
 Title_Block=False
@@ -191,18 +166,19 @@ Show Cross=False
 Show Attribute Text=True
 Show Grid Text=True
 
-[Comp]
-Name=Ground
-Px=360,504
-Rot=7
+[Wire]
+Pxs=104,80,104,144
+
+[Wire]
+Pxs=104,80,168,80
 
 [Comp]
 Name=Voltage Source
-Px=360,512
+Px=104,192
 Rot=3
 
 [Attr]
-ON=-31,-27,PART
+ON=-39,-33,PART
 V=V1
 Style=8192
 
@@ -220,39 +196,20 @@ V=DC 0 AC 1 0 Pulse 0 5 100n 10n 10n 400n 1u
 Style=256
 
 [Comp]
-Name=F
-Style=ShowPinText
-Px=1008,400
-
-[Attr]
-ON=22,-14,PART
-V=X1
-Style=8192
-
-[Attr]
-ON=22,0,FILE
-V=F
-
-[Attr]
-ON=22,28,Param:FS
-V=2*exp(-S*T0)/(1+S*T0)^n
-Style=8192
-
-[Attr]
-ON=0,0,PACKAGE
-V
+Name=Ground
+Px=104,184
+Rot=7
 
 [Wire]
-Pxs=512,400,528,400
+Pxs=104,184,104,192
 
 [Comp]
 Name=Sub
-Px=464,400
+Px=168,80
 
 [Attr]
-ON=44,5,PART
-V=X2
-Style=8192
+ON=59,18,PART
+V=X1
 
 [Attr]
 ON=44,19,FILE
@@ -271,42 +228,32 @@ ON=0,0,PACKAGE
 V
 
 [Wire]
-Pxs=360,504,360,512
+Pxs=200,112,200,176
 
 [Wire]
-Pxs=496,432,496,552
+Pxs=200,176,624,176
 
 [Wire]
-Pxs=496,552,1216,552
+Pxs=216,80,232,80
 
 [Wire]
-Pxs=1216,400,1216,552
-
-[Wire]
-Pxs=1168,400,1216,400
-
-[Wire]
-Pxs=360,400,360,464
-
-[Wire]
-Pxs=360,400,464,400
+Pxs=232,80,280,80
 
 [Comp]
 Name=Amp
-Px=880,400
+Px=280,80
 
 [Attr]
 ON=54,3,PART
-V=X3
-Style=8192
+V=X2
 
 [Attr]
 ON=54,17,FILE
 V=Amp
 
 [Attr]
-ON=20,29,Param:GAIN
-V=1.10
+ON=17,35,Param:GAIN
+V=1.977
 Style=8192
 
 [Attr]
@@ -314,157 +261,44 @@ ON=0,0,PACKAGE
 V
 
 [Wire]
-Pxs=952,400,1008,400
-
-[Wire]
-Pxs=528,400,536,400
+Pxs=352,80,408,80
 
 [Comp]
 Name=F
 Style=ShowPinText
-Px=600,488
+Px=408,80
 
 [Attr]
-ON=22,-14,PART
-V=X4
-Style=8192
+ON=26,-9,PART
+V=X3
 
 [Attr]
 ON=22,0,FILE
 V=F
 
 [Attr]
-ON=22,28,Param:FS
-V=1/(Tu*S)
+ON=7,33,Param:FS
+V=2*exp(-S*T1)/(1+S*T0)^n
 Style=8192
 
 [Attr]
 ON=0,0,PACKAGE
 V
 
-[Comp]
-Name=F
-Style=ShowPinText
-Px=696,216
-
-[Attr]
-ON=22,-14,PART
-V=X5
-Style=8192
-
-[Attr]
-ON=22,0,FILE
-V=F
-
-[Attr]
-ON=22,28,Param:FS
-V=1/S
-Style=8192
-
-[Attr]
-ON=0,0,PACKAGE
-V
-
-[Comp]
-Name=Abs
-Style=ShowPinText
-Px=536,216
-
-[Attr]
-ON=20,25,PART
-V=X6
-Style=8192
-
-[Attr]
-ON=20,39,FILE
-V=Abs
-
-[Attr]
-ON=0,0,PACKAGE
-V
+[Wire]
+Pxs=568,80,624,80
 
 [Wire]
-Pxs=616,216,696,216
+Pxs=624,80,624,176
 
-[Wire]
-Pxs=536,216,536,400
-
-[Wire]
-Pxs=536,400,600,400
-
-[Wire]
-Pxs=600,400,600,488
-
-[Wire]
-Pxs=600,400,880,400
+[Node Offsets]
+Section=0
+;Node,Page,GridX,GridY,OffsetX,OffsetY
+Offset=2,0,200,112,1,11
 
 [Grid Text]
-Text="кнопка хай смотрим на правом конце какие то числа это ошибка которую надо запомнить там right - это на правом конце"
-Text="потом мен€ем K в усилителе там, чтобы уменьшить ошибку."
-Px=752,32
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
-
-[Grid Text]
-Text="4.873 -- “ критическое врем€ (рассто€ние между пиками)"
-Text="1.10 --   критиеское (значение усилител€ когда функцией с одинаковыми периодами становитс€)"
-Px=64,40
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
-
-[Grid Text]
-Text="M = 4"
-Text="m = 1"
-Text="n = 4"
-Px=64,88
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
-
-[Grid Text]
-Text=".define T0 0.54"
-Px=152,80
-Color=#DE0CBE
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
-
-[Grid Text]
-Text=".define Kcrit 2.20"
-Px=280,80
-Color=#DE0CBE
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
-
-[Grid Text]
-Text=".define Tcrit 4.9"
-Px=472,80
-Color=#DE0CBE
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
-
-[Grid Text]
-Text=".define Kn 0.6*Kcrit"
-Px=280,104
-Color=#DE0CBE
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
-
-[Grid Text]
-Text=".define Tn Tcrit/2"
-Px=472,104
+Text=".define T0 1.26"
+Px=96,288
 Color=#DE0CBE
 GridSnap=True
 JustifyH=Left
@@ -473,7 +307,7 @@ CBorder=None
 
 [Grid Text]
 Text=".define n 4"
-Px=152,104
+Px=96,264
 Color=#DE0CBE
 GridSnap=True
 JustifyH=Left
@@ -481,17 +315,8 @@ JustifyV=Bottom
 CBorder=None
 
 [Grid Text]
-Text=".define Ti Tcrit/1.2"
-Px=472,128
-Color=#DE0CBE
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
-
-[Grid Text]
-Text=".define Ki 0.45*Kcrit"
-Px=280,128
+Text=".define T1 0"
+Px=96,312
 Color=#DE0CBE
 GridSnap=True
 JustifyH=Left
@@ -508,7 +333,7 @@ Splitter.ys=0
 TextQuad=4099
 Scale=1
 GridUser=10
-ShapeGroups="Main","Euro","Polarity","Main1","Main11","Electrolytic","GroundArrow","DeMorgan","Main2"
+ShapeGroups="Main","Euro","Polarity","Main1","Main11","Electrolytic","GroundArrow","DeMorgan"
 CalcRMS=False
 CalcAVG=False
 CalcPeak=False
@@ -523,27 +348,64 @@ BOM=No
 FILEPCB=No
 PROBE=Yes
 SELECT=Yes
+PAN=Yes
 COMP=Yes
 TEXT=Yes
 WIRE=Yes
 WIRED=Yes
 BUS=Yes
 GRAPHIC=Yes
+FLOWCHART=Yes
 LINE=No
 ELLIPSE=No
 RECT=No
 DIAM=No
 ARC=No
 PIE=No
+TRIANGLE=No
+STAR=No
 LEFTBRK=No
 RIGHTBRK=No
 BOTHBRK=No
 META=Yes
+PARALLELOGRAM=No
+FC_PROCESS=No
+FC_ALT_PROCESS=No
+FC_DECISION=No
+FC_DATA=No
+FC_PREDEFPROCESS=No
+FC_INTERNALSTORAGE=No
+FC_DOCUMENT=No
+FC_MULTIDOCUMENT=No
+FC_TERMINATOR=No
+FC_PREPARATION=No
+FC_MANUALINPUT=No
+FC_MANUALOPERATION=No
+FC_CONNECTOR=No
+FC_OFFPAGECONNECTOR=No
+FC_PUNCHCARD=No
+FC_PUNCHEDTAPE=No
+FC_SUMMING_JUNCTION=No
+FC_OR=No
+FC_COLLATE=No
+FC_SORT=No
+FC_EXTRACT=No
+FC_MERGE=No
+FC_STORED_DATA=No
+FC_DELAY=No
+FC_SAS=No
+FC_MAGNETIC_DISK=No
+FC_DAS=No
+FC_DISPLAY=No
+SPREAD_SHEET=Yes
+POLYCLOS=No
+POLYOPEN=No
 FLAG=Yes
 INFO=Yes
 HELP=Yes
 HELP_SPICE=No
 LINK=Yes
+CHECK=Yes
 REGION_ENABLE=Yes
 TITLE_BLOCK=Yes
 DIGTRC=No
@@ -584,6 +446,7 @@ CIR2CKT=Yes
 ATTDISP=Yes
 ENABLE=Yes
 DISABLE=Yes
+ENABLE_WITH=Yes
 TOFRONT=Yes
 TOBACK=Yes
 SELNEXT=Yes
@@ -598,6 +461,7 @@ GOTOFLAG=Yes
 UPLEVEL=Yes
 COLOR=Yes
 FONT=Yes
+STYLE=Yes
 DM_LAST=No
 DM_RMS=No
 DM_AVG=No
@@ -623,14 +487,17 @@ TEXTINC=No
 TOGGLETEXT=No
 TOGGLEMODE=No
 TOLERANCE=No
+ALIGNAB=No
 ALIGNLEFT=Yes
+ALIGNCENTER=No
 ALIGNRIGHT=Yes
 ALIGNTOP=Yes
+ALIGNMIDDLES=No
 ALIGNBOTTOM=Yes
 
 [Section]
 Index=0
-Name="lab1_2_мой"
+Name="p-regulator"
 Type=Main
 Enable=True
 CurrentPage 0=0
@@ -652,9 +519,9 @@ PrinterScale=1
 Scale 0=1
 Scale 1=1
 Scale 2=1
-SB 3=47,0
+SB 3=4,0
 Scale 3=1
-Px=1195,299
+Px=500,393
 WinBackGround Color=#FFFFFF
 Select Color=#FF0000
 Anchor Color=#000000
@@ -666,6 +533,9 @@ Grid Text GridSnap=True
 Grid Text PinIt=False
 Grid Text JustifyH=Left
 Grid Text JustifyV=Bottom
+Grid GradientColor2=None
+Grid OutlineThickness=1
+Grid OutlineColor=None
 Component Color=#0000FF
 Attribute Text=Height=-12,FStyle=0,Color=#008000,Name=Verdana
 Wire Color=#008000
@@ -757,16 +627,19 @@ Measure=True
 MacroSubckt=True
 NotUsed=True
 ComponentCounts=True
+VariablizePaths=False
+DontShowPaths=False
+SimulationLog=True
 
 [Transient]
 WinID=1
-Window Placement=2,3, 0,616, -8,-31, 97,371,1395,862
+Window Placement=2,3, -1,-1, -8,-31, 78,78,1371,600
 Font=Height=-19,FStyle=0,Color=#0000FF,Name=Arial
 WinBackGround Color=#FFFFFF
 Select Color=#FF0000
 Anchor Color=#000000
 Select Box Color=#000080
-Title
+Title=p-regulator.cir
 AutoTitle=Yes
 Grid Color=#808080
 Grid Weight=1
@@ -829,7 +702,7 @@ MonMaxShow=2
 MonPageWidth=66
 MonPlotWidth=21
 MonExprXWidth=142
-MonExprYWidth=306
+MonExprYWidth=367
 MonRangeXWidth=90
 MonRangeYWidth=90
 AnimateWait=None
@@ -852,6 +725,7 @@ Num Out Write Zero Models=True
 Num Out Write Undefined Models=True
 Num Out Write Operating Point=True
 Num Out Write Measurement Values=True
+Num Out Write Tolerance Detail=True
 Num Out Write Values=True
 Num Out Write Waveform Header=True
 Num Out Allow Dup Y Expr=False
@@ -860,6 +734,7 @@ Num Out High="TMAX"
 Num Out Font=Height=-15,FStyle=0,Color=#000000,Name=Courier New
 Num Out Format=3
 Num Out HideNonSelected=False
+Num Out UseActualDataPoints=False
 AutoSaveWave=False
 Wave Format=16E
 State Variables Format=5E
@@ -868,6 +743,7 @@ Print Individual Pages=False
 [Tools]
 Pos=Top
 SELECT=Yes
+PAN=Yes
 GRAPHIC=Yes
 LINE=No
 ELLIPSE=No
@@ -875,11 +751,15 @@ RECT=No
 DIAM=No
 ARC=No
 PIE=No
+TRIANGLE=No
+STAR=No
 LEFTBRK=No
 RIGHTBRK=No
 BOTHBRK=No
 META=No
+PARALLELOGRAM=No
 POLYCLOS=No
+POLYOPEN=No
 SCALE=Yes
 CURSOR=Yes
 MEASUREH=Yes
@@ -930,6 +810,7 @@ AUTOSCALE=Yes
 RESTORESCALE=No
 COLOR=Yes
 FONT=Yes
+STYLE=Yes
 SELNEXT=No
 NORMALIZE=No
 NORMALIZE_MIN=No
@@ -958,6 +839,7 @@ ENVELOPE=No
 SAMEYSCALES=No
 KEEPXSCALESTHESAME=No
 CURVEFIT=No
+ADD_MARKER=No
 SHOWWATCH=No
 BP=No
 TOGGLEMODE=No
@@ -965,13 +847,30 @@ REMOVEALLTEXT=No
 AUTOSCALEX=No
 LABELALLMINOR=No
 ALIGNLEFT=No
+ALIGNCENTER=No
 ALIGNRIGHT=No
 ALIGNTOP=No
+ALIGNMIDDLES=No
 ALIGNBOTTOM=No
 
 [APage]
 Analysis=Transient
-Name="Main"
+Name="MAIN"
+
+[AObject]
+Analysis=Transient
+Object=MeasureH
+Locked=True
+EndPoint=ArrowF
+CBorder=#000080
+w=1
+AliasID1=2
+w2=1
+AliasID2=2
+Pos=33.2177734375,1.263117790222168,40.2734375,1.262192822344995
+Posm=1.1100000000000001
+Font=Height=-15,FStyle=0,Color=#FF0000,Name=Arial
+Format=3
 
 [AObject]
 Analysis=Transient
@@ -1014,7 +913,8 @@ Seed=0
 
 [Limits]
 Analysis=Transient
-TRange=100
+TMax=100
+TStart=0
 TStep=0
 NPts=51
 Temp=27
@@ -1052,9 +952,9 @@ NOFmtY=3E
 [WaveForm]
 Analysis=Transient
 Plt=1
-AliasID=2
+AliasID=3
 XExp=T
-YExp=v(3)
+YExp=v(2)
 XRng=AutoAlways
 YRng=AutoAlways
 Options=LINEARX,LINEARY
@@ -1085,11 +985,10 @@ PlaceText=True
 
 [Pane]
 Analysis=Transient
-SplitterRow 0=318
-SplitterRow 1=34
+SplitterRow 0=684
 SplitterCol 0=1278
-CurrentPage 0="Main"
-CurrentPage 4="Main"
+CurrentPage 0="MAIN"
+CurrentPage 4="MAIN"
 
 [Pane]
 Analysis=AC
@@ -1115,6 +1014,14 @@ ExprPercentWidth=80
 Var Width=100
 Nominal Width=72
 Tol Width=152
+Tol Name=Drift
+Col Width Neq=50
+Col Width Pos=50
+Col Width Rnd=50
+
+[WCFiles]
+UseFile=<Library>Standard.tlib
+AVAILABLE_FILE=<Library>Standard.tlib
 
 [OPMethods]
 Analysis=Transient

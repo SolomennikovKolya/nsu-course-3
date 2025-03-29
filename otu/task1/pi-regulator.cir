@@ -7,8 +7,14 @@ Shape Version=11.00
 Screen=1536,960
 MCAPVersion=12.2.0.5
 Key ID=Demo
-NLCnt=15
-TXCnt=11
+NLCnt=27
+TXCnt=5
+
+[shapedef]
+Name=Absolute
+Root="Plt.root",0,0,0
+Line=40,0,56,-16
+Line=40,0,24,-16
 
 [shapedef]
 Name=Amp
@@ -55,6 +61,15 @@ Name=Minus.root
 Line=-2,0,2,0
 
 [shapedef]
+Name=Plt.root
+Rectangle=16,-24,64,24
+FColor=None
+Line=0,0,16,0
+Line=22,0,58,0
+Line=40,-18,40,18
+Line=64,0,80,0
+
+[shapedef]
 Name=Plus.root
 Line=-2,0,2,0
 Line=0,-2,0,2
@@ -68,6 +83,12 @@ Name=Sub
 Root="Circle.root",0,0,0
 Root="Plus.root",5,-10,0
 Root="Minus.root",25,27,0
+
+[shapedef]
+Name=Sum
+Root="Circle.root",0,0,0
+Line=27,0,37,0
+Line=32,-5,32,5
 
 [shapedef]
 Name=Vsource.root
@@ -138,8 +159,33 @@ PinCnt=2
 Pin="PinA",a,0,0,-12,-3
 Pin="PinB",a,9,0,-12,-3
 
+[compdef]
+Name=Abs
+Definition=Macro
+Shape=Absolute
+Mask=20480
+Used=3
+memo=Absolute Value Macro
+Label Offset=20,25,28,28
+PinCnt=2
+Pin="PinA",a,0,0,-11,-3
+Pin="PinB",a,10,0,-6,-3
+
+[compdef]
+Name=Sum
+Definition=Macro
+Shape=Sum
+Mask=4096
+Used=6
+memo=2-Input Summer Macro
+Label Offset=45,5,15,21
+PinCnt=3
+Pin="PinA",a,0,0,-9,-3
+Pin="PinB",a,4,4,8,4
+Pin="PinC",a,8,0,-7,-3
+
 [Circuit]
-Window Placement=2,3, -1,-1, -8,-31, 52,52,1145,589
+Window Placement=2,3, -1,-1, -8,-31, 130,130,1230,652
 Default Object=Color=#000080
 Default Object Font=Height=-15,FStyle=0,Color=#000080,Name=Arial
 Default Object Apply Border To Text=No
@@ -151,7 +197,7 @@ PowerFormat=3
 PathDelayFormat=3
 WarningFormat=3
 GridTextFormulaFormat=3
-Window Placement in Transient Analysis=2,3, -1,-1, -8,-31, 78,78,1371,600
+Window Placement in Transient Analysis=2,3, -1,-1, -8,-31, 26,26,1319,548
 SpiceType=AMBIGUOUS
 Title_Block_Border=None
 Title_Block=False
@@ -168,12 +214,12 @@ Show Grid Text=True
 
 [Comp]
 Name=Ground
-Px=360,504
+Px=88,328
 Rot=7
 
 [Comp]
 Name=Voltage Source
-Px=360,512
+Px=88,336
 Rot=3
 
 [Attr]
@@ -197,20 +243,19 @@ Style=256
 [Comp]
 Name=F
 Style=ShowPinText
-Px=1008,400
+Px=736,224
 
 [Attr]
 ON=22,-14,PART
 V=X1
-Style=8192
 
 [Attr]
 ON=22,0,FILE
 V=F
 
 [Attr]
-ON=22,28,Param:FS
-V=2*exp(-S*T0)/(1+S*T0)^n
+ON=6,32,Param:FS
+V=2*exp(-S*T1)/(1+S*T0)^n
 Style=8192
 
 [Attr]
@@ -218,16 +263,15 @@ ON=0,0,PACKAGE
 V
 
 [Wire]
-Pxs=512,400,528,400
+Pxs=240,224,256,224
 
 [Comp]
 Name=Sub
-Px=464,400
+Px=192,224
 
 [Attr]
 ON=44,5,PART
 V=X2
-Style=8192
 
 [Attr]
 ON=44,19,FILE
@@ -246,42 +290,41 @@ ON=0,0,PACKAGE
 V
 
 [Wire]
-Pxs=360,504,360,512
+Pxs=88,328,88,336
 
 [Wire]
-Pxs=496,432,496,552
+Pxs=224,256,224,376
 
 [Wire]
-Pxs=496,552,1216,552
+Pxs=224,376,952,376
 
 [Wire]
-Pxs=1216,400,1216,552
+Pxs=952,224,952,376
 
 [Wire]
-Pxs=1168,400,1216,400
+Pxs=896,224,952,224
 
 [Wire]
-Pxs=360,400,360,464
+Pxs=88,224,88,288
 
 [Wire]
-Pxs=360,400,464,400
+Pxs=88,224,192,224
 
 [Comp]
 Name=Amp
-Px=880,400
+Px=608,224
 
 [Attr]
 ON=54,3,PART
 V=X3
-Style=8192
 
 [Attr]
 ON=54,17,FILE
 V=Amp
 
 [Attr]
-ON=19,29,Param:GAIN
-V=Kcrit
+ON=17,33,Param:GAIN
+V=K
 Style=8192
 
 [Attr]
@@ -289,78 +332,131 @@ ON=0,0,PACKAGE
 V
 
 [Wire]
-Pxs=952,400,1008,400
+Pxs=680,224,736,224
+
+[Comp]
+Name=Abs
+Style=ShowPinText
+Px=304,96
+
+[Attr]
+ON=20,25,PART
+V=X6
+
+[Attr]
+ON=32,33,FILE
+V=Abs
+Style=8192
+
+[Attr]
+ON=0,0,PACKAGE
+V
+
+[Comp]
+Name=F
+Style=ShowPinText
+ShowPinMarkers=True
+ShowPackagePins=True
+Px=456,96
+
+[Attr]
+ON=22,-14,PART
+V=X7
+
+[Attr]
+ON=22,0,FILE
+V=F
+
+[Attr]
+ON=49,31,Param:FS
+V=1/(S)
+Style=12288
+
+[Attr]
+ON=0,0,PACKAGE
+V
 
 [Wire]
-Pxs=528,400,880,400
+Pxs=384,96,456,96
 
-[Grid Text]
-Text="кнопка хай смотрим на правом конце какие то числа это ошибка которую надо запомнить там right - это на правом конце"
-Text="потом мен€ем K в усилителе там, чтобы уменьшить ошибку."
-Px=752,32
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
+[Wire]
+Pxs=280,96,304,96
 
-[Grid Text]
-Text="4.873 -- “ критическое врем€ (рассто€ние между пиками)"
-Text="1.10 --   критиеское (значение усилител€ когда функцией с одинаковыми периодами становитс€)"
-Px=64,32
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
+[Wire]
+Pxs=256,224,280,224
 
-[Grid Text]
-Text="M = 4"
-Text="m = 9"
-Text="n = 4"
-Px=64,88
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
+[Comp]
+Name=F
+Style=ShowPinText
+Px=336,304
+
+[Attr]
+ON=22,-14,PART
+V=X8
+
+[Attr]
+ON=22,0,FILE
+V=F
+
+[Attr]
+ON=45,32,Param:FS
+V=1/(Ti*S)
+Style=8192
+
+[Attr]
+ON=0,0,PACKAGE
+V
+
+[Comp]
+Name=Sum
+Px=464,224
+
+[Attr]
+ON=45,5,PART
+V=X9
+
+[Attr]
+ON=45,19,FILE
+V=Sum
+
+[Attr]
+ON=48,21,Param:KA
+V=1
+
+[Attr]
+ON=45,61,Param:KB
+V=1
+
+[Attr]
+ON=0,0,PACKAGE
+V
+
+[Wire]
+Pxs=496,256,496,304
+
+[Wire]
+Pxs=336,224,336,304
+
+[Wire]
+Pxs=280,224,336,224
+
+[Wire]
+Pxs=528,224,608,224
+
+[Wire]
+Pxs=280,96,280,224
+
+[Wire]
+Pxs=336,224,464,224
+
+[Node Offsets]
+Section=0
+;Node,Page,GridX,GridY,OffsetX,OffsetY
+Offset=7,0,616,96,3,1
 
 [Grid Text]
 Text=".define T0 1.26"
-Px=128,64
-Color=#DE0CBE
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
-
-[Grid Text]
-Text=".define Kcrit 1.1"
-Px=120,184
-Color=#DE0CBE
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
-
-[Grid Text]
-Text=".define Tcrit 11.4"
-Px=120,160
-Color=#DE0CBE
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
-
-[Grid Text]
-Text=".define Kn 0.6*Kcrit"
-Px=488,96
-Color=#DE0CBE
-GridSnap=True
-JustifyH=Left
-JustifyV=Bottom
-CBorder=None
-
-[Grid Text]
-Text=".define Tn Tcrit/2"
-Px=680,96
+Px=128,496
 Color=#DE0CBE
 GridSnap=True
 JustifyH=Left
@@ -369,7 +465,7 @@ CBorder=None
 
 [Grid Text]
 Text=".define n 4"
-Px=128,88
+Px=128,472
 Color=#DE0CBE
 GridSnap=True
 JustifyH=Left
@@ -377,8 +473,8 @@ JustifyV=Bottom
 CBorder=None
 
 [Grid Text]
-Text=".define Ti Tcrit/1.2"
-Px=680,120
+Text=".define Ti 10.1"
+Px=280,496
 Color=#DE0CBE
 GridSnap=True
 JustifyH=Left
@@ -386,8 +482,17 @@ JustifyV=Bottom
 CBorder=None
 
 [Grid Text]
-Text=".define Ki 0.45*Kcrit"
-Px=488,120
+Text=".define K 0.45"
+Px=280,472
+Color=#DE0CBE
+GridSnap=True
+JustifyH=Left
+JustifyV=Bottom
+CBorder=None
+
+[Grid Text]
+Text=".define T1 3"
+Px=128,520
 Color=#DE0CBE
 GridSnap=True
 JustifyH=Left
@@ -568,7 +673,7 @@ ALIGNBOTTOM=Yes
 
 [Section]
 Index=0
-Name="lab1_2_1"
+Name="pi-regulator"
 Type=Main
 Enable=True
 CurrentPage 0=0
@@ -590,8 +695,9 @@ PrinterScale=1
 Scale 0=1
 Scale 1=1
 Scale 2=1
+SB 3=2,0
 Scale 3=1
-Px=1023,136
+Px=449,507
 WinBackGround Color=#FFFFFF
 Select Color=#FF0000
 Anchor Color=#000000
@@ -703,13 +809,13 @@ SimulationLog=True
 
 [Transient]
 WinID=1
-Window Placement=2,3, -1,-1, -8,-31, 78,78,1371,600
+Window Placement=2,3, -1,-1, -8,-31, 26,26,1319,548
 Font=Height=-19,FStyle=0,Color=#0000FF,Name=Arial
 WinBackGround Color=#FFFFFF
 Select Color=#FF0000
 Anchor Color=#000000
 Select Box Color=#000080
-Title
+Title=pi-regulator.cir
 AutoTitle=Yes
 Grid Color=#808080
 Grid Weight=1
@@ -768,7 +874,7 @@ FFT_IncludeDCHarmonic=False
 FFT_AutoScale_Harmonics="10"
 PrinterAutoTile=No
 PrinterBlackBorder=No
-MonMaxShow=2
+MonMaxShow=3
 MonPageWidth=66
 MonPlotWidth=21
 MonExprXWidth=142
@@ -927,21 +1033,6 @@ ALIGNBOTTOM=No
 Analysis=Transient
 Name="MAIN"
 
-[AObject]
-Analysis=Transient
-Object=MeasureH
-Locked=True
-EndPoint=ArrowF
-CBorder=#000080
-w=1
-AliasID1=2
-w2=1
-AliasID2=2
-Pos=30.3369140625,1.359725927976839,41.73828125,1.3531917067843628
-Posm=1.2150000000000001
-Font=Height=-15,FStyle=0,Color=#FF0000,Name=Arial
-Format=3
-
 [Monte Carlo Options]
 Analysis=Transient
 Status=Off
@@ -992,9 +1083,33 @@ NOFmtY=3E
 [WaveForm]
 Analysis=Transient
 Plt=1
-AliasID=2
+AliasID=5
 XExp=T
 YExp=v(3)
+XRng=AutoAlways
+YRng=AutoAlways
+Options=LINEARX,LINEARY
+Enable=Enable
+Line Color=#36C25C
+Text Color=#36C25C
+Rainbow=False
+VFmtX=3
+VFmtY=3
+ScaleFactorX="None"
+ScaleFactorY="None"
+ScaleUnitsX="Auto"
+ScaleUnitsY="Auto"
+SFmtX=2
+SFmtY=2
+NOFmtX=3E
+NOFmtY=3E
+
+[WaveForm]
+Analysis=Transient
+Plt=2
+AliasID=4
+XExp=T
+YExp=v(7)
 XRng=AutoAlways
 YRng=AutoAlways
 Options=LINEARX,LINEARY
@@ -1025,8 +1140,7 @@ PlaceText=True
 
 [Pane]
 Analysis=Transient
-SplitterRow 0=318
-SplitterRow 1=34
+SplitterRow 0=684
 SplitterCol 0=1278
 CurrentPage 0="MAIN"
 CurrentPage 4="MAIN"
