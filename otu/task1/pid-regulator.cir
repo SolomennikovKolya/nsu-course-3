@@ -528,7 +528,7 @@ JustifyV=Bottom
 CBorder=None
 
 [Grid Text]
-Text=".define Ti 12.754"
+Text=".define Ti 8.23"
 Px=344,512
 GridSnap=True
 JustifyH=Left
@@ -536,7 +536,7 @@ JustifyV=Bottom
 CBorder=None
 
 [Grid Text]
-Text=".define T1 3"
+Text=".define T1 10"
 Px=152,536
 GridSnap=True
 JustifyH=Left
@@ -544,7 +544,7 @@ JustifyV=Bottom
 CBorder=None
 
 [Grid Text]
-Text=".define K 0.361"
+Text=".define K 0.386"
 Px=344,488
 GridSnap=True
 JustifyH=Left
@@ -748,7 +748,7 @@ Scale 0=1
 Scale 1=1
 Scale 2=1
 Scale 3=1
-Px=979,553
+Px=412,504
 WinBackGround Color=#FFFFFF
 Select Color=#FF0000
 Anchor Color=#000000
@@ -1379,10 +1379,10 @@ AliasID=3
 XExp=T
 YExp=v(8)
 XRng=100
-YRng=24,-6
+YRng=30,-7.5
 Options=LINEARX,LINEARY
 Range Grid X=20
-Range Grid Y=6
+Range Grid Y=7.5
 Enable=Enable
 Line Color=#FF0000
 Text Color=#FF0000
