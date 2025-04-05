@@ -1,6 +1,6 @@
 
 **Начальная настройка:** 
-- `cd ../backend && .venv\Scripts\activate` - активация виртуального окружения
+- `cd backend && .venv\Scripts\activate` - активация виртуального окружения
 - `pip install -r requirements.txt` - установка зависимостей
 
 **Development:**

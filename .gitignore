@@ -5,6 +5,5 @@
 !/obsidian/Программирование/**
 !/obsidian/README.md
 
-/networks/task2/server/uploads
-/networks/task2/client/data
 myenv/
+.venv/
