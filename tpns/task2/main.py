@@ -2,12 +2,14 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from tabulate import tabulate
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
-import argparse
+from sklearn.neural_network import MLPRegressor
 
 from data_preprocessing import get_data
 from perceptron_lib import train_regressor as train_regressor_lib
+from config import ModelConfig
 
 
 def show_graphics(y_test, y_pred) -> None:
@@ -39,25 +41,20 @@ def show_graphics(y_test, y_pred) -> None:
 
 def main() -> None:
     # Парсим входные параметры
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--mode', type=str, default="lib",
-                        help='Способ реализации и обучения модели: "lib" или "manual"')
-    # parser.add_argument('mode', help='Тип модели: "lib" или "manual"')
-    args = parser.parse_args()
+    config = ModelConfig()
+    config.parse_args()
 
     # Загружаем данные
-    data = get_data()
+    data = get_data(shuffle=False)
     X = data.drop(columns='quality')
     y = data['quality']
     X_train, X_test = train_test_split(X, test_size=0.2, random_state=42)
     y_train, y_test = train_test_split(y, test_size=0.2, random_state=42)
 
-    # Обучаем персептрон
+    # Обучаем модель
     start_time = time.time()
-    if args.mode == 'lib':
-        model = train_regressor_lib(X_train, y_train)
-    else:
-        model = train_regressor_lib(X_train, y_train)
+    model = train_regressor_lib(X_train, y_train, config) if config.mode == 'manual' \
+        else train_regressor_lib(X_train, y_train, config)
     elapsed_time = time.time() - start_time
 
     # Предсказания и оценка
@@ -66,9 +63,9 @@ def main() -> None:
     r2 = r2_score(y_test, y_pred)
 
     # Выводим результаты
-    print(f"Время обучения: {elapsed_time:.4f}")
-    print(f"MSE: {mse:.4f}")
-    print(f"R²: {r2:.4f}")
+    table_data = [(f"{elapsed_time:.4f}", f"{mse:.4f}", f"{r2:.4f}")]
+    print(tabulate(table_data, headers=[
+          "Время обучения", "MSE", "R²"], tablefmt="pretty"))
     show_graphics(y_test, y_pred)
 
 
