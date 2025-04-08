@@ -50,7 +50,3 @@ def get_data(shuffle=False, remove_unnecessary_features=False) -> pd.DataFrame:
         data = data.sample(frac=1).reset_index(drop=True)
 
     return data
-
-
-data = get_data(shuffle=True, remove_unnecessary_features=True)
-print(data)
