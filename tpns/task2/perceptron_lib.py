@@ -8,7 +8,7 @@ def train_regressor(X_train, y_train, config: ModelConfig):
         hidden_layer_sizes=config.layers,
         max_iter=config.epochs,
         learning_rate_init=config.step,
-        learning_rate="constant",
+        learning_rate='adaptive',
         solver='adam',
         activation='identity',
         early_stopping=False,

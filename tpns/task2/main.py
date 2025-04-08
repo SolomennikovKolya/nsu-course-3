@@ -6,6 +6,7 @@ from tabulate import tabulate
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.neural_network import MLPRegressor
+from imblearn.over_sampling import SMOTE
 
 from data_preprocessing import get_data
 from perceptron_lib import train_regressor as train_regressor_lib
@@ -48,8 +49,11 @@ def main() -> None:
     data = get_data(shuffle=False)
     X = data.drop(columns='quality')
     y = data['quality']
-    X_train, X_test = train_test_split(X, test_size=0.2, random_state=42)
-    y_train, y_test = train_test_split(y, test_size=0.2, random_state=42)
+    X_train, X_test = train_test_split(X, test_size=0.2, random_state=54)
+    y_train, y_test = train_test_split(y, test_size=0.2, random_state=54)
+
+    smote = SMOTE(sampling_strategy='auto', random_state=42, k_neighbors=2)
+    X_res, y_res = smote.fit_resample(X_train, y_train)
 
     # Обучаем модель
     start_time = time.time()

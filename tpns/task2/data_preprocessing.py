@@ -35,6 +35,14 @@ def clean_data(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
+def balance_data(data: pd.DataFrame) -> pd.DataFrame:
+    threshold = 100
+    data_grouped = data.groupby('quality')
+    balanced_data = data_grouped.apply(
+        lambda x: x.sample(n=min(threshold, len(x))))
+    return balanced_data.reset_index(drop=True)
+
+
 def get_data(shuffle=False, remove_unnecessary_features=False) -> pd.DataFrame:
     """Получение очищенного датасета"""
     data = get_data_from_csv()
@@ -48,5 +56,7 @@ def get_data(shuffle=False, remove_unnecessary_features=False) -> pd.DataFrame:
     # Перемешивание строк
     if (shuffle):
         data = data.sample(frac=1).reset_index(drop=True)
+
+    data = balance_data(data)
 
     return data
