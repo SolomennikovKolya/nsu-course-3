@@ -5,15 +5,15 @@ from config import ModelConfig
 def train_regressor(X_train, y_train, config: ModelConfig):
     """Обучение персептрона для линейной регрессии с помощью sklearn"""
     model = MLPRegressor(
-        hidden_layer_sizes=config.layers,
-        max_iter=config.epochs,
-        learning_rate_init=config.step,
-        learning_rate='adaptive',
-        solver='adam',
+        hidden_layer_sizes=config.hidden_layer_sizes or [],
         activation='identity',
-        early_stopping=False,
+        solver=config.solver or 'adam',
+        learning_rate=config.learning_rate or 'adaptive',
+        learning_rate_init=config.learning_rate_init or 0.001,
+        max_iter=config.max_iter or 200,
+        random_state=54,
         tol=1e-6,
-        random_state=54
+        early_stopping=config.early_stopping or False,
     )
     model.fit(X_train, y_train)
     print(f"Модель прошла {model.n_iter_} эпох")
