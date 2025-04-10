@@ -7,16 +7,19 @@ app = Flask(__name__)
 # В production это должно настраиваться на веб-сервере (Nginx)
 CORS(app)
 
-# Пример API endpoint
+
 @app.route('/api/hello')
+# Пример API endpoint
 def hello():
     return jsonify({'message': 'Hello from Flask!'})
 
-# Для обслуживания React сборки
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
+# Для обслуживания React сборки
 def serve(path):
     return app.send_static_file('index.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
