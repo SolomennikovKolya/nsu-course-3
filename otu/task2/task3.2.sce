@@ -11,10 +11,8 @@ x2 = cos(t);
 y2 = cos(2*t);
 z2 = sin(t);
 
-// Построение 3D линий
+// Построение линий
 clf();
-param3d([x1; x2], [y1; y2], [z1; z2]);
-xlabel("X");
-ylabel("Y");
-zlabel("Z");
+param3d(x1, y1, z1);
+param3d(x2, y2, z2);
 title("Параметрические кривые");

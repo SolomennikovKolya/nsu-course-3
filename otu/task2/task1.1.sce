@@ -8,6 +8,6 @@ disp("Решение системы:");
 disp(x);
 
 // Проверяем результат
-b_calculated = A * x;
-disp("Проверка:");
-disp(b_calculated);
+b_res = A * x;
+disp("A*x:");
+disp(b_res);

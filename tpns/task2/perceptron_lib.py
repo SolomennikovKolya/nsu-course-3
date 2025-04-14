@@ -5,18 +5,17 @@ from config import ModelConfig
 def train_regressor(X_train, y_train, config: ModelConfig):
     """Обучение персептрона для линейной регрессии с помощью sklearn"""
     model = MLPRegressor(
-        hidden_layer_sizes=config.hidden_layer_sizes or [],
+        hidden_layer_sizes=config.hidden_layer_sizes or [36, 10],
         activation='identity',
         solver=config.solver or 'adam',
         learning_rate=config.learning_rate or 'adaptive',
         learning_rate_init=config.learning_rate_init or 0.001,
-        max_iter=config.max_iter or 200,
+        max_iter=config.max_iter or 1000,
         random_state=54,
         tol=1e-6,
         early_stopping=config.early_stopping or False,
     )
     model.fit(X_train, y_train)
-    print(f"Модель прошла {model.n_iter_} эпох")
     return model
 
 
@@ -38,8 +37,8 @@ batch_size,          # Размер мини-батча
 warm_start,          # Продолжить обучение с предыдущего состояния
 momentum,            # Импульс для SGD
 nesterovs_momentum,  # Использовать Nesterov momentum
-+ early_stopping,      # Остановить обучение при отсутствии уменьшения ошибки на tol на валидациионной выборке за n_iter_no_change шагов
-+ validation_fraction, # Доля данных для валидации при early stopping
++ early_stopping,      # Включает кросс валидацию. Останавливает обучение при отсутствии уменьшения ошибки на tol на валидациионной выборке за n_iter_no_change шагов
++ validation_fraction, # Доля тренировочной выборки, которая станет валидационной при включенном early stopping
 beta_1,              # Экспоненциальное затухание для первого момента (Adam)
 beta_2,              # Для второго момента (Adam)
 epsilon,             # Малое значение для численной устойчивости
