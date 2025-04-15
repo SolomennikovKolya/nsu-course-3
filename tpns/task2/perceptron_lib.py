@@ -1,19 +1,22 @@
+import pandas as pd
 from sklearn.neural_network import MLPRegressor
 from config import ModelConfig
 
 
-def train_regressor(X_train, y_train, config: ModelConfig):
+def train_regressor(X_train: pd.DataFrame, y_train: pd.Series, config: ModelConfig):
     """Обучение персептрона для линейной регрессии с помощью sklearn"""
     model = MLPRegressor(
-        hidden_layer_sizes=config.hidden_layer_sizes or [36, 10],
+        hidden_layer_sizes=config.hidden_layer_sizes,
         activation='identity',
-        solver=config.solver or 'adam',
-        learning_rate=config.learning_rate or 'adaptive',
-        learning_rate_init=config.learning_rate_init or 0.001,
-        max_iter=config.max_iter or 1000,
+        solver=config.solver,
+        learning_rate=config.learning_rate,
+        learning_rate_init=config.learning_rate_init,
+        max_iter=config.max_iter,
         random_state=54,
         tol=1e-6,
-        early_stopping=config.early_stopping or False,
+        n_iter_no_change=config.max_iter,  # ! чтобы не было ранней остановки
+        early_stopping=config.early_stopping,
+        verbose=config.verbose,
     )
     model.fit(X_train, y_train)
     return model
