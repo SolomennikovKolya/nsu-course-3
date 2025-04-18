@@ -16,4 +16,12 @@ def ping():
 
 
 if __name__ == "__main__":
+
+    # Пример использования
+    # db_config = {
+    #     'host': 'localhost',
+    #     'user': 'root',
+    #     'password': 'your_password',
+    # }
+
     app.run(debug=True)
