@@ -1,27 +1,38 @@
 from flask import Flask
 from flask_cors import CORS
 from auth import auth_bp
+from flask import current_app
+from settings import load_config
+from db.init_db import init_db
+from db.seed_db import seed_db
 
-app = Flask(__name__)
+
+# app - экземпляр flask приложения
 # CORS (Cross-Origin Resource Sharing) нужен, чтобы разрешить запросы с другого домена или порта
 # "/api/*" ограничивает область действия CORS только на пути, начинающиеся с /api/
-# "origins": "http://localhost:5173" - указывает разрешённый источник — т.е. React-приложение, работающее на http://localhost:5173
+# "origins" указывает разрешённый источник — т.е. React-приложение, работающее на http://localhost:5173
+app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
-app.register_blueprint(auth_bp, url_prefix='/api/auth')
+with app.app_context():
+    load_config()
 
 
-@app.route("/api/ping")
-def ping():
-    return {"message": "pong"}
+# flask init_db - Инициализация БД
+@app.cli.command("init_db")
+def init_db_command():
+    init_db()
+
+
+# flask init_db - Заполнение БД тестовыми данными
+@app.cli.command("seed_db")
+def seed_db_command():
+    seed_db()
+
+
+# @app.route("/api/ping")
+# def ping():
+#     return {"message": "pong"}
 
 
 if __name__ == "__main__":
-
-    # Пример использования
-    # db_config = {
-    #     'host': 'localhost',
-    #     'user': 'root',
-    #     'password': 'your_password',
-    # }
-
     app.run(debug=True)

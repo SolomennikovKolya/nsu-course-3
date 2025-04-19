@@ -7,7 +7,9 @@
     - `py -m venv .venv` - создание виртуального окружения
     - `.venv\Scripts\activate.bat` - активация виртуального окружения
     - `pip install -r requirements.txt` - установка необходимых библиотек
+    - `set FLASK_APP=src/app.py` - даёт возможность использования flask CLI команд
 - `python src\app.py` - запуск сервера
+- `flask run` - другой способ запуска (работает, если установлена переменная FLASK_APP)
 - Flask будет слушать на http://localhost:5000
 
 #### Фронтенд

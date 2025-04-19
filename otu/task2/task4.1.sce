@@ -9,6 +9,9 @@ p2 = [7, 11, 5, 2];
 roots_p1 = roots(p1)
 roots_p2 = roots(p2)
 
+y = horner(p1, 1.1381125);
+disp(y);
+
 disp("Корни первого полинома:");
 disp(roots_p1);
 disp("Корни второго полинома:");

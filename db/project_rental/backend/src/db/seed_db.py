@@ -1,34 +1,39 @@
 import mysql.connector
-
-DB_NAME = "equipment_rental"
+from pathlib import Path
+from flask import current_app
 
 
 def seed_db():
-    """Заполнение БД тестовыми данными"""
-    with open("seed_data.sql", "r", encoding="utf-8") as f:
+    """Заполнение БД тестовыми данными."""
+    DB_ROOT_NAME = current_app.config['DB_ROOT_NAME']
+    DB_ROOT_PASSWORD = current_app.config['DB_ROOT_PASSWORD']
+    DB_HOST = current_app.config['DB_HOST']
+    DB_NAME = current_app.config['DB_NAME']
+
+    seed_db_path = Path(__file__).resolve().parent / "seed_db.sql"
+    with open(seed_db_path, "r", encoding="utf-8") as f:
         seed_sql = f.read()
 
     try:
         conn = mysql.connector.connect(
-            user='root', password='root', host='localhost', database=DB_NAME, autocommit=False)
+            user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=False)
         cursor = conn.cursor()
         conn.database = DB_NAME
 
         # MySQL автоматически начинает транзакцию, если использовать DML (INSERT, UPDATE, DELETE)
         # Изменения в БД происходят, но не фиксируются, пока транзакция открыта. Только conn.commit() фиксирует изменения
         conn.start_transaction()
-        for result in cursor.execute(seed_sql, multi=True):
-            if result.with_rows:
-                print("Rows returned:", result.fetchall())
+        for statement in seed_sql.split(';'):
+            stmt = statement.strip()
+            if stmt:
+                cursor.execute(stmt)
         conn.commit()
-        print("Test data inserted.")
 
     except mysql.connector.Error as err:
         print(f"Error seeding database: {err}")
+
     finally:
-        cursor.close()
-        conn.close()
-
-
-if __name__ == "__main__":
-    seed_db()
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
