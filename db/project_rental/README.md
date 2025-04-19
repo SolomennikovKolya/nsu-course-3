@@ -7,17 +7,20 @@
     - `py -m venv .venv` - создание виртуального окружения
     - `.venv\Scripts\activate.bat` - активация виртуального окружения
     - `pip install -r requirements.txt` - установка необходимых библиотек
-    - `set FLASK_APP=src/app.py` - даёт возможность использования flask CLI команд
-- `python src\app.py` - запуск сервера
-- `flask run` - другой способ запуска (работает, если установлена переменная FLASK_APP)
-- Flask будет слушать на http://localhost:5000
+- `python src\app.py` - запуск сервера. Flask будет слушать на http://localhost:5000
+- `set FLASK_APP=src/app.py` - даёт доступ к flask CLI командам:
+    - `flask run --debug` - другой способ запуска
+    - `flask run` - запуск без режима debug
+    - `flask init_db` - создание структуры БД (создание БД и пустых таблиц)
+    - `flask clear_db` - удаление всех данных из БД (с сохранением структуры)
+    - `flask seed_db` - заполнение БД тестовыми данными
+
 
 #### Фронтенд
 - `cd frontend`
 - При первом запуске:
     - `npm install`
-- `npm run dev` - Запуск dev-сервера Vite
-- По умолчанию, фронт будет на http://localhost:5173
+- `npm run dev` - Запуск dev-сервера Vite. Фронт будет работать на http://localhost:5173
 
 ### Как создавался проект
 
