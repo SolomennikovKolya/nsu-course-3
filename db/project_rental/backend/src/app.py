@@ -1,10 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-from auth import auth_bp
-from flask import current_app
-from settings import load_config
-from db.init_db import init_db
-from db.seed_db import seed_db
+import db.actions
 
 
 # app - экземпляр flask приложения
@@ -13,20 +9,24 @@ from db.seed_db import seed_db
 # "origins" указывает разрешённый источник — т.е. React-приложение, работающее на http://localhost:5173
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
-with app.app_context():
-    load_config()
 
 
-# flask init_db - Инициализация БД
+# flask init_db
 @app.cli.command("init_db")
-def init_db_command():
-    init_db()
+def init_db():
+    db.actions.init_db()
 
 
-# flask init_db - Заполнение БД тестовыми данными
+# flask clear_db
+@app.cli.command("clear_db")
+def clear_db():
+    db.actions.clear_db()
+
+
+# flask seed_db
 @app.cli.command("seed_db")
-def seed_db_command():
-    seed_db()
+def seed_db():
+    db.actions.seed_db()
 
 
 # @app.route("/api/ping")
