@@ -77,7 +77,7 @@ def with_db(user: str = None, password: str = None, host: str = None, database: 
                     database=database,
                     autocommit=autocommit
                 )
-                cursor = conn.cursor()
+                cursor = conn.cursor(dictionary=True)
 
                 result = func(*args, conn=conn, cursor=cursor, **kwargs)
                 if not autocommit:
@@ -136,14 +136,48 @@ def seed_db(conn, cursor):
         cursor.execute(query)
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=True)
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
 def clear_db(conn, cursor):
     """Очистка базы данных (данные удаляются но каркас остаётся)."""
     for query in get_queries_from_file("clear.sql"):
         cursor.execute(query)
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=True)
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
 def drop_db(conn, cursor):
-    """Полное удаление базы данных"""
+    """Полное удаление базы данных."""
     cursor.execute(f"DROP DATABASE IF EXISTS {DB_NAME}")
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_user(identifier, conn, cursor):
+    """Получение пользователя из БД по имени, телефону или емейлу."""
+    cursor.execute("SELECT * FROM Users WHERE name = %s OR phone = %s OR email = %s", (identifier, identifier, identifier))
+    return cursor.fetchone()
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def insert_refresh_token(token, user_id, role, expires, conn, cursor) -> str:
+    """Добавление Refresh токена в БД."""
+    cursor.execute(
+        "INSERT INTO refresh_tokens(token, user_id, role, expires_at) "
+        "VALUES (%s, %s, %s, %s)",
+        (token, user_id, role, expires)
+    )
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_refresh_token(token, conn, cursor):
+    """Получение Refresh токена из БД."""
+    cursor.execute(
+        "SELECT user_id, role, expires_at "
+        "FROM refresh_tokens WHERE token = %s",
+        (token)
+    )
+    return cursor.fetchone()
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def delete_refresh_token(token, conn, cursor):
+    """Удаление Refresh токена из БД."""
+    cursor.execute("DELETE FROM refresh_tokens WHERE token = %s", (token,))

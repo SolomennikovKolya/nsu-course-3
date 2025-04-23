@@ -65,6 +65,11 @@ CREATE TABLE IF NOT EXISTS Notifications (
 );
 
 CREATE TABLE IF NOT EXISTS Refresh_Tokens (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    token VARCHAR(35) NOT NULL
+    token CHAR(36) PRIMARY KEY, 
+    user_id INT NOT NULL,
+    role ENUM('client', 'manager', 'admin') NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX ix_refresh_tokens_expires (token),
+    CONSTRAINT fk_refresh_user FOREIGN KEY (user_id) REFERENCES Users(id)
 );

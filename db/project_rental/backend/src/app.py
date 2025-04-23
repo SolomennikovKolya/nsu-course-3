@@ -46,24 +46,6 @@ def drop_db():
     db.actions.drop_db()
 
 
-# Симуляция подключения к БД и получения пользователя
-def get_user(identifier: str):
-    conn = mysql.connector.connect(user='root', password='root', host='localhost', database='equipment_rental')
-    cursor = conn.cursor(dictionary=True)
-    query = """
-        SELECT * FROM Users WHERE name = %s OR phone = %s OR email = %s
-    """
-    cursor.execute(query, (identifier, identifier, identifier))
-    user = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    return user
-
-
-# Хранилище refresh токенов (в реальности — Redis или таблица в БД)
-refresh_store = {}
-
-
 @app.route('/login', methods=['POST'])
 def login():
     """
@@ -81,8 +63,7 @@ def login():
     password = data.get('password')
 
     # Сравнение введённого пароля с паролем в бд
-    user = get_user(identifier)
-    print(user)
+    user = db.actions.get_user(identifier)
     if not user or not check_password_hash(user['password_hash'], password):
         return jsonify({"msg": "Неверные данные"}), 401
 
@@ -98,16 +79,11 @@ def login():
 
     # Генерация случайного Refresh токена (для продления доступа, т.е. перегенерации JWT)
     refresh_token = str(uuid.uuid4())
-    refresh_store[refresh_token] = {
-        "user_id": user_id,
-        "role": role,
-        "expires": datetime.now(timezone.utc) + timedelta(days=REFRESH_EXPIRES_DAYS)
-    }
+    db.actions.insert_refresh_token(refresh_token, user_id, role, datetime.now(
+        timezone.utc) + timedelta(days=REFRESH_EXPIRES_DAYS))
 
     response = make_response(jsonify({"access_token": access_token}))
     response.set_cookie("refresh_token", refresh_token, httponly=True, samesite='Strict')
-
-    # app.logger.debug(f"Outgoing response: {response.get_json()}")
     return response
 
 
@@ -119,15 +95,22 @@ def refresh():
     Request: Refresh токен.\n
     Response: JWT токен.
     """
+    # Проверка наличия Refresh токена в запросе
     refresh_token = request.cookies.get('refresh_token')
-    if not refresh_token or refresh_token not in refresh_store:
+    if not refresh_token:
+        return jsonify({"msg": "There is no refresh token"}), 401
+
+    # Проверка наличия Refresh токена в базе
+    record = db.actions.get_refresh_token(refresh_token)
+    if not record:
         return jsonify({"msg": "Invalid refresh token"}), 401
 
-    record = refresh_store[refresh_token]
+    # Проверка срока годности Refresh токена
     if record['expires'] < datetime.now(timezone.utc):
-        refresh_store.pop(refresh_token)
+        db.actions.delete_refresh_token(refresh_token)
         return jsonify({"msg": "Refresh token expired"}), 401
 
+    # Генерация нового токена
     access_token = jwt.encode({
         "sub": record['user_id'],
         "role": record['role'],
@@ -139,10 +122,14 @@ def refresh():
 
 @app.route('/logout', methods=['POST'])
 def logout():
-    """Выход из системы. Удаляется Refresh токен с сервера и куки с браузера."""
+    """
+    Выход из системы. 
+    Удаляется Refresh токен с сервера и куки с браузера.
+    """
     refresh_token = request.cookies.get('refresh_token')
     if refresh_token:
-        refresh_store.pop(refresh_token, None)
+        db.actions.delete_refresh_token(refresh_token)
+
     response = make_response(jsonify({"msg": "Logged out"}))
     response.delete_cookie("refresh_token")
     return response
@@ -150,15 +137,19 @@ def logout():
 
 @app.route('/protected', methods=['GET'])
 def protected():
-    """Проверка JWT токена."""
+    """Демонстрационный энд‑поинт, который показывает, как сервер проверяет JWT перед тем, как отдать «закрытые» данные."""
     auth_header = request.headers.get('Authorization')
     if not auth_header:
         return jsonify({"msg": "Missing auth header"}), 401
 
     try:
+        # Проверка JWT
         token = auth_header.split()[1]
         payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+
+        # Продоставление "приватной" информации
         return jsonify({"msg": "Access granted", "role": payload['role']})
+
     except jwt.ExpiredSignatureError:
         return jsonify({"msg": "Access token expired"}), 401
     except jwt.InvalidTokenError:
