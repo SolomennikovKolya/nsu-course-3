@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
     const login = async (identifier, password) => {
         const res = await axios.post('/login', { identifier, password });
         localStorage.setItem('access_token', res.data.access_token);
-        setUser(res.data);
+        setUser({ role: res.data.role });
         navigate('/');
     };
 

@@ -82,7 +82,7 @@ def login():
     db.actions.insert_refresh_token(refresh_token, user_id, role, datetime.now(
         timezone.utc) + timedelta(days=REFRESH_EXPIRES_DAYS))
 
-    response = make_response(jsonify({"access_token": access_token}))
+    response = make_response(jsonify({"access_token": access_token, "role": role}))
     response.set_cookie("refresh_token", refresh_token, httponly=True, samesite='Strict')
     return response
 
