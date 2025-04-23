@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS Items (
 
 CREATE TABLE IF NOT EXISTS Users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    role ENUM('client', 'manager', 'administrator') NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    role ENUM('client', 'manager', 'admin') NOT NULL,
+    password_hash VARCHAR(255),
     name VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
     email VARCHAR(255),
@@ -62,4 +62,9 @@ CREATE TABLE IF NOT EXISTS Notifications (
     created_at DATETIME NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (manager_id) REFERENCES Users(id)
+);
+
+CREATE TABLE IF NOT EXISTS Refresh_Tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    token VARCHAR(35) NOT NULL
 );

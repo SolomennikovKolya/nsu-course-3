@@ -2,8 +2,10 @@ import mysql.connector
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+from functools import wraps
 
 
+# Секретные данные из окружения
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
 DB_ROOT_NAME = os.getenv('DB_ROOT_NAME')
 DB_ROOT_PASSWORD = os.getenv('DB_ROOT_PASSWORD')
@@ -55,18 +57,93 @@ def execute_query(query: str = None, filename: str = None, user: str = None, pas
             conn.close()
 
 
+def with_db(user: str = None, password: str = None, host: str = None, database: str = None, autocommit: bool = True):
+    """
+    Декоратор, автоматизирующий работу с MySQL.
+    Внутри функции, использующей данный декоратор, можно считать, что соединение уже создано и пользоваться conn, cursor для выполнения запросов.
+    В параметрах декоратора указываются параметры подключения к бд.
+    Подключение автоматически закрывается, незакоммиченные транзакции автоматически коммитятся.
+    Если произошла ошибка, ролбэчит транзакции и также закрывает соединение, после чего пробрасывает исключение дальше.
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            conn = cursor = None
+            try:
+                conn = mysql.connector.connect(
+                    user=user,
+                    password=password,
+                    host=host,
+                    database=database,
+                    autocommit=autocommit
+                )
+                cursor = conn.cursor()
+
+                result = func(*args, conn=conn, cursor=cursor, **kwargs)
+                if not autocommit:
+                    conn.commit()
+                return result
+
+            except mysql.connector.Error as err:
+                print(f"MySQL Error in {func.__name__}: {err}")
+                if conn and not autocommit:
+                    conn.rollback()
+                raise
+
+            except Exception as e:
+                print(f"Unexpected error in {func.__name__}: {e}")
+                if conn and not autocommit:
+                    conn.rollback()
+                raise
+
+            finally:
+                if cursor is not None:
+                    cursor.close()
+                if conn is not None:
+                    conn.close()
+
+        return wrapper
+    return decorator
+
+
+def get_queries_from_file(filename: str):
+    """Получение всех запросов из файла в виде списка."""
+    filename = Path(__file__).resolve().parent / "queries" / filename
+    with open(filename, "r", encoding="utf-8") as f:
+        queries_raw = f.read()
+
+    queries = list()
+    for statement in queries_raw.split(';'):
+        stmt = statement.strip()
+        if stmt:
+            queries.append(stmt)
+    return queries
+
+
 def init_db():
-    """Создание базы данных со всеми таблицами (создаёт только каркас без данных)."""
-    execute_query(query=f"CREATE DATABASE IF NOT EXISTS {DB_NAME}", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD)
+    """Создание (либо полное пересоздание) базы данных со всеми таблицами (создаёт только каркас без данных)."""
+    execute_query(query=f"DROP DATABASE IF EXISTS {DB_NAME}", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD)
+    execute_query(query=f"CREATE DATABASE {DB_NAME}", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD)
     execute_query(filename="schema.sql", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
 
 
-def clear_db():
-    """Очистка базы данных (данные удаляются но каркас остаётся)."""
-    execute_query(filename="clean.sql", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
-
-
-def seed_db():
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=False)
+def seed_db(conn, cursor):
     """Заполнение БД тестовыми данными (полностью перезаписывает все данные)."""
-    clear_db()
-    execute_query(filename="seed.sql", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
+    for query in get_queries_from_file("clear.sql"):
+        cursor.execute(query)
+    for query in get_queries_from_file("seed.sql"):
+        cursor.execute(query)
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=True)
+def clear_db(conn, cursor):
+    """Очистка базы данных (данные удаляются но каркас остаётся)."""
+    for query in get_queries_from_file("clear.sql"):
+        cursor.execute(query)
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=True)
+def drop_db(conn, cursor):
+    """Полное удаление базы данных"""
+    cursor.execute(f"DROP DATABASE IF EXISTS {DB_NAME}")

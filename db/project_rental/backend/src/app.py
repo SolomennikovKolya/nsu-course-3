@@ -1,27 +1,29 @@
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import jwt
-import datetime
+from datetime import datetime, timezone, timedelta
 import uuid
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 import mysql.connector
 import db.actions
 
+
+# print("хэши паролей:")
+# print(generate_password_hash("client_pass"))
+# print(generate_password_hash("manager_pass"))
+# print(generate_password_hash("admin_pass"))
 
 SECRET_KEY = "access_secret"
 REFRESH_SECRET_KEY = "refresh_secret"
 ACCESS_EXPIRES_MIN = 15
 REFRESH_EXPIRES_DAYS = 7
 
-
 # app - экземпляр flask приложения
-# CORS (Cross-Origin Resource Sharing) нужен, чтобы разрешить запросы с другого домена или порта
-# "/api/*" ограничивает область действия CORS только на пути, начинающиеся с /api/
-# "origins" указывает разрешённый источник — т.е. React-приложение, работающее на http://localhost:5173
 # Уровени логирования: DEBUG, INFO, WARNING, ERROR, CRITICAL
+# CORS (Cross-Origin Resource Sharing) нужен, чтобы разрешить запросы с другого домена или порта
 app = Flask(__name__)
 app.logger.setLevel("DEBUG")
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
+CORS(app, supports_credentials=True)
 
 
 @app.cli.command("init_db")
@@ -29,14 +31,19 @@ def init_db():
     db.actions.init_db()
 
 
+@app.cli.command("seed_db")
+def seed_db():
+    db.actions.seed_db()
+
+
 @app.cli.command("clear_db")
 def clear_db():
     db.actions.clear_db()
 
 
-@app.cli.command("seed_db")
-def seed_db():
-    db.actions.seed_db()
+@app.cli.command("drop_db")
+def drop_db():
+    db.actions.drop_db()
 
 
 # Симуляция подключения к БД и получения пользователя
@@ -64,38 +71,43 @@ def login():
     Request: Идентификатор пользователя (имя, телефон или емейл), пароль.\n
     Response: JWT токен и куки с Refresh токеном, если доступ разрешён.
     """
-    app.logger.info(f"Incoming request: {request.method} {request.url}")
-    app.logger.debug(f"Headers: {request.headers}")
-    app.logger.debug(f"Body: {request.get_json()}")
+    # app.logger.info(f"XXX Incoming request: {request.method} {request.url}")
+    # app.logger.debug(f"XXX Headers: {request.headers}")
+    # app.logger.debug(f"XXX Body: {request.get_json()}")
 
+    # Получние данных из тела запроса
     data = request.get_json()
     identifier = data.get('identifier')
     password = data.get('password')
 
+    # Сравнение введённого пароля с паролем в бд
     user = get_user(identifier)
-    if not user or not check_password_hash(user['password'], password):
+    print(user)
+    if not user or not check_password_hash(user['password_hash'], password):
         return jsonify({"msg": "Неверные данные"}), 401
 
     user_id = user['id']
     role = user['role']
 
+    # Генерация JWT (токен для подтверждения, что пользователь уже авторизован)
     access_token = jwt.encode({
         "sub": user_id,
         "role": role,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=ACCESS_EXPIRES_MIN)
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_EXPIRES_MIN)
     }, SECRET_KEY, algorithm="HS256")
 
+    # Генерация случайного Refresh токена (для продления доступа, т.е. перегенерации JWT)
     refresh_token = str(uuid.uuid4())
     refresh_store[refresh_token] = {
         "user_id": user_id,
         "role": role,
-        "expires": datetime.datetime.utcnow() + datetime.timedelta(days=REFRESH_EXPIRES_DAYS)
+        "expires": datetime.now(timezone.utc) + timedelta(days=REFRESH_EXPIRES_DAYS)
     }
 
     response = make_response(jsonify({"access_token": access_token}))
     response.set_cookie("refresh_token", refresh_token, httponly=True, samesite='Strict')
 
-    app.logger.debug(f"Outgoing response: {response.get_json()}")
+    # app.logger.debug(f"Outgoing response: {response.get_json()}")
     return response
 
 
@@ -112,14 +124,14 @@ def refresh():
         return jsonify({"msg": "Invalid refresh token"}), 401
 
     record = refresh_store[refresh_token]
-    if record['expires'] < datetime.datetime.utcnow():
+    if record['expires'] < datetime.now(timezone.utc):
         refresh_store.pop(refresh_token)
         return jsonify({"msg": "Refresh token expired"}), 401
 
     access_token = jwt.encode({
         "sub": record['user_id'],
         "role": record['role'],
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=ACCESS_EXPIRES_MIN)
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_EXPIRES_MIN)
     }, SECRET_KEY, algorithm="HS256")
 
     return jsonify({"access_token": access_token})
