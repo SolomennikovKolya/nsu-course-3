@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import '../main.css';
 
 function Home() {
     const { user, logout } = useAuth();
@@ -15,7 +16,7 @@ function Home() {
 
     return (
         <div>
-            {/* 🔵 Верхняя панель */}
+            {/* Верхняя панель */}
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -23,10 +24,8 @@ function Home() {
                 padding: '1rem',
                 backgroundColor: '#eee'
             }}>
-                <div style={{ fontWeight: 'bold' }}>🏢 Название компании</div>
-
+                <div style={{ fontWeight: 'bold' }}>Аренда Оборудования</div>
                 <button>Каталог</button>
-
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <input
                         type="text"
@@ -37,47 +36,38 @@ function Home() {
                     <button onClick={clearSearch}>X</button>
                     <button>Поиск</button>
                 </div>
-
-                {/* 🔐 Войти / Выйти */}
                 <button onClick={handleAuthClick}>
                     {user ? 'Выйти' : 'Войти'}
                 </button>
             </div>
 
-            {/* 🟢 Общая панель */}
-            <div style={{
-                padding: '1rem',
-                backgroundColor: '#f8f8f8',
-                display: 'flex',
-                gap: '1rem',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap'
-            }}>
+            {/* 🟡 Общая панель */}
+            <div style={{ padding: '1rem', display: 'flex', gap: '1rem', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                    <Link to="/terms">Условия</Link>
-                    <Link to="/company">Компания</Link>
-                    <Link to="/contacts">Контакты</Link>
+                    <Link to="/terms" className="link-style">📄Условия</Link>
+                    <Link to="/company" className="link-style">❓Компания</Link>
+                    <Link to="/contacts" className="link-style">☎️Контакты</Link>
                 </div>
                 <div style={{ marginLeft: 'auto' }}>
-                    <Link to="/dev">Development</Link>
+                    <Link to="/dev" className="link-style">⚙️Development</Link>
                 </div>
             </div>
 
-            {/* 🟡 Менеджеры и админы */}
+            {/* 🟠 Менеджеры и админы */}
             {(user?.role === 'manager' || user?.role === 'admin') && (
-                <div style={{ padding: '1rem', backgroundColor: '#ddd', display: 'flex', gap: '1rem' }}>
-                    <Link to="/rents">Аренды</Link>
-                    <Link to="/notifications">Уведомления</Link>
-                    <Link to="/clients">Клиенты</Link>
+                <div style={{ padding: '1rem', display: 'flex', gap: '1rem' }}>
+                    <Link to="/rents" className="link-style">🗝️Аренды</Link>
+                    <Link to="/notifications" className="link-style">⚠️Уведомления</Link>
+                    <Link to="/clients" className="link-style">🙋Клиенты</Link>
                 </div>
             )}
 
             {/* 🔴 Только админы */}
             {user?.role === 'admin' && (
-                <div style={{ padding: '1rem', backgroundColor: '#ccc', display: 'flex', gap: '1rem' }}>
-                    <Link to="/equipment">Оборудование</Link>
-                    <Link to="/reports">Отчёты</Link>
-                    <Link to="/employees">Сотрудники</Link>
+                <div style={{ padding: '1rem', display: 'flex', gap: '1rem' }}>
+                    <Link to="/equipment" className="link-style">💲Оборудование</Link>
+                    <Link to="/reports" className="link-style">📈Отчёты</Link>
+                    <Link to="/employees" className="link-style">🪪Сотрудники</Link>
                 </div>
             )}
         </div>
