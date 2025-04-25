@@ -72,7 +72,7 @@ def login():
 
     # Генерация JWT (токен для подтверждения, что пользователь уже авторизован)
     access_token = jwt.encode({
-        "sub": user_id,
+        "sub": str(user_id),
         "role": role,
         "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_EXPIRES_MIN)
     }, SECRET_KEY, algorithm="HS256")
