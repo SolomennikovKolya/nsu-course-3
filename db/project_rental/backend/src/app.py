@@ -137,17 +137,14 @@ def logout():
 
 @app.route('/protected', methods=['GET'])
 def protected():
-    """Демонстрационный энд‑поинт, который показывает, как сервер проверяет JWT перед тем, как отдать «закрытые» данные."""
+    """Энд‑поинт для проверки JWT."""
     auth_header = request.headers.get('Authorization')
     if not auth_header:
         return jsonify({"msg": "Missing auth header"}), 401
 
     try:
-        # Проверка JWT
         token = auth_header.split()[1]
         payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-
-        # Продоставление "приватной" информации
         return jsonify({"msg": "Access granted", "role": payload['role']})
 
     except jwt.ExpiredSignatureError:

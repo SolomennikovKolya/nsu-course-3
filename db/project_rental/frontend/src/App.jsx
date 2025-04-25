@@ -1,13 +1,12 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Home from './pages/Home';
 import Login from './pages/Login';
 
-// <Router> — обёртка для всего приложения, которая отслеживает изменения URL
-// <Routes> — определяет область, где будут проверяться маршруты
-// <Route path="/" element={<Home />} /> - Если пользователь заходит на корневой путь (или при входе на сайт), отображается компонент Home
-// <Route path="/login" element={<Login />} /> - Если URL меняется на /login, отображается компонент Login
-
+// <Router> - Обёртка для всего приложения, которая отслеживает изменения URL
+// <AuthProvider> - Даёт доступ к состоянию авторизации (user, login(), logout()) через хук useAuth()
+// <Routes> - Контейнер для всех <Route>
+// <Route> - Определяет, какой компонент показывать при заданном пути
 function App() {
   return (
     <Router>
@@ -20,4 +19,5 @@ function App() {
     </Router>
   );
 }
+
 export default App;

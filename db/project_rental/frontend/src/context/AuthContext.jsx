@@ -2,13 +2,17 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import axios from '../axios';
 import { useNavigate } from 'react-router-dom';
 
+// Создаётся контекст - по сути, глобальная переменная, доступная из любого компонента через useAuth()
 const AuthContext = createContext();
 
+// Компонент-обёртка, который даёт всем детям доступ к переменной user 
+// (текущая роль или null, если не авторизован) и функциям login, logout
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null); // { username, role }
+    const [user, setUser] = useState(null);
     const navigate = useNavigate();
 
     // Проверка токена при монтировании
+    // Нужно, чтобы восстановить авторизацию, если пользователь уже вошёл ранее и у него остался токен
     useEffect(() => {
         const checkAuth = async () => {
             const token = localStorage.getItem('access_token');
@@ -49,6 +53,8 @@ export function AuthProvider({ children }) {
     );
 }
 
+// Удобный способ использовать контекст в любом компоненте:
+// const { user, login, logout } = useAuth();
 export function useAuth() {
     return useContext(AuthContext);
 }
