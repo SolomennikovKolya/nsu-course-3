@@ -1,3 +1,4 @@
+/* Глобальный стиль */
 body {
     font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', 'Roboto', sans-serif;
     margin: 0;
@@ -6,6 +7,19 @@ body {
     color: #222;
 }
 
+/* Стиль текта */
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0 1rem 1rem 0;
+}
+
+.subtext {
+    color: gray;
+    font-size: 1rem;
+}
+
+/* Стиль ссылок */
 .link-style {
     color: rgb(113, 113, 113);
     text-decoration: none;
@@ -16,10 +30,27 @@ body {
     white-space: nowrap;
 }
 
-.link-style:hover {
-    color: rgb(255, 119, 0);
+.active-link {
+    color: rgb(232, 89, 12);
+    font-weight: bold;
 }
 
-/* #root {
-    min-width: 1260px;
-} */
+.link-style:hover {
+    color: rgb(240, 140, 0);
+}
+
+
+/* Стиль кнопок */
+.action-button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.action-button:hover {
+    background-color: #e0e0e0;
+}

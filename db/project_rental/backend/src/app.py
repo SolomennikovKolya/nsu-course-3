@@ -106,7 +106,7 @@ def refresh():
         return jsonify({"msg": "Invalid refresh token"}), 401
 
     # Проверка срока годности Refresh токена
-    if record['expires'] < datetime.now(timezone.utc):
+    if record['expires_at'] < datetime.now(timezone.utc):
         db.actions.delete_refresh_token(refresh_token)
         return jsonify({"msg": "Refresh token expired"}), 401
 

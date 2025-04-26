@@ -20,12 +20,11 @@ function Login() {
 
     return (
         <div>
-            <button onClick={() => navigate('/')}>Назад на главную</button>
-            <form onSubmit={handleSubmit} style={{ padding: '2rem' }}>
-                <h2>Вход</h2>
+            <form onSubmit={handleSubmit} style={{ padding: '0 2rem 2rem 2rem' }}>
+                <h1 className="page-title">Вход</h1>
                 <input placeholder="Email, имя или телефон" value={identifier} onChange={(e) => setIdentifier(e.target.value)} /><br />
                 <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} /><br />
-                <button type="submit">Войти</button>
+                <button type="submit" className="action-button">Войти</button>
                 {error && <p style={{ color: 'red' }}>{error}</p>}
             </form>
         </div>
