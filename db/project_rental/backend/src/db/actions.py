@@ -157,12 +157,12 @@ def get_user(identifier, conn, cursor):
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
-def insert_refresh_token(token, user_id, role, expires, conn, cursor) -> str:
+def insert_refresh_token(token, user_id, user_role, expires_at, conn, cursor) -> str:
     """Добавление Refresh токена в БД."""
     cursor.execute(
-        "INSERT INTO refresh_tokens(token, user_id, role, expires_at) "
+        "INSERT INTO refresh_tokens(token, user_id, user_role, expires_at) "
         "VALUES (%s, %s, %s, %s)",
-        (token, user_id, role, expires)
+        (token, user_id, user_role, expires_at)
     )
 
 
@@ -170,9 +170,9 @@ def insert_refresh_token(token, user_id, role, expires, conn, cursor) -> str:
 def get_refresh_token(token, conn, cursor):
     """Получение Refresh токена из БД."""
     cursor.execute(
-        "SELECT user_id, role, expires_at "
+        "SELECT user_id, user_role, expires_at "
         "FROM refresh_tokens WHERE token = %s",
-        (token)
+        (token,)
     )
     return cursor.fetchone()
 

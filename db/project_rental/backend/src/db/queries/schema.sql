@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS Items (
 
 CREATE TABLE IF NOT EXISTS Users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    role ENUM('client', 'manager', 'admin') NOT NULL,
+    user_role ENUM('client', 'manager', 'admin') NOT NULL,
     password_hash VARCHAR(255),
     name VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
@@ -67,9 +67,8 @@ CREATE TABLE IF NOT EXISTS Notifications (
 CREATE TABLE IF NOT EXISTS Refresh_Tokens (
     token CHAR(36) PRIMARY KEY, 
     user_id INT NOT NULL,
-    role ENUM('client', 'manager', 'admin') NOT NULL,
+    user_role ENUM('client', 'manager', 'admin') NOT NULL,
     expires_at TIMESTAMP NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX ix_refresh_tokens_expires (token),
     CONSTRAINT fk_refresh_user FOREIGN KEY (user_id) REFERENCES Users(id)
 );

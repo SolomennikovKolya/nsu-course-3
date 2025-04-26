@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
+import './main.css';
 
 // main.jsx - Точка входа для React-приложения
 // document.getElementById('root') - Находит элемент <div id="root"></div> в index.html

@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import './main.css';
 
 // <Router> - Обёртка для всего приложения, которая отслеживает изменения URL
 // <AuthProvider> - Даёт доступ к состоянию авторизации (user, login(), logout()) через хук useAuth()

@@ -13,8 +13,13 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
+    white-space: nowrap;
 }
 
 .link-style:hover {
     color: rgb(255, 119, 0);
 }
+
+/* #root {
+    min-width: 1260px;
+} */

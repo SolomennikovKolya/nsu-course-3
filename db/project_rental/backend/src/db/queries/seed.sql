@@ -7,7 +7,7 @@ INSERT INTO Items (equipment_id, status, last_maintenance_date) VALUES
 (1, 'rented', '2025-01-10'),
 (2, 'available', '2025-01-01');
 
-INSERT INTO Users (role, password_hash, name, phone, email, registration_date) VALUES
+INSERT INTO Users (user_role, password_hash, name, phone, email, registration_date) VALUES
 ('client', 'scrypt:32768:8:1$57T6bS5tBgYEBMh9$37843a1ec4153393b65ed5cb42a47bd6e980600c7d4b8c1319259faa3bc7a6d3f864af6478b0b9efe879d8668b4bc7092484b4961f49818c37e3ce968ca030e0', 'Клиент Тестов', '+79130000001', 'client_testov@example.com', '2025-01-01'),
 ('manager', 'scrypt:32768:8:1$rT00M9IGcC5uoirK$b4492f385c873d2c07b211b460fe9b901f2b6f48b4f3ce43bbc9be862d74a24889de88929979cd665a80c994f499f0b485945eca8d868768015cf1d7d539dd4a', 'Менеджер Тестов', '+79130000002', 'manager_testov@example.com', '2025-01-02'),
 ('admin', 'scrypt:32768:8:1$svSg3LOqcvdu0wHH$073124f741222bdfac3e73552387597b475ee086d9edce5b608273a2afe29f8114fd1b7c944760ac5695417471583be02f02abbdcd50cabdbb7b70d647028645', 'Админ Тестов', '+79130000003', 'admin_testov@example.com', '2025-01-3');

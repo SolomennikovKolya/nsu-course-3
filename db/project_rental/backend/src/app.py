@@ -68,7 +68,7 @@ def login():
         return jsonify({"msg": "Неверные данные"}), 401
 
     user_id = user['id']
-    role = user['role']
+    role = user['user_role']
 
     # Генерация JWT (токен для подтверждения, что пользователь уже авторизован)
     access_token = jwt.encode({
@@ -79,8 +79,8 @@ def login():
 
     # Генерация случайного Refresh токена (для продления доступа, т.е. перегенерации JWT)
     refresh_token = str(uuid.uuid4())
-    db.actions.insert_refresh_token(refresh_token, user_id, role, datetime.now(
-        timezone.utc) + timedelta(days=REFRESH_EXPIRES_DAYS))
+    expires_at_timestamp = (datetime.now(timezone.utc) + timedelta(days=REFRESH_EXPIRES_DAYS)).strftime("%Y-%m-%d %H:%M:%S")
+    db.actions.insert_refresh_token(refresh_token, user_id, role, expires_at_timestamp)
 
     response = make_response(jsonify({"access_token": access_token, "role": role}))
     response.set_cookie("refresh_token", refresh_token, httponly=True, samesite='Strict')
@@ -113,7 +113,7 @@ def refresh():
     # Генерация нового токена
     access_token = jwt.encode({
         "sub": record['user_id'],
-        "role": record['role'],
+        "role": record['user_role'],
         "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_EXPIRES_MIN)
     }, SECRET_KEY, algorithm="HS256")
 
