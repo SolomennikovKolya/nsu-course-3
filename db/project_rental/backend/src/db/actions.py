@@ -5,7 +5,6 @@ import os
 from functools import wraps
 
 
-# Секретные данные из окружения
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
 DB_ROOT_NAME = os.getenv('DB_ROOT_NAME')
 DB_ROOT_PASSWORD = os.getenv('DB_ROOT_PASSWORD')

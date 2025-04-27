@@ -4,7 +4,7 @@ import axios from '../axios';
 function Dev() {
     const handleClearDB = async () => {
         try {
-            const res = await axios.post('/clear_db');
+            const res = await axios.post('/dev/clear_db');
             console.log('Ответ от сервера:', res.data);
             alert('База данных успешно очищена');
         } catch (err) {
@@ -15,7 +15,7 @@ function Dev() {
 
     const handleFillDB = async () => {
         try {
-            const res = await axios.post('/seed_db');
+            const res = await axios.post('/dev/seed_db');
             console.log('Ответ от сервера:', res.data);
             alert('База данных успешно заполнена');
         } catch (err) {
