@@ -22,15 +22,13 @@ CREATE TABLE IF NOT EXISTS Users (
     password_hash VARCHAR(255),
     name VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
-    email VARCHAR(255),
-    registration_date DATETIME NOT NULL
+    email VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS Reservations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     client_id INT NOT NULL,
     equipment_id INT NOT NULL,
-    reservation_date DATETIME NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     status ENUM('active', 'cancelled', 'completed') NOT NULL,
@@ -59,7 +57,7 @@ CREATE TABLE IF NOT EXISTS Notifications (
     manager_id INT NOT NULL,
     type ENUM('question', 'new booking', 'rental expiration') NOT NULL,
     message TEXT NOT NULL,
-    created_at DATETIME NOT NULL,
+    created_at TIMESTAMP NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (manager_id) REFERENCES Users(id)
 );

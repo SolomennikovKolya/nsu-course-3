@@ -15,7 +15,7 @@ import db.actions
 
 SECRET_KEY = "access_secret"
 REFRESH_SECRET_KEY = "refresh_secret"
-ACCESS_EXPIRES_MIN = 15
+ACCESS_EXPIRES_MIN = 1
 REFRESH_EXPIRES_DAYS = 7
 
 # app - экземпляр flask приложения
@@ -74,16 +74,16 @@ def login():
     access_token = jwt.encode({
         "sub": str(user_id),
         "role": role,
-        "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_EXPIRES_MIN)
+        "exp": int((datetime.now(timezone.utc) + timedelta(minutes=ACCESS_EXPIRES_MIN)).timestamp())
     }, SECRET_KEY, algorithm="HS256")
 
     # Генерация случайного Refresh токена (для продления доступа, т.е. перегенерации JWT)
     refresh_token = str(uuid.uuid4())
-    expires_at_timestamp = (datetime.now(timezone.utc) + timedelta(days=REFRESH_EXPIRES_DAYS)).strftime("%Y-%m-%d %H:%M:%S")
+    expires_at_timestamp = datetime.now(timezone.utc) + timedelta(days=REFRESH_EXPIRES_DAYS)
     db.actions.insert_refresh_token(refresh_token, user_id, role, expires_at_timestamp)
 
     response = make_response(jsonify({"access_token": access_token, "role": role}))
-    response.set_cookie("refresh_token", refresh_token, httponly=True, samesite='Strict')
+    response.set_cookie("refresh_token", refresh_token, httponly=True, samesite='Strict', path="/")
     return response
 
 
@@ -106,15 +106,16 @@ def refresh():
         return jsonify({"msg": "Invalid refresh token"}), 401
 
     # Проверка срока годности Refresh токена
-    if record['expires_at'] < datetime.now(timezone.utc):
+    expires_at = record['expires_at'].replace(tzinfo=timezone.utc)
+    if expires_at < datetime.now(timezone.utc):
         db.actions.delete_refresh_token(refresh_token)
         return jsonify({"msg": "Refresh token expired"}), 401
 
     # Генерация нового токена
     access_token = jwt.encode({
-        "sub": record['user_id'],
+        "sub": str(record['user_id']),
         "role": record['user_role'],
-        "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_EXPIRES_MIN)
+        "exp": int((datetime.now(timezone.utc) + timedelta(minutes=ACCESS_EXPIRES_MIN)).timestamp())
     }, SECRET_KEY, algorithm="HS256")
 
     return jsonify({"access_token": access_token})
@@ -137,7 +138,7 @@ def logout():
 
 @app.route('/protected', methods=['GET'])
 def protected():
-    """Энд‑поинт для проверки JWT."""
+    """Энд‑поинт для проверки JWT. Если JWT действителен, возвращает роль."""
     auth_header = request.headers.get('Authorization')
     if not auth_header:
         return jsonify({"msg": "Missing auth header"}), 401

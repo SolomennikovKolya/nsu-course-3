@@ -10,10 +10,11 @@ const instance = axios.create({
 
 // Настраиваем автоматическую подстановку куки и токенов; обновляем токен, если он истёк
 // Если запрос успешен - просто возвращаем ответ
-// Если ошибка - обновляем JWT токен, если он истёк
+// Если ошибка - обновляем JWT токен, если он истёк и делаем повторный запрос
 // Если Refresh токен тоже истёк или невалиден - пробрасываем ошибку дальше (возвращаем ошибочный промис)
 // Если ошибка не связана с истёкшим токеном - просто прокидываем её дальше
 // interceptor - Перехватчик ответов
+// err.config — это оригинальная конфигурация неудачного запроса (URL, метод, заголовки, тело и т.д.)
 instance.interceptors.response.use(
     res => res,
     async err => {
@@ -21,7 +22,14 @@ instance.interceptors.response.use(
             try {
                 const refreshRes = await instance.post('/refresh');
                 const newToken = refreshRes.data.access_token;
-                err.config.headers['Authorization'] = `Bearer ${newToken}`;
+
+                localStorage.setItem('access_token', newToken);
+                instance.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+
+                err.config.headers = {
+                    ...err.config.headers,
+                    Authorization: `Bearer ${newToken}`,
+                };
                 return instance(err.config);
 
             } catch (refreshErr) {

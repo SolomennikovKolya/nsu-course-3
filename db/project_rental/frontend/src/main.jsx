@@ -11,7 +11,7 @@ import './main.css';
 // <StrictMode>	- Включает дополнительные проверки в dev-режиме (не обязателен, но полезен)
 // <App /> - Рендерит корневой компонент приложения
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+  // <StrictMode>
+  <App />
+  // </StrictMode>,
 )

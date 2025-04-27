@@ -17,11 +17,10 @@ export function AuthProvider({ children }) {
         const checkAuth = async () => {
             const token = localStorage.getItem('access_token');
             if (!token) return;
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
             try {
-                const res = await axios.get('/protected', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const res = await axios.get('/protected');
                 setUser(res.data);
             } catch {
                 setUser(null);
@@ -33,6 +32,7 @@ export function AuthProvider({ children }) {
     const login = async (identifier, password) => {
         const res = await axios.post('/login', { identifier, password });
         localStorage.setItem('access_token', res.data.access_token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         setUser({ role: res.data.role });
         navigate('/');
     };
