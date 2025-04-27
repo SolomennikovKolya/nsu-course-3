@@ -27,22 +27,22 @@ CORS(app, supports_credentials=True)
 
 
 @app.cli.command("init_db")
-def init_db():
+def init_db_cli():
     db.actions.init_db()
 
 
 @app.cli.command("seed_db")
-def seed_db():
+def seed_db_cli():
     db.actions.seed_db()
 
 
 @app.cli.command("clear_db")
-def clear_db():
+def clear_db_cli():
     db.actions.clear_db()
 
 
 @app.cli.command("drop_db")
-def drop_db():
+def drop_db_cli():
     db.actions.drop_db()
 
 
@@ -152,6 +152,28 @@ def protected():
         return jsonify({"msg": "Access token expired"}), 401
     except jwt.InvalidTokenError:
         return jsonify({"msg": "Invalid token"}), 401
+
+
+@app.route('/clear_db', methods=['POST'])
+def clear_db():
+    """Очистка базы данных."""
+    try:
+        db.actions.clear_db()
+        return jsonify({"msg": "The database has been successfully cleaned"}), 200
+
+    except Exception as e:
+        return jsonify({"msg": f"Database error: {e}"}), 501
+
+
+@app.route('/seed_db', methods=['POST'])
+def seed_db():
+    """Заполнение базы данных тестовыми данными."""
+    try:
+        db.actions.seed_db()
+        return jsonify({"msg": "The database has been successfully filled in"}), 200
+
+    except Exception as e:
+        return jsonify({"msg": f"Database error: {e}"}), 501
 
 
 if __name__ == "__main__":

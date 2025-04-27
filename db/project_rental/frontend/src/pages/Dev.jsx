@@ -1,14 +1,27 @@
 import React from 'react';
+import axios from '../axios';
 
 function Dev() {
-    const handleClearDB = () => {
-        // Здесь будет логика очистки БД
-        console.log('Очистка базы данных...');
+    const handleClearDB = async () => {
+        try {
+            const res = await axios.post('/clear_db');
+            console.log('Ответ от сервера:', res.data);
+            alert('База данных успешно очищена');
+        } catch (err) {
+            console.error('Ошибка при очистке базы данных:', err);
+            alert('Ошибка при очистке базы данных');
+        }
     };
 
-    const handleFillDB = () => {
-        // Здесь будет логика заполнения БД
-        console.log('Заполнение базы данных...');
+    const handleFillDB = async () => {
+        try {
+            const res = await axios.post('/seed_db');
+            console.log('Ответ от сервера:', res.data);
+            alert('База данных успешно заполнена');
+        } catch (err) {
+            console.error('Ошибка при заполнении базы данных:', err);
+            alert('Ошибка при заполнении базы данных');
+        }
     };
 
     return (
