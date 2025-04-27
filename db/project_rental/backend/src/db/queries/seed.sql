@@ -17,8 +17,8 @@ INSERT INTO Users (user_role, password_hash, name, phone, email) VALUES
 ('client', NULL, 'Светлана Орлова', '+79130000009', 'svetlana.orlova@example.com'),
 ('client', NULL, 'Олег Морозов', '+79130000010', 'oleg.morozov@example.com'),
 ('manager', 'scrypt:32768:8:1$rT00M9IGcC5uoirK$b4492f385c873d2c07b211b460fe9b901f2b6f48b4f3ce43bbc9be862d74a24889de88929979cd665a80c994f499f0b485945eca8d868768015cf1d7d539dd4a', 'Менеджер Тестов', '+79130000002', 'manager_testov@example.com'),
-('manager', 'testhash', 'Менеджер Васильев', '+79130000011', 'vasiliev.manager@example.com'),
-('manager', 'testhash', 'Менеджер Петров', '+79130000012', 'petrov.manager@example.com'),
+('manager', 'scrypt:32768:8:1$rT00M9IGcC5uoirK$b4492f385c873d2c07b211b460fe9b901f2b6f48b4f3ce43bbc9be862d74a24889de88929979cd665a80c994f499f0b485945eca8d868768015cf1d7d539dd4a', 'Менеджер Васильев', '+79130000011', 'vasiliev.manager@example.com'),
+('manager', 'scrypt:32768:8:1$rT00M9IGcC5uoirK$b4492f385c873d2c07b211b460fe9b901f2b6f48b4f3ce43bbc9be862d74a24889de88929979cd665a80c994f499f0b485945eca8d868768015cf1d7d539dd4a', 'Менеджер Петров', '+79130000012', 'petrov.manager@example.com'),
 ('admin', 'scrypt:32768:8:1$svSg3LOqcvdu0wHH$073124f741222bdfac3e73552387597b475ee086d9edce5b608273a2afe29f8114fd1b7c944760ac5695417471583be02f02abbdcd50cabdbb7b70d647028645', 'Админ Тестов', '+79130000003', 'admin_testov@example.com');
 
 INSERT INTO Reservations (client_id, equipment_id, start_date, end_date, status) VALUES

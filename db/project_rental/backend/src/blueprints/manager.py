@@ -7,11 +7,8 @@ manager_bp = Blueprint('manager', __name__, url_prefix='/manager')
 @manager_bp.route('/clients', methods=['GET'])
 def get_clients():
     """Получение списка всех клиентов."""
-    try:
-        result = db.actions.get_clients()
-        return jsonify(result), 200
-    except Exception as e:
-        return jsonify({"msg": f"Database error: {e}"}), 501
+    result = db.actions.get_clients()
+    return jsonify(result)
 
 
 @manager_bp.route('/client_history', methods=['GET'])
@@ -22,8 +19,5 @@ def get_client_history():
     if not client_id:
         return jsonify({'error': 'client_id is required'}), 400
 
-    try:
-        result = db.actions.get_client_history(client_id)
-        return jsonify(result), 200
-    except Exception as e:
-        return jsonify({"msg": f"Database error: {e}"}), 501
+    result = db.actions.get_client_history(client_id)
+    return jsonify(result)
