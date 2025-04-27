@@ -180,3 +180,48 @@ def get_refresh_token(token, conn, cursor):
 def delete_refresh_token(token, conn, cursor):
     """Удаление Refresh токена из БД."""
     cursor.execute("DELETE FROM refresh_tokens WHERE token = %s", (token,))
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_clients(conn, cursor):
+    """Возвращает список всех клиентов."""
+    cursor.execute("SELECT id, name, phone, email FROM Users WHERE user_role = 'client'")
+    return cursor.fetchall()
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_client_history(client_id, conn, cursor):
+    """Возвращает историю аренд конкретного клиента."""
+    query = """
+    SELECT 
+        Equipment.name AS equipment_name,
+        Items.id AS item_id,
+        Rentals.start_date,
+        COALESCE(Rentals.extended_end_date, Rentals.end_date) AS end_date,
+        Rentals.total_cost,
+        Rentals.deposit_paid,
+        Rentals.penalty_amount,
+        Rentals.status
+    FROM Rentals
+    JOIN Items ON Rentals.item_id = Items.id
+    JOIN Equipment ON Items.equipment_id = Equipment.id
+    WHERE Rentals.client_id = %s
+    ORDER BY Rentals.start_date DESC
+    """
+
+    cursor.execute(query, (client_id,))
+    history = cursor.fetchall()
+
+    result = []
+    for record in history:
+        result.append({
+            'equipment': record['equipment_name'],
+            'item': record['item_id'],
+            'start_date': record['start_date'].isoformat(),
+            'end_date': record['end_date'].isoformat(),
+            'rent_sum': record['total_cost'],
+            'deposit': record['deposit_paid'],
+            'penalty': record['penalty_amount'],
+            'status': record['status'],
+        })
+    return result

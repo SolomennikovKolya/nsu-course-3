@@ -11,7 +11,6 @@ def clear_db():
     try:
         db.actions.clear_db()
         return jsonify({"msg": "The database has been successfully cleaned"}), 200
-
     except Exception as e:
         return jsonify({"msg": f"Database error: {e}"}), 501
 
@@ -22,6 +21,5 @@ def seed_db():
     try:
         db.actions.seed_db()
         return jsonify({"msg": "The database has been successfully filled in"}), 200
-
     except Exception as e:
         return jsonify({"msg": f"Database error: {e}"}), 501

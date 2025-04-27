@@ -34,13 +34,13 @@ def login():
     identifier = data.get('identifier')
     password = data.get('password')
 
-    # Сравнение введённого пароля с паролем в бд
     user = db.actions.get_user(identifier)
-    if not user or not check_password_hash(user['password_hash'], password):
-        return jsonify({"msg": "Неверные данные"}), 401
-
     user_id = user['id']
     role = user['user_role']
+
+    # Сравнение введённого пароля с паролем в бд
+    if role == 'client' or not user or not check_password_hash(user['password_hash'], password):
+        return jsonify({"msg": "Неверные данные"}), 401
 
     # Генерация JWT (токен для подтверждения, что пользователь уже авторизован)
     access_token = jwt.encode({
