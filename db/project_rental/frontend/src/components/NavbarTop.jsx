@@ -19,24 +19,38 @@ function NavbarTop() {
             {/* Верхняя панель */}
             <div style={{
                 display: 'flex',
-                justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: '1rem',
-                backgroundColor: location.pathname === '/login' ? '#ddd' : '#f0f0f0'
+                backgroundColor: '#f0f0f0',
+                gap: '1rem'
             }}>
-                <div style={{ fontWeight: 'bold' }}>Аренда Оборудования</div>
-                <button>Каталог</button>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <input
-                        type="text"
-                        placeholder="Поиск..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
-                    <button onClick={clearSearch}>X</button>
-                    <button>Поиск</button>
+                {/* Название */}
+                <div style={{ fontWeight: 'bold', whiteSpace: 'nowrap', lineHeight: '1.5' }}>
+                    Аренда Оборудования
                 </div>
-                <button onClick={handleAuthClick}>
+
+                {/* Кнопка Каталог */}
+                <button className="catalog-button">Каталог</button>
+
+                {/* Поисковая строка растягивается */}
+                <div style={{ flexGrow: 1 }}>
+                    <div className="search-container">
+                        <input
+                            type="text"
+                            placeholder="Поиск..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="search-input"
+                        />
+                        {search && (
+                            <span className="search-clear" onClick={clearSearch}>×</span>
+                        )}
+                        <button className="search-button">Поиск</button>
+                    </div>
+                </div>
+
+                {/* Кнопка "Выйти"/"Войти" */}
+                <button onClick={handleAuthClick} className="exit-button">
                     {user ? 'Выйти' : 'Войти'}
                 </button>
             </div>
