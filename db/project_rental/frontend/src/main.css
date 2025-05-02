@@ -28,6 +28,7 @@ body {
     align-items: center;
     gap: 0.3rem;
     white-space: nowrap;
+    font-weight: 600;
 }
 
 .active-link {

@@ -66,8 +66,8 @@ function Category() {
                 <p className='error-message'>{error}</p>
             ) : (
                 <div style={{ display: 'flex' }}>
-                    <div style={{ width: '15%', paddingRight: '2rem' }}>
-                        {/* Левая панель (Навигация) */}
+                    {/* Левая панель (Навигация)*/}
+                    <div style={{ width: '250px', paddingRight: '2rem' }}>
                         <ul style={{ listStyleType: 'none', paddingLeft: 0, paddingTop: 0 }}>
                             <li>
                                 <NavLink to="/catalog" className="link-style">Каталог</NavLink>
@@ -82,8 +82,8 @@ function Category() {
                         </ul>
                     </div>
 
-                    <div style={{ width: '85%' }}>
-                        {/* Правая панель (Список оборудования) */}
+                    {/* Правая панель (Список оборудования)*/}
+                    <div style={{ flexGrow: 1 }}>
                         {loading ? (
                             <p>Загрузка оборудования...</p>
                         ) : error ? (
