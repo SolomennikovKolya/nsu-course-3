@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from '../axios';
+import { convertToSlug } from '../utils';
 
 function Catalog() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -12,6 +15,7 @@ function Catalog() {
                 setCategories(res.data);
             } catch (error) {
                 console.error('Ошибка загрузки категорий:', error);
+                setError('Не удалось загрузить категории. Попробуйте позже.');
             } finally {
                 setLoading(false);
             }
@@ -20,19 +24,22 @@ function Catalog() {
     }, []);
 
     return (
-        <div style={{ padding: '2rem' }}>
+        <div style={{ padding: '0 2rem 2rem 2rem' }}>
+            <p className="subtext" style={{ margin: '0.5rem 0 0.5rem 0' }}>Каталог</p>
             <h1 className="page-title">Каталог</h1>
-            <p className="subtext">каталог</p>
 
-            {/* Сетка категорий */}
             {loading ? (
                 <p>Загрузка категорий...</p>
+            ) : error ? (
+                <p style={{ color: 'red' }}>{error}</p>
             ) : (
                 <div className="category-grid">
-                    {categories.map((category, index) => (
-                        <div key={index} className="category-item">
-                            <div className="category-box"></div>
-                            <p>{category.name}</p>
+                    {categories.map((category) => (
+                        <div key={category.name} className="category-item">
+                            <Link to={`/catalog/${convertToSlug(category.name)}`} className="category-box-link">
+                                <div className="category-box"></div>
+                                <p>{category.name}</p>
+                            </Link>
                         </div>
                     ))}
                 </div>

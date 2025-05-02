@@ -81,7 +81,7 @@ function Clients() {
     }
 
     return (
-        <div style={{ padding: '0 2rem 2rem 2rem' }}>
+        <div style={{ padding: '2rem' }}>
             <h1 className="page-title">Клиенты</h1>
 
             {loadingClients ? (

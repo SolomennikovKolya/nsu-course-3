@@ -233,3 +233,16 @@ def get_categories(conn, cursor):
     cursor.execute("SELECT DISTINCT category FROM Equipment")
     categories = cursor.fetchall()
     return [{'name': category['category']} for category in categories]
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_equipment_by_category(category_name, conn, cursor):
+    """Возвращает список оборудования для заданной категории."""
+    cursor.execute("""
+        SELECT name, rental_price_per_day
+        FROM Equipment
+        WHERE category = %s
+    """, (category_name,))
+
+    equipment = cursor.fetchall()
+    return [{'name': item['name'], 'rental_price_per_day': item['rental_price_per_day']} for item in equipment]
