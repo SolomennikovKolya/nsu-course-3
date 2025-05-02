@@ -13,6 +13,7 @@ function NavbarTop() {
         if (user) logout();
         else navigate('/login');
     };
+    const handleCatalogClick = () => { navigate('/catalog') }
 
     return (
         <div>
@@ -30,7 +31,7 @@ function NavbarTop() {
                 </div>
 
                 {/* Кнопка Каталог */}
-                <button className="catalog-button">Каталог</button>
+                <button onClick={handleCatalogClick} className="catalog-button">Каталог</button>
 
                 {/* Поисковая строка растягивается */}
                 <div style={{ flexGrow: 1 }}>

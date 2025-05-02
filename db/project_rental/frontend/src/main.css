@@ -115,7 +115,6 @@ body {
     margin: 0 1rem 2rem 0;
 }
 
-/* Анимация появления модалки */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -136,6 +135,26 @@ body {
         transform: translateY(0);
         opacity: 1;
     }
+}
+
+/* Стиль полей для ввода текста */
+.text-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.6rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    border: 1.5px solid #ccc;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #fff;
+    box-sizing: border-box;
+}
+
+.text-input:focus {
+    border-color: orange;
+    box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.2);
 }
 
 /* Стиль верхней панели */
@@ -227,22 +246,27 @@ body {
     text-decoration: none;
 }
 
-/* Стиль полей для ввода текста */
-.text-input {
-    width: 100%;
-    max-width: 400px;
-    padding: 0.6rem 1rem;
-    margin-bottom: 1rem;
-    font-size: 1rem;
-    border: 1.5px solid #ccc;
-    border-radius: 10px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    background-color: #fff;
-    box-sizing: border-box;
+/* Стиль каталога */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
 }
 
-.text-input:focus {
-    border-color: orange;
-    box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.2);
+.category-item {
+    text-align: center;
+}
+
+.category-box {
+    width: 100%;
+    height: 150px;
+    background-color: #ddd;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+}
+
+.category-item p {
+    font-size: 1rem;
+    font-weight: 500;
 }

@@ -225,3 +225,11 @@ def get_client_history(client_id, conn, cursor):
             'status': record['status'],
         })
     return result
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_categories(conn, cursor):
+    """Возвращает список всех уникальных категорий оборудования."""
+    cursor.execute("SELECT DISTINCT category FROM Equipment")
+    categories = cursor.fetchall()
+    return [{'name': category['category']} for category in categories]
