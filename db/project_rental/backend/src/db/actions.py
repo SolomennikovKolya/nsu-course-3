@@ -105,14 +105,14 @@ def with_db(user: str = None, password: str = None, host: str = None, database: 
     return decorator
 
 
-def get_queries_from_file(filename: str):
+def get_queries_from_file(filename: str, delimiter: str = ';'):
     """Получение всех запросов из файла в виде списка."""
     filename = Path(__file__).resolve().parent / "queries" / filename
     with open(filename, "r", encoding="utf-8") as f:
         queries_raw = f.read()
 
     queries = list()
-    for statement in queries_raw.split(';'):
+    for statement in queries_raw.split(delimiter):
         stmt = statement.strip()
         if stmt:
             queries.append(stmt)
@@ -124,6 +124,12 @@ def init_db():
     execute_query(query=f"DROP DATABASE IF EXISTS {DB_NAME}", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD)
     execute_query(query=f"CREATE DATABASE {DB_NAME}", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD)
     execute_query(filename="schema.sql", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
+
+    # Создание триггеров
+    execute_query(query=f"DELIMITER //", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
+    for query in get_queries_from_file("triggers.sql", delimiter='//'):
+        execute_query(query=query, user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
+    execute_query(query=f"DELIMITER ;", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=False)
@@ -256,3 +262,51 @@ def get_equipment_by_name(equipment_name, conn, cursor):
         GROUP BY e.id
     """, (equipment_name,))
     return cursor.fetchone()
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=False)
+def book_equipment(equipment_name, client_name, client_phone, client_email, start_date, end_date, conn, cursor):
+    """Бронирование оборудования."""
+
+    # Проверка, существует ли пользователь
+    cursor.execute("""
+        SELECT id FROM Users WHERE name = %s AND phone = %s AND email = %s
+    """, (client_name, client_phone, client_email))
+    user = cursor.fetchone()
+
+    # Если пользователь не найден, добавляем нового
+    user_id = None
+    if not user:
+        cursor.execute("""
+            INSERT INTO Users (name, phone, email, user_role)
+            VALUES (%s, %s, %s, 'client')
+        """, (client_name, client_phone, client_email))
+        user_id = cursor.lastrowid
+    else:
+        user_id = user['id']
+
+    # Проверка доступности хотя бы одного элемента с данным оборудованием
+    cursor.execute("""
+        SELECT id FROM Equipment WHERE name = %s
+    """, (equipment_name,))
+    equipment = cursor.fetchone()
+    if not equipment:
+        return {"error": "Оборудование не найдено"}, 404
+
+    equipment_id = equipment['id']
+    cursor.execute("""
+        SELECT id FROM Items WHERE equipment_id = %s AND status = 'available' LIMIT 1
+    """, (equipment_id,))
+    item = cursor.fetchone()
+    if not item:
+        return {"error": "Нет доступного оборудования для аренды"}, 400
+    item_id = item['id']
+
+    # Добавляем бронь в таблицу Reservations
+    cursor.execute("""
+        INSERT INTO Reservations (client_id, equipment_id, start_date, end_date, status)
+        VALUES (%s, %s, %s, %s, 'active')
+    """, (user_id, equipment_id, start_date, end_date))
+    reservation_id = cursor.lastrowid
+
+    return {"message": "Бронирование успешно"}, 200

@@ -2,6 +2,28 @@ import React from 'react';
 import axios from '../axios';
 
 function Dev() {
+    const handleInitDB = async () => {
+        try {
+            const res = await axios.post('/dev/init_db');
+            console.log('Ответ от сервера:', res.data);
+            alert('База данных успешно создана');
+        } catch (err) {
+            console.error('Ошибка при создании базы данных:', err);
+            alert('Ошибка при создании базы данных');
+        }
+    };
+
+    const handleSeedDB = async () => {
+        try {
+            const res = await axios.post('/dev/seed_db');
+            console.log('Ответ от сервера:', res.data);
+            alert('База данных успешно заполнена');
+        } catch (err) {
+            console.error('Ошибка при заполнении базы данных:', err);
+            alert('Ошибка при заполнении базы данных');
+        }
+    };
+
     const handleClearDB = async () => {
         try {
             const res = await axios.post('/dev/clear_db');
@@ -13,14 +35,14 @@ function Dev() {
         }
     };
 
-    const handleFillDB = async () => {
+    const handleDropDB = async () => {
         try {
-            const res = await axios.post('/dev/seed_db');
+            const res = await axios.post('/dev/drop_db');
             console.log('Ответ от сервера:', res.data);
-            alert('База данных успешно заполнена');
+            alert('База данных успешно удалена');
         } catch (err) {
-            console.error('Ошибка при заполнении базы данных:', err);
-            alert('Ошибка при заполнении базы данных');
+            console.error('Ошибка при удалении базы данных:', err);
+            alert('Ошибка при удалении базы данных');
         }
     };
 
@@ -30,8 +52,10 @@ function Dev() {
             <p className="subtext">Управление базой данных</p>
 
             <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+                <button onClick={handleInitDB} className="dark-action-button">Создать БД</button>
+                <button onClick={handleSeedDB} className="dark-action-button">Заполнить БД</button>
                 <button onClick={handleClearDB} className="dark-action-button">Очистить БД</button>
-                <button onClick={handleFillDB} className="dark-action-button">Заполнить БД</button>
+                <button onClick={handleDropDB} className="dark-action-button">Удалить БД</button>
             </div>
         </div>
     );

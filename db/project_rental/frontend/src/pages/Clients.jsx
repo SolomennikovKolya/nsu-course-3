@@ -24,7 +24,6 @@ function Clients() {
             setClients(res.data);
         } catch (err) {
             console.error('Ошибка загрузки клиентов:', err);
-            alert('Не удалось загрузить клиентов');
         } finally {
             setLoadingClients(false);
         }
@@ -37,7 +36,6 @@ function Clients() {
             setClientHistory(res.data);
         } catch (err) {
             console.error('Ошибка загрузки истории клиента:', err);
-            alert('Не удалось загрузить историю аренд');
         } finally {
             setLoadingHistory(false);
         }

@@ -11,6 +11,7 @@ function Equipment() {
     const [error, setError] = useState(null);                        // Ошибка
     const [isModalOpen, setIsModalOpen] = useState(false);           // Состояние для отображения модального окна
     const [isButtonDisabled, setIsButtonDisabled] = useState(false); // Для деактивации кнопки
+    const [bookingError, setBookingError] = useState(null);          // Ошибка бронирования
     const [formData, setFormData] = useState({ name: '', phone: '', email: '', rentFrom: '', rentTo: '' }); // Состояние для данных формы
 
     useEffect(() => {
@@ -47,17 +48,23 @@ function Equipment() {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('/rent_item', {
-                params: {
-                    equipmentName: equipmentName,
-                    ...formData
-                }
+            const res = await axios.post('/book_equipment', {
+                equipmentName: equipmentName,
+                ...formData
             });
-            // alert('Форма успешно отправлена')
             setIsModalOpen(false);
+            setBookingError(null);
+
+            if (equipmentData.available_count == 1) {
+                setIsButtonDisabled(true);
+            }
+            setEquipmentData(prevData => ({
+                ...prevData,
+                available_count: prevData.available_count - 1
+            }));
         } catch (error) {
-            // alert('Ошибка бронирования')
             console.error('Ошибка бронирования:', error);
+            setBookingError(error.response.data.error);
         }
     };
 
@@ -89,13 +96,13 @@ function Equipment() {
                 <p className="error-message">{error}</p>
             ) : (
                 <div style={{ display: 'flex' }}>
-                    {/* Левая панель (Описание) */}
+                    {/* Описание оборудования */}
                     <div style={{ flexGrow: 1, flexBasis: 0, padding: '0 1rem 0 0' }}>
                         <h1 className="page-title">{equipmentName}</h1>
                         <p>{equipmentData.description}</p>
                     </div>
 
-                    {/* Правая панель (Оформление аренды) */}
+                    {/* Бронирование */}
                     <div style={{ width: '300px', padding: '1rem' }}>
                         <p>Цена аренды: {equipmentData.rental_price_per_day} ₽/день</p>
                         <p>Залог: {equipmentData.deposit_amount} ₽</p>
@@ -114,7 +121,10 @@ function Equipment() {
             {isModalOpen && (
                 <div className="modal" onMouseDown={handleCloseModal}>
                     <div className="modal-content">
-                        <h2>Форма бронирования</h2>
+                        <h2>{equipmentName}</h2>
+                        {bookingError !== null && (
+                            <p className='error-message'>{bookingError}</p>
+                        )}
                         <form onSubmit={handleFormSubmit}>
                             <div>
                                 <label>Личные данные:</label>
