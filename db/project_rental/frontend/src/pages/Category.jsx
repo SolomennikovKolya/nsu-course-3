@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, NavLink } from 'react-router-dom';
+import { useLocation, useParams, Link, NavLink } from 'react-router-dom';
 import axios from '../axios';
 import { convertToSlug } from '../utils';
 import clsx from "clsx";
@@ -17,6 +17,15 @@ function Category() {
         return category ? category.name : slug;
     };
 
+    // При первой загрузки данной страницы, дастём оригинальное название категории из state
+    const location = useLocation();
+    useEffect(() => {
+        if (location.state?.categoryName) {
+            setCategoryName(location.state.categoryName);
+        }
+    }, [location.state]);
+
+    // Загрузка списка всех категорий (выполняется 1 раз при монтировании)
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -28,15 +37,16 @@ function Category() {
             }
         };
         fetchCategories();
-        setCategoryName(getOriginalCategoryName(categoryNameSlug));
     }, []);
 
+    // При выборе другой категории меняем оригинальное название
     useEffect(() => {
         if (categories.length > 0) {
             setCategoryName(getOriginalCategoryName(categoryNameSlug));
         }
     }, [categories, categoryNameSlug]);
 
+    // При выборе другой категории (а именно после изменения оригинального названия) обновляется контент
     useEffect(() => {
         if (!categoryName) return;
         const fetchEquipment = async () => {
@@ -61,7 +71,7 @@ function Category() {
             <h1 className="page-title">{categoryName} </h1>
 
             {loading ? (
-                <p>Загрузка оборудования...</p>
+                <p></p>
             ) : error ? (
                 <p className='error-message'>{error}</p>
             ) : (

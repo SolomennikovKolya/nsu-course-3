@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from '../axios';
 import { convertToSlug } from '../utils';
 
@@ -7,6 +7,7 @@ function Catalog() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -23,23 +24,27 @@ function Catalog() {
         fetchCategories();
     }, []);
 
+    const handleCategoryClick = (category) => {
+        navigate(`/catalog/${convertToSlug(category.name)}`, { state: { categoryName: category.name } });
+    };
+
     return (
         <div style={{ padding: '0 2rem 2rem 2rem' }}>
             <p className="subtext" style={{ margin: '0.5rem 0 0.5rem 0' }}>Каталог</p>
             <h1 className="page-title">Каталог</h1>
 
             {loading ? (
-                <p>Загрузка категорий...</p>
+                <p></p>
             ) : error ? (
                 <p style={{ color: 'red' }}>{error}</p>
             ) : (
                 <div className="category-grid">
                     {categories.map((category) => (
                         <div key={category.name} className="category-item">
-                            <Link to={`/catalog/${convertToSlug(category.name)}`} className="category-box-link">
+                            <button onClick={() => handleCategoryClick(category)} className="category-box-link">
                                 <div className="category-box"></div>
                                 <p>{category.name}</p>
-                            </Link>
+                            </button>
                         </div>
                     ))}
                 </div>

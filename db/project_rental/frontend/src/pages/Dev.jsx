@@ -27,7 +27,6 @@ function Dev() {
     return (
         <div style={{ padding: '2rem' }}>
             <h1 className="page-title">Development</h1>
-
             <p className="subtext">Управление базой данных</p>
 
             <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>

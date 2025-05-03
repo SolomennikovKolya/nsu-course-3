@@ -257,11 +257,22 @@ body {
 
 .category-item {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .category-box-link {
     text-decoration: none;
     color: inherit;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
 }
 
 .category-box-link:hover {
@@ -283,8 +294,10 @@ body {
     font-size: 1rem;
     font-weight: 500;
     text-align: center;
+    margin: 0;
 }
 
+/* Стиль категории */
 .equipment-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
