@@ -86,12 +86,10 @@ function Equipment() {
 
     return (
         <div style={{ padding: '0 2rem 2rem 2rem' }}>
-            <p className="subtext" style={{ margin: '0.5rem 0 0.5rem 0' }}>
-                Каталог → {categoryName} → {equipmentName}
-            </p>
+            {categoryName !== null && equipmentName !== null && (<p className="subtext" style={{ margin: '0.5rem 0 0.5rem 0' }}> Каталог → {categoryName} → {equipmentName} </p>)}
 
             {loading ? (
-                <p>Загрузка...</p>
+                <p></p>
             ) : error ? (
                 <p className="error-message">{error}</p>
             ) : (

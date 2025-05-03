@@ -310,3 +310,31 @@ def book_equipment(equipment_name, client_name, client_phone, client_email, star
     reservation_id = cursor.lastrowid
 
     return {"message": "Бронирование успешно"}, 200
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_employee(conn, cursor):
+    """Возвращает список всех сотрудников."""
+    cursor.execute("SELECT id, name, phone, email, user_role as role FROM Users WHERE user_role = 'manager' OR user_role = 'admin'")
+    return cursor.fetchall()
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def add_employee(name, phone, email, role, conn, cursor):
+    """Добавляет нового сотрудника в таблицу Users. Если такой сотрудник уже есть, то ничего не меняется."""
+    cursor.execute("""
+        SELECT 1 FROM Users WHERE name = %s AND phone = %s AND email = %s AND user_role = %s
+    """, (name, phone, email, role))
+    if cursor.fetchone():
+        return
+
+    cursor.execute("""
+        INSERT INTO Users (name, phone, email, user_role)
+        VALUES (%s, %s, %s, %s)
+    """, (name, phone, email, role))
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def delete_employee(employee_id, conn, cursor):
+    """Удаляет сотрудника по ID из таблицы Users."""
+    cursor.execute("DELETE FROM Users WHERE id = %s", (employee_id,))

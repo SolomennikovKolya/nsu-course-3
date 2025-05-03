@@ -5,6 +5,7 @@ from blueprints.dev import dev_bp
 from blueprints.general import general_bp
 from blueprints.manager import manager_bp
 from blueprints.client import client_bp
+from blueprints.admin import admin_bp
 
 
 # Настройка приложения
@@ -16,6 +17,7 @@ app.register_blueprint(dev_bp)        # Регистрирация блюпри�
 app.register_blueprint(general_bp)    # Основные запросы
 app.register_blueprint(client_bp)     # Клиентские запросы
 app.register_blueprint(manager_bp)    # Мэнеджерские запросы
+app.register_blueprint(admin_bp)      # Админские запросы
 
 
 if __name__ == "__main__":

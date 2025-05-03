@@ -89,6 +89,18 @@ body {
     background-color: #e0e0e0;
 }
 
+.delete-cell {
+    cursor: pointer;
+    text-align: center;
+    padding: 0.5rem;
+    transition: background-color 0.3s;
+}
+
+.delete-cell:hover {
+    background-color: orangered;
+    color: white;
+}
+
 /* Модальное окно */
 .modal {
     position: fixed;
@@ -145,6 +157,31 @@ body {
     box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.2);
 }
 
+/* Стиль селекторов */
+.text-select {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    border: 1.5px solid #ccc;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #fff;
+    box-sizing: border-box;
+    display: block;
+    appearance: none;
+}
+
+.text-select:focus {
+    border-color: orange;
+    box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.2);
+}
+
+.text-select::-ms-expand {
+    display: none;
+}
+
 /* Стиль для формы */
 form {
     display: flex;
@@ -177,20 +214,14 @@ form label {
 }
 
 .table th {
-    cursor: pointer;
     user-select: none;
     position: relative;
-}
-
-.table th:hover {
-    background-color: #e8e8e8;
 }
 
 .table td {
     border: 1px solid #ddd;
     padding: 0.5rem;
     text-align: center;
-    cursor: pointer;
 }
 
 /* Стиль верхней панели */
@@ -282,7 +313,34 @@ form label {
     text-decoration: none;
 }
 
-/* Стиль модального окона для истории аренд клиента */
+/* Стили для истории аренд клиента */
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.history-table th {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+
+.history-table-tr-hover:hover {
+    background-color: #e8e8e8;
+}
+
+.history-table th:hover {
+    background-color: #e8e8e8;
+}
+
+.history-table td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    text-align: center;
+    cursor: pointer;
+}
+
 .history-modal {
     position: fixed;
     top: 0;
@@ -447,4 +505,19 @@ ul li a:hover {
 
 ul li a:active {
     color: red;
+}
+
+/* Стили для строки добавления сотрудника */
+.add-employee-row {
+    cursor: pointer;
+    text-align: center;
+}
+
+.add-employee-cell {
+    padding: 1rem;
+    font-weight: bold;
+}
+
+.add-employee-row:hover .add-employee-cell {
+    background-color: #e8e8e8;
 }

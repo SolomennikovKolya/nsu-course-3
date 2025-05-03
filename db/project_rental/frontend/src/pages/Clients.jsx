@@ -82,9 +82,9 @@ function Clients() {
             <h1 className="page-title">Клиенты</h1>
 
             {loadingClients ? (
-                <div className="spinner"></div>
+                <div className="history-spinner"></div>
             ) : (
-                <table className="table">
+                <table className="history-table">
                     <thead>
                         <tr>
                             <th onClick={() => requestSort('id')}>ID {getSortArrow('id')}</th>
@@ -95,7 +95,7 @@ function Clients() {
                     </thead>
                     <tbody>
                         {sortedClients.map((client) => (
-                            <tr key={client.id} onClick={() => handleRowClick(client)}>
+                            <tr key={client.id} onClick={() => handleRowClick(client)} className='history-table-tr-hover'>
                                 <td>{client.id}</td>
                                 <td>{client.name}</td>
                                 <td>{client.phone}</td>
@@ -119,7 +119,7 @@ function Clients() {
                                 {clientHistory.length === 0 ? (
                                     <p className="subtext" style={{ marginTop: '1rem' }}>Аренд ещё не было</p>
                                 ) : (
-                                    <table className="table">
+                                    <table className="history-table">
                                         <thead>
                                             <tr>
                                                 <th>Оборудование</th>
