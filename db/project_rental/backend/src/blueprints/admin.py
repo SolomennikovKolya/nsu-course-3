@@ -5,7 +5,7 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
 @admin_bp.route('/employee/get', methods=['GET'])
-def get_clients():
+def get_employee():
     """Получение списка всех сотрудников."""
     result = db.actions.get_employee()
     return jsonify(result)
@@ -45,3 +45,50 @@ def delete_employee():
 
     db.actions.delete_employee(employee_id)
     return jsonify({"msg": "Employee deleted successfully"})
+
+
+@admin_bp.route('/equipment/get', methods=['GET'])
+def get_equipment():
+    """Получение списка всего оборудования."""
+    result = db.actions.get_equipment()
+    return jsonify(result)
+
+
+@admin_bp.route('/equipment/new', methods=['POST'])
+def add_equipment():
+    """Добавление нового оборудования."""
+    data = request.get_json()
+
+    name = data.get('name')
+    category = data.get('category')
+    description = data.get('description') or ""
+    rental_price_per_day = data.get('rental_price_per_day')
+    penalty_per_day = data.get('penalty_per_day')
+    deposit_amount = data.get('deposit_amount')
+
+    if not name:
+        return jsonify({"error": "Название - обязательное поле"}), 400
+    if not category:
+        return jsonify({"error": "Категория - обязательное поле"}), 400
+    if not rental_price_per_day:
+        return jsonify({"error": "Цена аренды - обязательное поле"}), 400
+    if not penalty_per_day:
+        return jsonify({"error": "Штраф за просрочку - обязательное поле"}), 400
+    if not deposit_amount:
+        return jsonify({"error": "Залог - обязательное поле"}), 400
+
+    db.actions.add_equipment(name, category, description, rental_price_per_day, penalty_per_day, deposit_amount)
+    return jsonify({"msg": "Equipment added successfully"})
+
+
+@admin_bp.route('/equipment/delete', methods=['POST'])
+def delete_equipment():
+    """Удаление оборудования по ID."""
+    data = request.get_json()
+    equipment_id = data.get('id')
+
+    if not equipment_id:
+        return jsonify({"error": "ID оборудования - обязательное поле"}), 400
+
+    result, code = db.actions.delete_equipment(equipment_id)
+    return jsonify(result), code

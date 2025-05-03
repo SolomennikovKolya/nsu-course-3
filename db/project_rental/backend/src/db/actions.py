@@ -338,3 +338,69 @@ def add_employee(name, phone, email, role, conn, cursor):
 def delete_employee(employee_id, conn, cursor):
     """Удаляет сотрудника по ID из таблицы Users."""
     cursor.execute("DELETE FROM Users WHERE id = %s", (employee_id,))
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_equipment(conn, cursor):
+    """Возвращает список всего оборудования."""
+    cursor.execute("SELECT id, name, category, description, rental_price_per_day, penalty_per_day, deposit_amount FROM Equipment")
+    return cursor.fetchall()
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def add_equipment(name, category, description, rental_price_per_day, penalty_per_day, deposit_amount, conn, cursor):
+    """Добавляет нового оборудования. Если название и категория новой записи совпадает со старой, то данные перезаписываются."""
+    cursor.execute("""
+        SELECT 1 FROM Equipment WHERE name = %s AND category = %s
+    """, (name, category))
+
+    if cursor.fetchone():
+        cursor.execute("""
+            UPDATE Equipment SET description = %s, rental_price_per_day = %s, penalty_per_day = %s, deposit_amount = %s
+            WHERE name = %s AND category = %s
+        """, (description, rental_price_per_day, penalty_per_day, deposit_amount, name, category))
+    else:
+        cursor.execute("""
+            INSERT INTO Equipment (name, category, description, rental_price_per_day, penalty_per_day, deposit_amount)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (name, category, description, rental_price_per_day, penalty_per_day, deposit_amount))
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=False)
+def delete_equipment(equipment_id, conn, cursor):
+    """Удаляет оборудование, если нет активных бронирований или аренды."""
+
+    # Проверяем, есть ли активные бронирования для данного оборудования
+    cursor.execute("""
+        SELECT COUNT(*) as cnt FROM Reservations
+        WHERE equipment_id = %s AND status = 'active'
+    """, (equipment_id,))
+    active_reservations = cursor.fetchone()['cnt']
+    if active_reservations > 0:
+        return {"error": "Невозможно удалить оборудование, есть активные брони."}, 400
+
+    # Проверяем, есть ли активные аренды для айтемов, связанных с данным оборудованием
+    cursor.execute("""
+        SELECT COUNT(*) as cnt FROM Rentals r
+        JOIN Items i ON r.item_id = i.id
+        WHERE i.equipment_id = %s AND r.status = 'active'
+    """, (equipment_id,))
+    active_rentals = cursor.fetchone()['cnt']
+    if active_rentals > 0:
+        return {"error": "Невозможно удалить оборудование, есть активные аренды."}, 400
+
+    # Если нет активных броней и аренды, удаляем оборудование и связанные записи
+    try:
+        cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
+        cursor.execute("""DELETE FROM Rentals WHERE item_id IN (SELECT id FROM Items WHERE equipment_id = %s)""", (equipment_id,))
+        cursor.execute("""DELETE FROM Reservations WHERE equipment_id = %s""", (equipment_id,))
+        cursor.execute("""DELETE FROM Items WHERE equipment_id = %s""", (equipment_id,))
+        cursor.execute("""DELETE FROM Equipment WHERE id = %s""", (equipment_id,))
+        cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
+
+        conn.commit()
+        return {"message": "Оборудование и связанные записи удалены успешно."}, 200
+
+    except Exception as e:
+        conn.rollback()
+        return {"error": f"Ошибка при удалении: {str(e)}"}, 500

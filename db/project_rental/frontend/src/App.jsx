@@ -10,8 +10,9 @@ import Contacts from './pages/Contacts';
 import Clients from './pages/Clients';
 import Catalog from './pages/Catalog';
 import Category from './pages/Category';
-import Equipment from './pages/Equipment';
+import EquipmentCard from './pages/EquipmentCard';
 import Employees from './pages/Employees';
+import Equipment from './pages/Equipment';
 
 // <Router> - Обёртка для всего приложения, которая отслеживает изменения URL
 // <AuthProvider> - Даёт доступ к состоянию авторизации (user, login(), logout()) через хук useAuth()
@@ -29,7 +30,7 @@ function App() {
 
             <Route path="/catalog" element={<Catalog />} />
             <Route path="/catalog/:categoryNameSlug" element={<Category />} />
-            <Route path="/catalog/:categoryNameSlug/:equipmentNameSlug" element={<Equipment />} />
+            <Route path="/catalog/:categoryNameSlug/:equipmentNameSlug" element={<EquipmentCard />} />
 
             <Route path="/terms" element={<Terms />} />
             <Route path="/company" element={<Company />} />
@@ -37,6 +38,7 @@ function App() {
 
             <Route path="/clients" element={<Clients />} />
 
+            <Route path="/equipment" element={<Equipment />} />
             <Route path="/employees" element={<Employees />} />
           </Route>
         </Routes>

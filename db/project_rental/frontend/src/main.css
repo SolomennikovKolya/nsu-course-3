@@ -507,17 +507,17 @@ ul li a:active {
     color: red;
 }
 
-/* Стили для строки добавления сотрудника */
-.add-employee-row {
+/* Стили для строки добавления в таблице */
+.add-row {
     cursor: pointer;
     text-align: center;
 }
 
-.add-employee-cell {
+.add-cell {
     padding: 1rem;
     font-weight: bold;
 }
 
-.add-employee-row:hover .add-employee-cell {
+.add-row:hover .add-cell {
     background-color: #e8e8e8;
 }

@@ -90,10 +90,8 @@ function Employees() {
                             <td style={{ padding: 0 }}> <div onClick={() => handleDeleteEmployee(employee.id)} className="delete-cell">X</div></td>
                         </tr>
                     ))}
-                    <tr onClick={() => setIsModalOpen(true)} className="add-employee-row">
-                        <td colSpan="6" className="add-employee-cell">
-                            Добавить сотрудника
-                        </td>
+                    <tr onClick={() => setIsModalOpen(true)} className="add-row">
+                        <td colSpan="6" className="add-cell">Добавить сотрудника</td>
                     </tr>
                 </tbody>
             </table>
