@@ -110,9 +110,9 @@ function Clients() {
 
             {/* Модальное окно */}
             {selectedClient && (
-                <div className="modal" onClick={closeModal}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <h2 className='modal-title'>История аренд: {selectedClient.name}</h2>
+                <div className="history-modal" onClick={closeModal}>
+                    <div className="history-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <h2 className='history-modal-title'>История аренд: {selectedClient.name}</h2>
 
                         {loadingHistory ? (
                             <div className="spinner"></div>

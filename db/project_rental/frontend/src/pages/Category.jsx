@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useParams, Link, NavLink } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, NavLink } from 'react-router-dom';
 import axios from '../axios';
 import { convertToSlug } from '../utils';
 import clsx from "clsx";
@@ -11,6 +11,7 @@ function Category() {
     const [equipment, setEquipment] = useState([]);         // Оборудование в данной категории
     const [loading, setLoading] = useState(true);           // Идёт ли сейчас загрузка
     const [error, setError] = useState(null);               // Ошибка
+    const navigate = useNavigate();
 
     const getOriginalCategoryName = (slug) => {
         const category = categories.find(c => convertToSlug(c.name) === slug);
@@ -65,6 +66,12 @@ function Category() {
         fetchEquipment();
     }, [categoryName]);
 
+    const handleEquipmentClick = (categoryName, equipmentName) => {
+        navigate(`/catalog/${convertToSlug(categoryName)}/${convertToSlug(equipmentName)}`, {
+            state: { categoryName: categoryName, equipmentName: equipmentName }
+        });
+    };
+
     return (
         <div style={{ padding: '0 2rem 2rem 2rem' }}>
             <p className="subtext" style={{ margin: '0.5rem 0 0.5rem 0' }}>Каталог → {categoryName}</p>
@@ -100,12 +107,12 @@ function Category() {
                             <p className='error-message'>{error}</p>
                         ) : (
                             <div className="equipment-grid">
-                                {equipment.map((item) => (
-                                    <div key={item.name} className="equipment-item">
-                                        <Link to={`/equipment/${convertToSlug(item.name)}`} className='equipment-box-link'>
+                                {equipment.map((unit) => (
+                                    <div key={unit.name} className="equipment-item">
+                                        <button onClick={() => handleEquipmentClick(categoryName, unit.name)} className='equipment-box-link'>
                                             <div className="equipment-box"></div>
-                                            <p>{item.name}<br />{item.rental_price_per_day} ₽/день</p>
-                                        </Link>
+                                            <p>{unit.name}<br />{unit.rental_price_per_day} ₽/день</p>
+                                        </button>
                                     </div>
                                 ))}
                             </div>

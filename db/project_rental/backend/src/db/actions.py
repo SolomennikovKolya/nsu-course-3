@@ -211,7 +211,6 @@ def get_client_history(client_id, conn, cursor):
 
     cursor.execute(query, (client_id,))
     history = cursor.fetchall()
-
     result = []
     for record in history:
         result.append({
@@ -243,6 +242,17 @@ def get_equipment_by_category(category_name, conn, cursor):
         FROM Equipment
         WHERE category = %s
     """, (category_name,))
-
     equipment = cursor.fetchall()
     return [{'name': item['name'], 'rental_price_per_day': item['rental_price_per_day']} for item in equipment]
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_equipment_by_name(equipment_name, conn, cursor):
+    """Возвращает список оборудования для заданной категории с количеством доступных единиц."""
+    cursor.execute("""
+        SELECT e.name, e.rental_price_per_day, e.deposit_amount, e.description, COUNT(i.id) AS available_count
+        FROM Equipment e LEFT JOIN Items i ON e.id = i.equipment_id AND i.status = 'available'
+        WHERE e.name = %s
+        GROUP BY e.id
+    """, (equipment_name,))
+    return cursor.fetchone()

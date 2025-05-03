@@ -21,3 +21,14 @@ def get_category_equipment():
 
     result = db.actions.get_equipment_by_category(category_name)
     return jsonify(result)
+
+
+@client_bp.route('/equipment', methods=['GET'])
+def get_equipment():
+    """Получение информации об оборудовании по его названию."""
+    equipment_name = request.args.get('name')
+    if not equipment_name:
+        return jsonify({'error': 'Equipment name is required'}), 400
+
+    result = db.actions.get_equipment_by_name(equipment_name)
+    return jsonify(result)

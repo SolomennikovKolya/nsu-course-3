@@ -30,8 +30,8 @@ function Dev() {
             <p className="subtext">Управление базой данных</p>
 
             <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
-                <button onClick={handleClearDB} className="action-button">Очистить БД</button>
-                <button onClick={handleFillDB} className="action-button">Заполнить БД</button>
+                <button onClick={handleClearDB} className="dark-action-button">Очистить БД</button>
+                <button onClick={handleFillDB} className="dark-action-button">Заполнить БД</button>
             </div>
         </div>
     );

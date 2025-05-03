@@ -24,8 +24,8 @@ function Catalog() {
         fetchCategories();
     }, []);
 
-    const handleCategoryClick = (category) => {
-        navigate(`/catalog/${convertToSlug(category.name)}`, { state: { categoryName: category.name } });
+    const handleCategoryClick = (categoryName) => {
+        navigate(`/catalog/${convertToSlug(categoryName)}`, { state: { categoryName: categoryName } });
     };
 
     return (
@@ -41,7 +41,7 @@ function Catalog() {
                 <div className="category-grid">
                     {categories.map((category) => (
                         <div key={category.name} className="category-item">
-                            <button onClick={() => handleCategoryClick(category)} className="category-box-link">
+                            <button onClick={() => handleCategoryClick(category.name)} className="category-box-link">
                                 <div className="category-box"></div>
                                 <p>{category.name}</p>
                             </button>
