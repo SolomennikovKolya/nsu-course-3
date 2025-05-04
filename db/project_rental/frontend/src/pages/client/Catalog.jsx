@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from '../../axios';
 import { convertToSlug } from '../../utils';
-import '../../main.css';
-import './catalog.css';
+import styles from './Catalog.module.css';
 
 function Catalog() {
     const [categories, setCategories] = useState([]);
@@ -40,11 +39,11 @@ function Catalog() {
             ) : error ? (
                 <p style={{ color: 'red' }}>{error}</p>
             ) : (
-                <div className="category-grid">
+                <div className={styles["category-grid"]}>
                     {categories.map((category) => (
-                        <div key={category.name} className="category-item">
-                            <button onClick={() => handleCategoryClick(category.name)} className="category-box-link">
-                                <div className="category-box"></div>
+                        <div key={category.name} className={styles["category-item"]}>
+                            <button onClick={() => handleCategoryClick(category.name)} className={styles["category-box-link"]}>
+                                <div className={styles["category-box"]}></div>
                                 <p>{category.name}</p>
                             </button>
                         </div>

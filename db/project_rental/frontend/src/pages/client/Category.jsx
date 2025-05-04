@@ -3,8 +3,7 @@ import { useLocation, useNavigate, useParams, NavLink } from 'react-router-dom';
 import clsx from "clsx";
 import axios from '../../axios';
 import { convertToSlug } from '../../utils';
-import '../../main.css';
-import './category.css';
+import styles from './Category.module.css';
 
 function Category() {
     const { categoryNameSlug } = useParams();               // Название категории транслитом
@@ -87,12 +86,12 @@ function Category() {
                 <div style={{ display: 'flex' }}>
                     {/* Левая панель (Навигация)*/}
                     <div style={{ width: '250px', paddingRight: '2rem' }}>
-                        <ul style={{ listStyleType: 'none', paddingLeft: 0, paddingTop: 0 }}>
-                            <li>
+                        <ul className={styles['ul']} style={{ listStyleType: 'none', paddingLeft: 0, paddingTop: 0 }}>
+                            <li className={styles['li']}>
                                 <NavLink to="/catalog" className="link-style">Каталог</NavLink>
                             </li>
                             {categories.map((category) => (
-                                <li key={category.name} style={{ paddingLeft: '1rem' }}>
+                                <li className={styles['li']} key={category.name} style={{ paddingLeft: '1rem' }}>
                                     <NavLink to={`/catalog/${convertToSlug(category.name)}`} className={({ isActive }) => clsx("link-style", { "active-link": isActive })}>
                                         {category.name}
                                     </NavLink>
@@ -108,11 +107,11 @@ function Category() {
                         ) : error ? (
                             <p className='error-message'>{error}</p>
                         ) : (
-                            <div className="equipment-grid">
+                            <div className={styles["equipment-grid"]}>
                                 {equipment.map((unit) => (
-                                    <div key={unit.name} className="equipment-item">
-                                        <button onClick={() => handleEquipmentClick(categoryName, unit.name)} className='equipment-box-link'>
-                                            <div className="equipment-box"></div>
+                                    <div key={unit.name} className={styles["equipment-item"]}>
+                                        <button onClick={() => handleEquipmentClick(categoryName, unit.name)} className={styles['equipment-box-link']}>
+                                            <div className={styles["equipment-box"]}></div>
                                             <p>{unit.name}<br />{unit.rental_price_per_day} ₽/день</p>
                                         </button>
                                     </div>
