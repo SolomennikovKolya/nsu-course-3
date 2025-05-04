@@ -215,6 +215,16 @@ table th {
     position: relative;
 }
 
+table th:hover {
+    background-color: #e8e8e8;
+    cursor: pointer
+}
+
+table th.no-hover:hover {
+    background-color: transparent;
+    cursor: default;
+}
+
 table td {
     border: 1px solid #ddd;
     padding: 0.5rem;

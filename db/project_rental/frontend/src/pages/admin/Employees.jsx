@@ -98,12 +98,12 @@ function Employees() {
             <table className='custom-table'>
                 <thead>
                     <tr>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('id')}>ID {sortConfig.key === 'id' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('name')}>Имя {sortConfig.key === 'name' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('phone')}>Номер {sortConfig.key === 'phone' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('email')}>Email {sortConfig.key === 'email' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('role')}>Должность {sortConfig.key === 'role' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th></th>
+                        <th onClick={() => requestSort('id')}>ID {sortConfig.key === 'id' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th onClick={() => requestSort('name')}>Имя {sortConfig.key === 'name' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th onClick={() => requestSort('phone')}>Номер {sortConfig.key === 'phone' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th onClick={() => requestSort('email')}>Email {sortConfig.key === 'email' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th onClick={() => requestSort('role')}>Должность {sortConfig.key === 'role' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th className='no-hover'></th>
                     </tr>
                 </thead>
                 <tbody>

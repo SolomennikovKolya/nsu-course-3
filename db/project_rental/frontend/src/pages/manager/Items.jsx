@@ -163,13 +163,13 @@ function Rentals() {
             </select>
 
             {/* Таблица айтемов */}
-            <table className='custom-table'>
+            <table>
                 <thead>
                     <tr>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('id')}>ID {sortConfig.key === 'id' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('equipment_name')}>Оборудование {sortConfig.key === 'equipment_name' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('status')}>Статус {sortConfig.key === 'status' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th></th>
+                        <th onClick={() => requestSort('id')}>ID {sortConfig.key === 'id' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th onClick={() => requestSort('equipment_name')}>Оборудование {sortConfig.key === 'equipment_name' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th onClick={() => requestSort('status')}>Статус {sortConfig.key === 'status' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th className='no-hover'></th>
                     </tr>
                 </thead>
                 <tbody>

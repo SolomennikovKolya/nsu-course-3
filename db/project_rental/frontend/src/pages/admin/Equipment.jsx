@@ -93,14 +93,14 @@ function Employees() {
             <table>
                 <thead>
                     <tr>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('id')}>ID {sortConfig.key === 'id' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('name')}>Название {sortConfig.key === 'name' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('category')}>Категория {sortConfig.key === 'category' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('description')}>Описание {sortConfig.key === 'description' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('rental_price_per_day')}>Цена аренды {sortConfig.key === 'rental_price_per_day' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('penalty_per_day')}>Штраф за просрочку {sortConfig.key === 'penalty_per_day' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('deposit_amount')}>Залог {sortConfig.key === 'deposit_amount' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th></th>
+                        <th onClick={() => requestSort('id')}>ID {sortConfig.key === 'id' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th onClick={() => requestSort('name')}>Название {sortConfig.key === 'name' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th onClick={() => requestSort('category')}>Категория {sortConfig.key === 'category' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th onClick={() => requestSort('description')}>Описание {sortConfig.key === 'description' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th onClick={() => requestSort('rental_price_per_day')}>Цена аренды {sortConfig.key === 'rental_price_per_day' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th onClick={() => requestSort('penalty_per_day')}>Штраф за просрочку {sortConfig.key === 'penalty_per_day' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th onClick={() => requestSort('deposit_amount')}>Залог {sortConfig.key === 'deposit_amount' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th className='no-hover'></th>
                     </tr>
                 </thead>
                 <tbody>

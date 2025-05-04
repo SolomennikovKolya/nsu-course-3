@@ -10,9 +10,9 @@
     cursor: pointer;
 }
 
-/* .clients-table th:hover {
+.clients-table th:hover {
     background-color: #e8e8e8;
-} */
+}
 
 .clients-table-tr-hover:hover {
     background-color: #e8e8e8;
