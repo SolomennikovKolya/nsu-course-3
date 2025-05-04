@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useAuth } from '../AuthContext';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
+import './navbarTop.css';
 
 function NavbarTop() {
     const { user, logout } = useAuth();

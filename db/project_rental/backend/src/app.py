@@ -2,7 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from cli.commands import register_commands
 from blueprints.dev import dev_bp
-from blueprints.general import general_bp
+from blueprints.authorization import general_bp
 from blueprints.manager import manager_bp
 from blueprints.client import client_bp
 from blueprints.admin import admin_bp

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams, NavLink } from 'react-router-dom';
-import axios from '../axios';
-import { convertToSlug } from '../utils';
 import clsx from "clsx";
+import axios from '../../axios';
+import { convertToSlug } from '../../utils';
 
 function Category() {
     const { categoryNameSlug } = useParams();               // Название категории транслитом

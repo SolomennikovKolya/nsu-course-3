@@ -7,7 +7,7 @@ body {
     color: #222;
 }
 
-/* Стиль текта */
+/* Текст */
 .page-title {
     font-size: 2rem;
     font-weight: bold;
@@ -19,7 +19,7 @@ body {
     font-size: 1rem;
 }
 
-/* Стиль ссылок */
+/* Ссылоки */
 .link-style {
     color: #555;
     text-decoration: none;
@@ -39,7 +39,7 @@ body {
     color: darkorange;
 }
 
-/* Стиль кнопок */
+/* Кнопки */
 .action-button {
     background-color: orange;
     color: white;
@@ -75,7 +75,7 @@ body {
     background-color: darkorange;
 }
 
-.dark-action-button {
+.gray-button {
     padding: 0.5rem 1rem;
     font-size: 1rem;
     background-color: #f0f0f0;
@@ -85,7 +85,7 @@ body {
     transition: background-color 0.3s;
 }
 
-.dark-action-button:hover {
+.gray-button:hover {
     background-color: #e0e0e0;
 }
 
@@ -101,7 +101,7 @@ body {
     color: white;
 }
 
-/* Модальное окно */
+/* Модальные окна */
 .modal {
     position: fixed;
     top: 0;
@@ -113,6 +113,7 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 9999;
+    animation: fadeIn 0.3s ease-out;
 }
 
 .modal-content {
@@ -122,22 +123,49 @@ body {
     max-width: 500px;
     width: 100%;
     box-sizing: border-box;
+    animation: slideUp 0.3s ease-out;
 }
 
-.modal-close-button {
-    background-color: #f1f1f1;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
+.modal h2 {
+    margin-top: 0;
 }
 
-.modal-close-button:hover {
-    background-color: #ddd;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
-/* Стиль полей для ввода текста */
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Формы */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+form label {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Поля для ввода или выбора текста */
 .text-input {
     width: 100%;
     padding: 0.6rem 1rem;
@@ -157,7 +185,6 @@ body {
     box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.2);
 }
 
-/* Стиль селекторов */
 .text-select {
     width: 100%;
     padding: 0.6rem 1rem;
@@ -182,31 +209,7 @@ body {
     display: none;
 }
 
-/* Стиль для формы */
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-h2 {
-    margin-top: 0;
-}
-
-form label {
-    font-size: 1rem;
-    margin-bottom: 8px;
-    display: block;
-}
-
 /* Стиль таблиц */
-.spinner {
-    text-align: center;
-    margin-top: 2rem;
-    font-size: 1.2rem;
-    color: gray;
-}
-
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -224,95 +227,6 @@ form label {
     text-align: center;
 }
 
-/* Стиль верхней панели */
-.catalog-button {
-    background-color: orange;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 0.4rem 0.8rem;
-    height: 2.4rem;
-    font-size: 0.95rem;
-    cursor: pointer;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-}
-
-.catalog-button:hover {
-    background-color: darkorange;
-}
-
-.search-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    border: 2px solid orange;
-    border-radius: 10px;
-    padding-left: 1rem;
-    background-color: white;
-    height: 2.4rem;
-    overflow: hidden;
-}
-
-.search-input {
-    flex-grow: 1;
-    border: none;
-    outline: none;
-    font-size: 1rem;
-    height: 100%;
-    padding-right: 2rem;
-}
-
-.search-clear {
-    position: absolute;
-    right: 4.7rem;
-    top: 50%;
-    transform: translateY(-60%);
-    font-size: 1.6rem;
-    color: gray;
-    cursor: pointer;
-    user-select: none;
-}
-
-.search-button {
-    background-color: orange;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.95rem;
-    height: calc(100% - 0.4rem);
-    margin: 0.2rem;
-    cursor: pointer;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-}
-
-.search-button:hover {
-    background-color: darkorange;
-}
-
-.exit-button {
-    border: none;
-    background: none;
-    color: #555;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 0.25rem 0.5rem;
-    white-space: nowrap;
-    height: 2.4rem;
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-}
-
-.exit-button:hover {
-    color: darkorange;
-    text-decoration: none;
-}
-
 /* Стили для истории аренд клиента */
 .history-table {
     width: 100%;
@@ -326,11 +240,11 @@ form label {
     position: relative;
 }
 
-.history-table-tr-hover:hover {
+.history-table th:hover {
     background-color: #e8e8e8;
 }
 
-.history-table th:hover {
+.history-table-tr-hover:hover {
     background-color: #e8e8e8;
 }
 
@@ -368,28 +282,6 @@ form label {
     font-size: 1.5rem;
     font-weight: bold;
     margin: 0 1rem 2rem 0;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(20px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
 }
 
 /* Стиль каталога */

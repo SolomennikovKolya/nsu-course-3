@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../AuthContext';
-import axios from '../axios';
-import '../main.css';
+import { useAuth } from '../../AuthContext';
+import axios from '../../axios';
 
 function Employees() {
     const { user } = useAuth();

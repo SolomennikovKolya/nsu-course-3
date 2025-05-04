@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../AuthContext';
-import axios from '../axios';
+import { useAuth } from '../../AuthContext';
+import axios from '../../axios';
 
 function Clients() {
     const { user } = useAuth();
@@ -82,7 +82,7 @@ function Clients() {
             <h1 className="page-title">Клиенты</h1>
 
             {loadingClients ? (
-                <div className="history-spinner"></div>
+                <div></div>
             ) : (
                 <table className="history-table">
                     <thead>
@@ -113,7 +113,7 @@ function Clients() {
                         <h2 className='history-modal-title'>История аренд: {selectedClient.name}</h2>
 
                         {loadingHistory ? (
-                            <div className="spinner"></div>
+                            <div></div>
                         ) : (
                             <>
                                 {clientHistory.length === 0 ? (
