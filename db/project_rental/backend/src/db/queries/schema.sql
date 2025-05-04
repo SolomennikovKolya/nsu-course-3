@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS Equipment (
     category VARCHAR(255) NOT NULL,
     description TEXT,
     rental_price_per_day INT NOT NULL,
-    penalty_per_day INT NOT NULL,
     deposit_amount INT NOT NULL
 );
 

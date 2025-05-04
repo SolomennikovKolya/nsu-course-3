@@ -198,7 +198,7 @@ def get_clients(conn, cursor):
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
 def get_all_equipment(conn, cursor):
     """Возвращает список всего оборудования."""
-    cursor.execute("SELECT id, name, category, description, rental_price_per_day, penalty_per_day, deposit_amount FROM Equipment")
+    cursor.execute("SELECT id, name, category, description, rental_price_per_day, deposit_amount FROM Equipment")
     return cursor.fetchall()
 
 
@@ -387,12 +387,12 @@ def delete_employee(employee_id, conn, cursor):
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
 def get_equipment(conn, cursor):
     """Возвращает список всего оборудования."""
-    cursor.execute("SELECT id, name, category, description, rental_price_per_day, penalty_per_day, deposit_amount FROM Equipment")
+    cursor.execute("SELECT id, name, category, description, rental_price_per_day, deposit_amount FROM Equipment")
     return cursor.fetchall()
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
-def add_equipment(name, category, description, rental_price_per_day, penalty_per_day, deposit_amount, conn, cursor):
+def add_equipment(name, category, description, rental_price_per_day, deposit_amount, conn, cursor):
     """Добавляет нового оборудования. Если название и категория новой записи совпадает со старой, то данные перезаписываются."""
     cursor.execute("""
         SELECT 1 FROM Equipment WHERE name = %s AND category = %s
@@ -400,14 +400,14 @@ def add_equipment(name, category, description, rental_price_per_day, penalty_per
 
     if cursor.fetchone():
         cursor.execute("""
-            UPDATE Equipment SET description = %s, rental_price_per_day = %s, penalty_per_day = %s, deposit_amount = %s
+            UPDATE Equipment SET description = %s, rental_price_per_day = %s, deposit_amount = %s
             WHERE name = %s AND category = %s
-        """, (description, rental_price_per_day, penalty_per_day, deposit_amount, name, category))
+        """, (description, rental_price_per_day, deposit_amount, name, category))
     else:
         cursor.execute("""
-            INSERT INTO Equipment (name, category, description, rental_price_per_day, penalty_per_day, deposit_amount)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (name, category, description, rental_price_per_day, penalty_per_day, deposit_amount))
+            INSERT INTO Equipment (name, category, description, rental_price_per_day, deposit_amount)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (name, category, description, rental_price_per_day, deposit_amount))
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=False)

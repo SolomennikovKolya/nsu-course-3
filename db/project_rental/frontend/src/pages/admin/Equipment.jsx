@@ -9,7 +9,7 @@ function Employees() {
     const [modalError, setModalError] = useState(null);
     const [newEquipment, setNewEquipment] = useState({
         name: '', category: '', description: '',
-        rental_price_per_day: '', penalty_per_day: '', deposit_amount: ''
+        rental_price_per_day: '', deposit_amount: ''
     });
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
@@ -98,7 +98,6 @@ function Employees() {
                         <th onClick={() => requestSort('category')}>Категория {sortConfig.key === 'category' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
                         <th onClick={() => requestSort('description')}>Описание {sortConfig.key === 'description' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
                         <th onClick={() => requestSort('rental_price_per_day')}>Цена аренды {sortConfig.key === 'rental_price_per_day' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
-                        <th onClick={() => requestSort('penalty_per_day')}>Штраф за просрочку {sortConfig.key === 'penalty_per_day' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
                         <th onClick={() => requestSort('deposit_amount')}>Залог {sortConfig.key === 'deposit_amount' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
                         <th className='no-hover'></th>
                     </tr>
@@ -111,7 +110,6 @@ function Employees() {
                             <td>{unit.category}</td>
                             <td>{unit.description}</td>
                             <td>{unit.rental_price_per_day}</td>
-                            <td>{unit.penalty_per_day}</td>
                             <td>{unit.deposit_amount}</td>
                             <td style={{ padding: 0 }}>
                                 <div onClick={() => handleDeleteEquipment(unit.id)} className="delete-cell">X</div>
@@ -137,7 +135,6 @@ function Employees() {
                                 <input className='text-input' placeholder='Категория' type="text" name="category" value={newEquipment.category} onChange={handleChange} required />
                                 <input className='text-input' placeholder='Описание' type="text" name="description" value={newEquipment.description} onChange={handleChange} />
                                 <input className='text-input' placeholder='Стоимость аренды' type="number" name="rental_price_per_day" value={newEquipment.rental_price_per_day} onChange={handleChange} required />
-                                <input className='text-input' placeholder='Штраф за просрочку' type="number" name="penalty_per_day" value={newEquipment.penalty_per_day} onChange={handleChange} required />
                                 <input className='text-input' placeholder='Залог' type="number" name="deposit_amount" value={newEquipment.deposit_amount} onChange={handleChange} required />
                             </div>
                             <button type="submit" className="action-button">Добавить</button>

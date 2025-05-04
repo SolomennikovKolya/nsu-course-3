@@ -63,7 +63,6 @@ def add_equipment():
     category = data.get('category')
     description = data.get('description') or ""
     rental_price_per_day = data.get('rental_price_per_day')
-    penalty_per_day = data.get('penalty_per_day')
     deposit_amount = data.get('deposit_amount')
 
     if not name:
@@ -72,12 +71,10 @@ def add_equipment():
         return jsonify({"error": "Категория - обязательное поле"}), 400
     if not rental_price_per_day:
         return jsonify({"error": "Цена аренды - обязательное поле"}), 400
-    if not penalty_per_day:
-        return jsonify({"error": "Штраф за просрочку - обязательное поле"}), 400
     if not deposit_amount:
         return jsonify({"error": "Залог - обязательное поле"}), 400
 
-    db.actions.add_equipment(name, category, description, rental_price_per_day, penalty_per_day, deposit_amount)
+    db.actions.add_equipment(name, category, description, rental_price_per_day, deposit_amount)
     return jsonify({"msg": "Equipment added successfully"})
 
 
