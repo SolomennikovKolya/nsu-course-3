@@ -1,0 +1,33 @@
+.clients-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.clients-table th {
+    user-select: none;
+    position: relative;
+    cursor: pointer;
+}
+
+.clients-table th:hover {
+    background-color: #e8e8e8;
+}
+
+.clients-table-tr-hover:hover {
+    background-color: #e8e8e8;
+}
+
+.clients-table td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    text-align: center;
+    cursor: pointer;
+}
+
+.custom-modal-content {
+    max-width: none;
+    width: 80%;
+    max-height: 80%;
+    overflow-y: auto;
+}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import './navbarTop.css';
+import styles from './NavbarTop.module.css';
 
 function NavbarTop() {
     const { user, logout } = useAuth();
@@ -32,27 +32,27 @@ function NavbarTop() {
                 </div>
 
                 {/* Кнопка Каталог */}
-                <button onClick={handleCatalogClick} className="catalog-button">Каталог</button>
+                <button onClick={handleCatalogClick} className={styles['catalog-button']}>Каталог</button>
 
                 {/* Поисковая строка растягивается */}
                 <div style={{ flexGrow: 1 }}>
-                    <div className="search-container">
+                    <div className={styles["search-container"]}>
                         <input
                             type="text"
                             placeholder="Поиск..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="search-input"
+                            className={styles["search-input"]}
                         />
                         {search && (
-                            <span className="search-clear" onClick={clearSearch}>×</span>
+                            <span className={styles["search-clear"]} onClick={clearSearch}>×</span>
                         )}
-                        <button className="search-button">Поиск</button>
+                        <button className={styles["search-button"]}>Поиск</button>
                     </div>
                 </div>
 
                 {/* Кнопка "Выйти"/"Войти" */}
-                <button onClick={handleAuthClick} className="exit-button">
+                <button onClick={handleAuthClick} className={styles["exit-button"]}>
                     {user ? 'Выйти' : 'Войти'}
                 </button>
             </div>

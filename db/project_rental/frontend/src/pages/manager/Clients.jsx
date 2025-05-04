@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import classNames from 'classnames';
 import { useAuth } from '../../AuthContext';
 import axios from '../../axios';
+import styles from './Clients.module.css';
 
 function Clients() {
     const { user } = useAuth();
@@ -79,12 +81,13 @@ function Clients() {
 
     return (
         <div style={{ padding: '2rem' }}>
-            <h1 className="page-title">Клиенты</h1>
+            <h1 className='page-title'>Клиенты</h1>
 
+            {/* Таблица клиентов */}
             {loadingClients ? (
                 <div></div>
             ) : (
-                <table className="history-table">
+                <table className={styles['clients-table']}>
                     <thead>
                         <tr>
                             <th onClick={() => requestSort('id')}>ID {getSortArrow('id')}</th>
@@ -95,7 +98,7 @@ function Clients() {
                     </thead>
                     <tbody>
                         {sortedClients.map((client) => (
-                            <tr key={client.id} onClick={() => handleRowClick(client)} className='history-table-tr-hover'>
+                            <tr key={client.id} onClick={() => handleRowClick(client)} className={styles['clients-table-tr-hover']}>
                                 <td>{client.id}</td>
                                 <td>{client.name}</td>
                                 <td>{client.phone}</td>
@@ -106,20 +109,20 @@ function Clients() {
                 </table>
             )}
 
-            {/* Модальное окно */}
+            {/* Модальное окно истории аренд */}
             {selectedClient && (
-                <div className="history-modal" onClick={closeModal}>
-                    <div className="history-modal-content" onClick={(e) => e.stopPropagation()}>
-                        <h2 className='history-modal-title'>История аренд: {selectedClient.name}</h2>
+                <div className='modal' onClick={closeModal}>
+                    <div className={classNames('modal-content', styles['custom-modal-content'])} onClick={(e) => e.stopPropagation()}>
+                        <h2>История аренд - {selectedClient.name}</h2>
 
                         {loadingHistory ? (
                             <div></div>
                         ) : (
                             <>
                                 {clientHistory.length === 0 ? (
-                                    <p className="subtext" style={{ marginTop: '1rem' }}>Аренд ещё не было</p>
+                                    <p className='subtext' style={{ marginTop: '1rem' }}>Аренд ещё не было</p>
                                 ) : (
-                                    <table className="history-table">
+                                    <table>
                                         <thead>
                                             <tr>
                                                 <th>Оборудование</th>

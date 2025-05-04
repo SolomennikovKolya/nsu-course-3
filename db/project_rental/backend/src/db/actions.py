@@ -334,10 +334,12 @@ def add_employee(name, phone, email, role, conn, cursor):
     """, (name, phone, email, role))
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=False)
 def delete_employee(employee_id, conn, cursor):
     """Удаляет сотрудника по ID из таблицы Users."""
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
     cursor.execute("DELETE FROM Users WHERE id = %s", (employee_id,))
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)

@@ -3,6 +3,8 @@ import { useLocation, useNavigate, useParams, NavLink } from 'react-router-dom';
 import clsx from "clsx";
 import axios from '../../axios';
 import { convertToSlug } from '../../utils';
+import '../../main.css';
+import './category.css';
 
 function Category() {
     const { categoryNameSlug } = useParams();               // Название категории транслитом
