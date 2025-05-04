@@ -89,8 +89,8 @@ function NavbarTop() {
                         borderRadius: '10px',
                         alignItems: 'center'
                     }}>
-                        <NavLink to="/rents" className={({ isActive }) => isActive ? "link-style active-link" : "link-style"}> 🗝️Аренды </NavLink>
-                        <NavLink to="/notifications" className={({ isActive }) => isActive ? "link-style active-link" : "link-style"}> ⚠️Уведомления </NavLink>
+                        <NavLink to="/rentals" className={({ isActive }) => isActive ? "link-style active-link" : "link-style"}> 🗝️Аренды </NavLink>
+                        <NavLink to="/items" className={({ isActive }) => isActive ? "link-style active-link" : "link-style"}> 🛠️Айтемы </NavLink>
                         <NavLink to="/clients" className={({ isActive }) => isActive ? "link-style active-link" : "link-style"}> 🙋Клиенты </NavLink>
                     </div>
                 )}

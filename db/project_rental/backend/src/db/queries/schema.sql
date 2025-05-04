@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS Items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     equipment_id INT NOT NULL,
     status ENUM('available', 'booked', 'rented', 'serviced', 'decommissioned') NOT NULL,
-    last_maintenance_date DATE,
     FOREIGN KEY (equipment_id) REFERENCES Equipment(id)
 );
 

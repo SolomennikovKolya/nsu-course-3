@@ -220,3 +220,33 @@ table td {
     padding: 0.5rem;
     text-align: center;
 }
+
+.add-row {
+    cursor: pointer;
+    text-align: center;
+}
+
+.add-cell {
+    font-weight: bold;
+}
+
+.add-row:hover .add-cell {
+    background-color: #e8e8e8;
+}
+
+.changeable-cell:hover {
+    background-color: #e8e8e8;
+    cursor: pointer;
+}
+
+.delete-cell {
+    cursor: pointer;
+    text-align: center;
+    padding: 0.5rem;
+    transition: background-color 0.3s;
+}
+
+.delete-cell:hover {
+    background-color: orangered;
+    color: white;
+}

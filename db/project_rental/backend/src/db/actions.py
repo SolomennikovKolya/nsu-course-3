@@ -196,6 +196,48 @@ def get_clients(conn, cursor):
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_all_equipment(conn, cursor):
+    """Возвращает список всего оборудования."""
+    cursor.execute("SELECT id, name, category, description, rental_price_per_day, penalty_per_day, deposit_amount FROM Equipment")
+    return cursor.fetchall()
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_items(equipment_id, conn, cursor):
+    """Возвращает айтемов выбранного обрудования либо все айтемы."""
+    if not equipment_id:
+        cursor.execute("""SELECT i.id, e.name AS equipment_name, i.status 
+            FROM Items i LEFT JOIN Equipment e ON i.equipment_id = e.id""")
+    else:
+        cursor.execute("""SELECT i.id, e.name AS equipment_name, i.status 
+            FROM Items i LEFT JOIN Equipment e ON i.equipment_id = e.id WHERE i.equipment_id = %s""", (equipment_id,))
+    return cursor.fetchall()
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def add_item(equipment_id, conn, cursor):
+    """Добавление айтема."""
+    cursor.execute("""
+        INSERT INTO Items (equipment_id, status)
+        VALUES (%s, 'available')
+    """, (equipment_id,))
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def change_item_status(item_id, status, conn, cursor):
+    """Изменение статуса айтема."""
+    cursor.execute("UPDATE Items SET status = %s WHERE id = %s", (status, item_id))
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def delete_item(item_id, conn, cursor):
+    """Удаление айтема."""
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
+    cursor.execute("""DELETE FROM Items WHERE id = %s""", (item_id,))
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
 def get_client_history(client_id, conn, cursor):
     """Возвращает историю аренд конкретного клиента."""
     query = """

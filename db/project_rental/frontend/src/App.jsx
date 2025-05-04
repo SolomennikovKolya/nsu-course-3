@@ -9,6 +9,8 @@ import EquipmentCard from './pages/client/EquipmentCard';
 import Terms from './pages/client/Terms';
 import Company from './pages/client/Company';
 import Contacts from './pages/client/Contacts';
+import Rentals from './pages/manager/Rentals';
+import Items from './pages/manager/Items';
 import Clients from './pages/manager/Clients';
 import Employees from './pages/admin/Employees';
 import Equipment from './pages/admin/Equipment';
@@ -37,6 +39,8 @@ function App() {
             <Route path="/contacts" element={<Contacts />} />
 
             {/* Страницы для менеджера */}
+            <Route path="/rentals" element={<Rentals />} />
+            <Route path="/items" element={<Items />} />
             <Route path="/clients" element={<Clients />} />
 
             {/* Страницы для админов */}

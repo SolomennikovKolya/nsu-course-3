@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../AuthContext';
 import axios from '../../axios';
-import styles from './Equipment.module.css'
 
 function Employees() {
     const { user } = useAuth();
@@ -95,11 +94,11 @@ function Employees() {
                             <td>{unit.rental_price_per_day}</td>
                             <td>{unit.penalty_per_day}</td>
                             <td>{unit.deposit_amount}</td>
-                            <td style={{ padding: 0 }}> <div onClick={() => handleDeleteEquipment(unit.id)} className={styles["delete-cell"]}>X</div></td>
+                            <td style={{ padding: 0 }}> <div onClick={() => handleDeleteEquipment(unit.id)} className="delete-cell">X</div></td>
                         </tr>
                     ))}
-                    <tr onClick={() => setIsModalOpen(true)} className={styles["add-row"]}>
-                        <td colSpan="8" className={styles["add-cell"]}>Добавить оборудование</td>
+                    <tr onClick={() => setIsModalOpen(true)} className="add-row">
+                        <td colSpan="8" className="add-cell">Добавить оборудование</td>
                     </tr>
                 </tbody>
             </table>

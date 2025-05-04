@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import classNames from 'classnames';
 import { useAuth } from '../../AuthContext';
 import axios from '../../axios';
 import styles from './Clients.module.css';
@@ -111,8 +110,8 @@ function Clients() {
 
             {/* Модальное окно истории аренд */}
             {selectedClient && (
-                <div className='modal' onClick={closeModal}>
-                    <div className={classNames('modal-content', styles['custom-modal-content'])} onClick={(e) => e.stopPropagation()}>
+                <div className={styles['history-modal']} onClick={closeModal}>
+                    <div className={styles['history-modal-content']} onClick={(e) => e.stopPropagation()}>
                         <h2>История аренд - {selectedClient.name}</h2>
 
                         {loadingHistory ? (

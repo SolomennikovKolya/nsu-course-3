@@ -1,3 +1,20 @@
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.custom-table th {
+    user-select: none;
+    position: relative;
+}
+
+.custom-table td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    text-align: center;
+}
+
 .add-row {
     cursor: pointer;
     text-align: center;
