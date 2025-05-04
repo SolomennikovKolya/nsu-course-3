@@ -8,6 +8,7 @@ function Employees() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalError, setModalError] = useState(null);
     const [newEmployee, setNewEmployee] = useState({ name: '', phone: '', email: '', role: '' });
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
     useEffect(() => {
         if (user && user.role === 'admin') {
@@ -51,7 +52,34 @@ function Employees() {
         setNewEmployee((prev) => ({ ...prev, [name]: value }));
     };
 
-    // Обработчик клика по фону модального окна (для его закрытия)
+    // Обработчик сортировки
+    const requestSort = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const sortedEmployees = React.useMemo(() => {
+        if (!sortConfig.key) return employees;
+        return [...employees].sort((a, b) => {
+            if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }, [employees, sortConfig]);
+
+    const translateRole = (role) => {
+        switch (role) {
+            case 'client': return 'Клиент';
+            case 'manager': return 'Менеджер';
+            case 'admin': return 'Админ';
+            default: return role;
+        }
+    };
+
+    // Обработчик для закрытия модального окна
     const handleCloseModal = (e) => {
         if (e.target.classList.contains('modal')) {
             setIsModalOpen(false);
@@ -67,26 +95,28 @@ function Employees() {
             <h1 className="page-title">Сотрудники</h1>
 
             {/* Таблица сотрудников */}
-            <table>
+            <table className='custom-table'>
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Имя</th>
-                        <th>Номер</th>
-                        <th>Email</th>
-                        <th>Должность</th>
+                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('id')}>ID {sortConfig.key === 'id' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('name')}>Имя {sortConfig.key === 'name' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('phone')}>Номер {sortConfig.key === 'phone' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('email')}>Email {sortConfig.key === 'email' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                        <th style={{ cursor: 'pointer' }} onClick={() => requestSort('role')}>Должность {sortConfig.key === 'role' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {employees.map((employee) => (
+                    {sortedEmployees.map((employee) => (
                         <tr key={employee.id}>
                             <td>{employee.id}</td>
                             <td>{employee.name}</td>
                             <td>{employee.phone}</td>
                             <td>{employee.email}</td>
-                            <td>{employee.role}</td>
-                            <td style={{ padding: 0 }}> <div onClick={() => handleDeleteEmployee(employee.id)} className="delete-cell">X</div></td>
+                            <td>{translateRole(employee.role)}</td>
+                            <td style={{ padding: 0 }}>
+                                <div onClick={() => handleDeleteEmployee(employee.id)} className="delete-cell">X</div>
+                            </td>
                         </tr>
                     ))}
                     <tr onClick={() => setIsModalOpen(true)} className="add-row">

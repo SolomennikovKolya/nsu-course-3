@@ -106,7 +106,6 @@ function NavbarTop() {
                         alignItems: 'center'
                     }}>
                         <NavLink to="/equipment" className={({ isActive }) => isActive ? "link-style active-link" : "link-style"}>💲Оборудование </NavLink>
-                        <NavLink to="/reports" className={({ isActive }) => isActive ? "link-style active-link" : "link-style"}> 📈Отчёты </NavLink>
                         <NavLink to="/employees" className={({ isActive }) => isActive ? "link-style active-link" : "link-style"}> 🪪Сотрудники </NavLink>
                     </div>
                 )}
