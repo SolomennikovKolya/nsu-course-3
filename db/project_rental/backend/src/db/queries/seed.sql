@@ -89,7 +89,7 @@ INSERT INTO Reservations (client_id, equipment_id, start_date, end_date, status)
 (5, 10, '2025-05-02', '2025-05-04', 'completed');
 
 INSERT INTO Rentals (client_id, item_id, start_date, end_date, extended_end_date, actual_return_date, deposit_paid, penalty_amount, total_cost, status) VALUES
-(2, 43, '2025-04-28', '2025-04-30', NULL, '2025-05-06', 50000, 0, 96000, 'completed'),
+(2, 43, '2025-04-28', '2025-04-30', NULL, '2025-04-30', 50000, 0, 36000, 'completed'),
 (3, 17, '2025-05-03', '2025-05-08', NULL, NULL, 2500, 0, 0, 'active'),
 (5, 15, '2025-05-02', '2025-05-04', NULL, NULL, 6000, 0, 0, 'active');
 
