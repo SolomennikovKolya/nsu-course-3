@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS Rentals (
     end_date DATE NOT NULL,
     extended_end_date DATE,
     actual_return_date DATE,
-    total_cost INT,
     deposit_paid INT,
-    penalty_amount INT,
+    penalty_amount INT DEFAULT 0,
+    total_cost INT DEFAULT 0,
     status ENUM('active', 'completed') NOT NULL,
     FOREIGN KEY (client_id) REFERENCES Users(id),
     FOREIGN KEY (item_id) REFERENCES Items(id)

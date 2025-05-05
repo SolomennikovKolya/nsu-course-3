@@ -14,7 +14,7 @@ def get_rentals():
 
 @manager_bp.route('/rentals/complete', methods=['POST'])
 def complete_rental():
-    # """Завершение аренды."""
+    """Завершение аренды."""
     rental_id = request.json.get('rental_id')
     if not rental_id:
         return jsonify({'error': 'Необходимо указать rental_id'}), 400
@@ -25,18 +25,21 @@ def complete_rental():
 
 @manager_bp.route('/rentals/extend', methods=['POST'])
 def extend_rental():
-    # """Продление аренды."""
+    """Продление аренды."""
     rental_id = request.json.get('rental_id')
+    extend_date = request.json.get('extend_date')
     if not rental_id:
         return jsonify({'error': 'Необходимо указать rental_id'}), 400
+    if not extend_date:
+        return jsonify({'error': 'Необходимо указать extend_date'}), 400
 
-    db.actions.extend_rental(rental_id)
-    return jsonify({"msg": "Аренда успешно завершена"})
+    result, code = db.actions.extend_rental(rental_id, extend_date)
+    return jsonify(result), code
 
 
 @manager_bp.route('/rentals/penalty', methods=['POST'])
 def penalty_rental():
-    # """Начисление штрафа при аренде."""
+    """Начисление штрафа при аренде."""
     rental_id = request.json.get('rental_id')
     penalty_amount = request.json.get('penalty_amount')
     if not rental_id:
@@ -44,8 +47,8 @@ def penalty_rental():
     if not rental_id:
         return jsonify({'error': 'Необходимо указать penalty_amount'}), 400
 
-    db.actions.penalty_rental(rental_id, penalty_amount)
-    return jsonify({"msg": "Штраф успешно начислен"})
+    result, code = db.actions.penalty_rental(rental_id, penalty_amount)
+    return jsonify(result), code
 
 
 @manager_bp.route('/bookings', methods=['GET'])
@@ -58,24 +61,24 @@ def get_bookings():
 
 @manager_bp.route('/bookings/cancel', methods=['POST'])
 def cancel_booking():
-    # """Отмена брони."""
+    """Отмена брони."""
     booking_id = request.json.get('booking_id')
     if not booking_id:
         return jsonify({'error': 'Необходимо указать booking_id'}), 400
 
-    db.actions.cancel_booking(booking_id)
-    return jsonify({"msg": "Бронь успешно отменена"})
+    result, code = db.actions.cancel_booking(booking_id)
+    return jsonify(result), code
 
 
 @manager_bp.route('/bookings/activate', methods=['POST'])
 def activate_booking():
-    # """Переход от брони к аренде."""
+    """Переход от брони к аренде."""
     booking_id = request.json.get('booking_id')
     if not booking_id:
         return jsonify({'error': 'Необходимо указать booking_id'}), 400
 
-    db.actions.activate_booking(booking_id)
-    return jsonify({"msg": "Бронь успешно стала арендой"})
+    result, code = db.actions.activate_booking(booking_id)
+    return jsonify(result), code
 
 
 @manager_bp.route('/all_equipment', methods=['GET'])
@@ -114,8 +117,9 @@ def change_item_status():
 def delete_item():
     """Удаление айтема."""
     item_id = request.json.get('item_id')
-    db.actions.delete_item(item_id)
-    return jsonify({"msg": "Item deleted successfully"})
+
+    result, code = db.actions.delete_item(item_id)
+    return jsonify(result), code
 
 
 @manager_bp.route('/clients', methods=['GET'])

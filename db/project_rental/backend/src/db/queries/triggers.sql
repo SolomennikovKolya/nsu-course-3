@@ -32,9 +32,10 @@ CREATE TRIGGER after_reservation_completed
 AFTER UPDATE ON Reservations
 FOR EACH ROW
 BEGIN
-    IF NEW.status = 'completed' THEN
-        DECLARE rented_item_id INT;
+    DECLARE rented_item_id INT;
+    DECLARE deposit INT;
 
+    IF NEW.status = 'completed' THEN
         SELECT id INTO rented_item_id
         FROM Items
         WHERE equipment_id = NEW.equipment_id
@@ -46,8 +47,12 @@ BEGIN
             SET status = 'rented'
             WHERE id = rented_item_id;
 
-            INSERT INTO Rentals (client_id, item_id, start_date, end_date, status)
-            VALUES (NEW.client_id, rented_item_id, NEW.start_date, NEW.end_date, 'active');
+            SELECT deposit_amount INTO deposit
+            FROM Equipment
+            WHERE id = NEW.equipment_id;
+
+            INSERT INTO Rentals (client_id, item_id, start_date, end_date, status, deposit_paid)
+            VALUES (NEW.client_id, rented_item_id, NEW.start_date, NEW.end_date, 'active', COALESCE(deposit, 0));
         END IF;
     END IF;
 END//

@@ -114,8 +114,8 @@ function Employees() {
                             <td>{employee.phone}</td>
                             <td>{employee.email}</td>
                             <td>{translateRole(employee.role)}</td>
-                            <td style={{ padding: 0 }}>
-                                <div onClick={() => handleDeleteEmployee(employee.id)} className="delete-cell">X</div>
+                            <td className="delete-cell">
+                                <div onClick={() => handleDeleteEmployee(employee.id)}>X</div>
                             </td>
                         </tr>
                     ))}

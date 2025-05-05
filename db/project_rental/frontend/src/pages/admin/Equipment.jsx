@@ -111,8 +111,8 @@ function Employees() {
                             <td>{unit.description}</td>
                             <td>{unit.rental_price_per_day}</td>
                             <td>{unit.deposit_amount}</td>
-                            <td style={{ padding: 0 }}>
-                                <div onClick={() => handleDeleteEquipment(unit.id)} className="delete-cell">X</div>
+                            <td className="delete-cell">
+                                <div onClick={() => handleDeleteEquipment(unit.id)}>X</div>
                             </td>
                         </tr>
                     ))}

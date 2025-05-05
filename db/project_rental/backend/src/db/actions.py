@@ -159,6 +159,126 @@ def drop_db(conn, cursor):
     cursor.execute(f"DROP DATABASE IF EXISTS {DB_NAME}")
 
 
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def make_seed_db(conn, cursor):
+    """Сохранение всех данных из БД в generated-seed.sql."""
+
+    with open("./src/db/queries/generated-seed.sql", "w", encoding="utf-8") as f:
+        # Запрос для извлечения данных из таблицы Equipment
+        cursor.execute("SELECT * FROM Equipment")
+        equipment_rows = cursor.fetchall()
+        equipment_insert = "INSERT INTO Equipment (name, category, description, rental_price_per_day, deposit_amount) VALUES\n"
+
+        # Формируем строки для вставки в таблицу Equipment
+        equipment_values = []
+        for row in equipment_rows:
+            name = f"'{row['name']}'" if row['name'] is not None else 'NULL'
+            category = f"'{row['category']}'" if row['category'] is not None else 'NULL'
+            description = f"'{row['description']}'" if row['description'] is not None else 'NULL'
+            rental_price_per_day = row['rental_price_per_day'] if row['rental_price_per_day'] is not None else 'NULL'
+            deposit_amount = row['deposit_amount'] if row['deposit_amount'] is not None else 'NULL'
+
+            values = f"({name}, {category}, {description}, {rental_price_per_day}, {deposit_amount})"
+            equipment_values.append(values)
+        if len(equipment_values) > 0:
+            f.write(equipment_insert + ",\n".join(equipment_values) + ";\n\n")
+
+        # Запрос для извлечения данных из таблицы Items
+        cursor.execute("SELECT * FROM Items")
+        items_rows = cursor.fetchall()
+        items_insert = "INSERT INTO Items (equipment_id, status) VALUES\n"
+
+        # Формируем строки для вставки в таблицу Items
+        items_values = []
+        for row in items_rows:
+            equipment_id = row['equipment_id'] if row['equipment_id'] is not None else 'NULL'
+            status = f"'{row['status']}'" if row['status'] is not None else 'NULL'
+            values = f"({equipment_id}, {status})"
+            items_values.append(values)
+        if len(items_values) > 0:
+            f.write(items_insert + ",\n".join(items_values) + ";\n\n")
+
+        # Запрос для извлечения данных из таблицы Users
+        cursor.execute("SELECT * FROM Users")
+        users_rows = cursor.fetchall()
+        users_insert = "INSERT INTO Users (user_role, password_hash, name, phone, email) VALUES\n"
+
+        # Формируем строки для вставки в таблицу Users
+        users_values = []
+        for row in users_rows:
+            user_role = f"'{row['user_role']}'" if row['user_role'] is not None else 'NULL'
+            password_hash = f"'{row['password_hash']}'" if row['password_hash'] is not None else 'NULL'
+            name = f"'{row['name']}'" if row['name'] is not None else 'NULL'
+            phone = f"'{row['phone']}'" if row['phone'] is not None else 'NULL'
+            email = f"'{row['email']}'" if row['email'] is not None else 'NULL'
+
+            values = f"({user_role}, {password_hash}, {name}, {phone}, {email})"
+            users_values.append(values)
+        if len(users_values) > 0:
+            f.write(users_insert + ",\n".join(users_values) + ";\n\n")
+
+        # Запрос для извлечения данных из таблицы Reservations
+        cursor.execute("SELECT * FROM Reservations")
+        reservations_rows = cursor.fetchall()
+        reservations_insert = "INSERT INTO Reservations (client_id, equipment_id, start_date, end_date, status) VALUES\n"
+
+        # Формируем строки для вставки в таблицу Reservations
+        reservations_values = []
+        for row in reservations_rows:
+            client_id = row['client_id'] if row['client_id'] is not None else 'NULL'
+            equipment_id = row['equipment_id'] if row['equipment_id'] is not None else 'NULL'
+            start_date = f"'{row['start_date']}'" if row['start_date'] is not None else 'NULL'
+            end_date = f"'{row['end_date']}'" if row['end_date'] is not None else 'NULL'
+            status = f"'{row['status']}'" if row['status'] is not None else 'NULL'
+
+            values = f"({client_id}, {equipment_id}, {start_date}, {end_date}, {status})"
+            reservations_values.append(values)
+        if len(reservations_values) > 0:
+            f.write(reservations_insert + ",\n".join(reservations_values) + ";\n\n")
+
+        # Запрос для извлечения данных из таблицы Rentals
+        cursor.execute("SELECT * FROM Rentals")
+        rentals_rows = cursor.fetchall()
+        rentals_insert = "INSERT INTO Rentals (client_id, item_id, start_date, end_date, extended_end_date, actual_return_date, deposit_paid, penalty_amount, total_cost, status) VALUES\n"
+
+        # Формируем строки для вставки в таблицу Rentals
+        rentals_values = []
+        for row in rentals_rows:
+            client_id = row['client_id'] if row['client_id'] is not None else 'NULL'
+            item_id = row['item_id'] if row['item_id'] is not None else 'NULL'
+            start_date = f"'{row['start_date']}'" if row['start_date'] is not None else 'NULL'
+            end_date = f"'{row['end_date']}'" if row['end_date'] is not None else 'NULL'
+            extended_end_date = f"'{row['extended_end_date']}'" if row['extended_end_date'] is not None else 'NULL'
+            actual_return_date = f"'{row['actual_return_date']}'" if row['actual_return_date'] is not None else 'NULL'
+            deposit_paid = row['deposit_paid'] if row['deposit_paid'] is not None else 'NULL'
+            penalty_amount = row['penalty_amount'] if row['penalty_amount'] is not None else 'NULL'
+            total_cost = row['total_cost'] if row['total_cost'] is not None else 'NULL'
+            status = f"'{row['status']}'" if row['status'] is not None else 'NULL'
+
+            values = f"({client_id}, {item_id}, {start_date}, {end_date}, {extended_end_date}, {actual_return_date}, {deposit_paid}, {penalty_amount}, {total_cost}, {status})"
+            rentals_values.append(values)
+        if len(rentals_values) > 0:
+            f.write(rentals_insert + ",\n".join(rentals_values) + ";\n\n")
+
+        # Запрос для извлечения данных из таблицы Refresh_Tokens
+        cursor.execute("SELECT * FROM Refresh_Tokens")
+        refresh_tokens_rows = cursor.fetchall()
+        refresh_tokens_insert = "INSERT INTO Refresh_Tokens (token, user_id, user_role, expires_at) VALUES\n"
+
+        # Формируем строки для вставки в таблицу Refresh_Tokens
+        refresh_tokens_values = []
+        for row in refresh_tokens_rows:
+            token = f"'{row['token']}'" if row['token'] is not None else 'NULL'
+            user_id = row['user_id'] if row['user_id'] is not None else 'NULL'
+            user_role = f"'{row['user_role']}'" if row['user_role'] is not None else 'NULL'
+            expires_at = f"'{row['expires_at']}'" if row['expires_at'] is not None else 'NULL'
+
+            values = f"({token}, {user_id}, {user_role}, {expires_at})"
+            refresh_tokens_values.append(values)
+        if len(refresh_tokens_values) > 0:
+            f.write(refresh_tokens_insert + ",\n".join(refresh_tokens_values) + ";\n\n")
+
+
 # +====================================================================================================+
 # |------------------------------------------- АВТОРИЗАЦИЯ --------------------------------------------|
 # +====================================================================================================+
@@ -299,6 +419,9 @@ def get_rentals(client_id, conn, cursor):
         JOIN Items i ON r.item_id = i.id
         JOIN Equipment e ON i.equipment_id = e.id
         WHERE (r.client_id = %s OR %s IS NULL)
+        ORDER BY 
+            FIELD(r.status, 'active', 'completed'),
+            COALESCE(r.extended_end_date, r.end_date)
     """, (client_id, client_id))
     return cursor.fetchall()
 
@@ -331,7 +454,39 @@ def complete_rental(rental_id, conn, cursor):
         WHERE id = %s
     """, (actual_return_date, total_cost, rental_id))
 
-    return {"msg": "Аренда завершена успешно", "total_cost": total_cost}, 200
+    return {"msg": "Аренда успешно завершена", "total_cost": total_cost}, 200
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def extend_rental(rental_id, extend_date, conn, cursor):
+    """Продление аренды."""
+    cursor.execute("SELECT end_date, extended_end_date FROM Rentals WHERE id = %s", (rental_id,))
+    rental = cursor.fetchone()
+    if rental is None:
+        return {"error": "Аренда не найдена"}, 404
+
+    extend_date = datetime.strptime(extend_date, '%Y-%m-%d').date()
+    cur_end_date = rental['extended_end_date'] or rental['end_date']
+    if (extend_date < cur_end_date):
+        return {"error": "Дата продления должна быть больше текущей даты окончания аренды"}, 400
+
+    cursor.execute("UPDATE Rentals SET extended_end_date = %s WHERE id = %s", (extend_date, rental_id))
+    return {"msg": "Аренда успешно продлена"}, 200
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def penalty_rental(rental_id, penalty_amount, conn, cursor):
+    """Начисление штрафа к аренде."""
+    cursor.execute("""
+        UPDATE Rentals 
+        SET penalty_amount = penalty_amount + %s 
+        WHERE id = %s
+    """, (penalty_amount, rental_id))
+
+    # Проверка, был ли обновлён штраф
+    if cursor.rowcount == 0:
+        return {"error": "Аренда не найдена"}, 404
+    return {"msg": "Штраф успешно начислен"}, 200
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
@@ -343,8 +498,43 @@ def get_bookings(client_id, conn, cursor):
         FROM Reservations r
         JOIN Equipment e ON r.equipment_id = e.id
         WHERE (r.client_id = %s OR %s IS NULL)
+        ORDER BY r.end_date
     """, (client_id, client_id))
     return cursor.fetchall()
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def cancel_booking(booking_id, conn, cursor):
+    """Отмена брони."""
+    cursor.execute("SELECT status FROM Reservations WHERE id = %s", (booking_id,))
+    data = cursor.fetchone()
+    if data is None:
+        return {"error": "Бронь не найдена"}, 404
+
+    if data['status'] == 'completed':
+        return {"error": "Бронь уже завершена"}, 400
+    if data['status'] == 'cancelled':
+        return {"error": "Бронь уже отменена"}, 400
+
+    cursor.execute("UPDATE Reservations SET status = 'cancelled' WHERE id = %s", (booking_id, ))
+    return {"msg": "Бронь успешно отменена"}, 200
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def activate_booking(booking_id, conn, cursor):
+    """Переход от брони к аренде."""
+    cursor.execute("SELECT status FROM Reservations WHERE id = %s", (booking_id,))
+    data = cursor.fetchone()
+    if data is None:
+        return {"error": "Бронь не найдена"}, 404
+
+    if data['status'] == 'completed':
+        return {"error": "По завершённой брони нельзя оформить аренду"}, 400
+    if data['status'] == 'cancelled':
+        return {"error": "По отменённой брони нельзя оформить аренду"}, 400
+
+    cursor.execute("UPDATE Reservations SET status = 'completed' WHERE id = %s", (booking_id, ))
+    return {"msg": "Бронь успешно отменена"}, 200
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
@@ -377,9 +567,20 @@ def change_item_status(item_id, status, conn, cursor):
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
 def delete_item(item_id, conn, cursor):
     """Удаление айтема."""
+    cursor.execute("SELECT status FROM Items WHERE id = %s", (item_id,))
+    data = cursor.fetchone()
+    if data is None:
+        return {"error": "Айтем не найден"}, 404
+
+    if data['status'] == 'rented':
+        return {"error": "Нельзя удалить арендованный айтем"}, 400
+    if data['status'] == 'booked':
+        return {"error": "Нельзя удалить забронированный айтем"}, 400
+
     cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
     cursor.execute("""DELETE FROM Items WHERE id = %s""", (item_id,))
     cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
+    return {"msg": "Айтем успешно удалён"}, 200
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)

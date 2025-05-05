@@ -46,6 +46,17 @@ function Dev() {
         }
     };
 
+    const handleMakeSeedDB = async () => {
+        try {
+            const res = await axios.post('/dev/make_seed_db');
+            console.log('Ответ от сервера:', res.data);
+            alert('Данные из базы успешно сохранены');
+        } catch (err) {
+            console.error('Ошибка при сохранении данных из базы:', err);
+            alert('Ошибка при сохранении данных из базы');
+        }
+    };
+
     return (
         <div style={{ padding: '2rem' }}>
             <h1 className="page-title">Development</h1>
@@ -56,6 +67,7 @@ function Dev() {
                 <button onClick={handleSeedDB} className="gray-button">Заполнить БД</button>
                 <button onClick={handleClearDB} className="gray-button">Очистить БД</button>
                 <button onClick={handleDropDB} className="gray-button">Удалить БД</button>
+                <button onClick={handleMakeSeedDB} className="gray-button">Сохранить БД</button>
             </div>
         </div>
     );

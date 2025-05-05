@@ -65,8 +65,9 @@ function Rentals() {
         try {
             await axios.post(`/manager/delete_item`, { item_id: id });
             fetchItems();
-        } catch (err) {
-            console.error('Ошибка при удалении айтема:', err);
+        } catch (error) {
+            alert(error?.response?.data?.error ?? 'Ошибка при удалении айтема');
+            console.error('Ошибка при удалении айтема:', error);
         }
     };
 
@@ -131,6 +132,21 @@ function Rentals() {
         }
     };
 
+    // Подсветка статуса айтема
+    const itemStatusStyle = (status) => {
+        if (status === 'available') {
+            return { backgroundColor: 'green', color: 'white', fontWeight: 'bold', width: '10rem' }
+        } else if (status === 'booked') {
+            return { backgroundColor: 'orange', color: 'white', fontWeight: 'bold', width: '10rem' }
+        } else if (status === 'rented') {
+            return { backgroundColor: 'orangered', color: 'white', fontWeight: 'bold', width: '10rem' }
+        } else if (status === 'serviced') {
+            return { backgroundColor: 'darkgray', color: 'white', fontWeight: 'bold', width: '10rem' }
+        } else {
+            return { backgroundColor: 'gray', color: 'white', fontWeight: 'bold', width: '10rem' }
+        }
+    };
+
     // Обработчик изменений в форме модального окна
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -173,13 +189,13 @@ function Rentals() {
                 <tbody>
                     {sortedItems.map((item) => (
                         <tr key={item.id}>
-                            <td>{item.id}</td>
+                            <td >{item.id}</td>
                             <td>{item.equipment_name}</td>
-                            <td onClick={() => changeStatus(item.id, item.status)} className='changeable-cell'>
+                            <td onClick={() => changeStatus(item.id, item.status)} className='changeable-cell' style={itemStatusStyle(item.status)}>
                                 {translateStatus(item.status)}
                             </td>
-                            <td style={{ padding: 0 }}>
-                                <div onClick={() => handleDeleteItem(item.id)} className="delete-cell">X</div>
+                            <td className="delete-cell">
+                                <div onClick={() => handleDeleteItem(item.id)}>X</div>
                             </td>
                         </tr>
                     ))}

@@ -10,6 +10,7 @@ function RentalsAndBookings() {
     const [modalData, setModalData] = useState({});
     const [penalty, setPenalty] = useState('');
     const [extendDate, setExtendDate] = useState('');
+    const [modalError, setModalError] = useState(null);
 
     useEffect(() => {
         fetchClients();
@@ -58,22 +59,22 @@ function RentalsAndBookings() {
     const rentalStatus = (status, endDate) => {
         const currentDate = new Date();
         if (status === 'completed') {
-            return <td style={{ backgroundColor: 'gray', color: 'white', fontWeight: 'bold' }}>Завершено</td>
+            return <td style={{ backgroundColor: 'gray', color: 'white', fontWeight: 'bold', width: '10rem' }}>Завершено</td>
         } else if (status === 'active' && new Date(endDate) >= currentDate) {
-            return <td style={{ backgroundColor: 'orangered', color: 'white', fontWeight: 'bold' }}>Активно</td>
+            return <td style={{ backgroundColor: 'orangered', color: 'white', fontWeight: 'bold', width: '10rem' }}>Активно</td>
         } else {
-            return <td style={{ backgroundColor: 'red', color: 'white', fontWeight: 'bold' }}>Просрочено</td>
+            return <td style={{ backgroundColor: 'red', color: 'white', fontWeight: 'bold', width: '10rem' }}>Просрочено</td>
         }
     };
 
     // Функция для подсветки статуса брони
     const reservationStatus = (status) => {
         if (status === 'active') {
-            return <td style={{ backgroundColor: 'orange', color: 'white', fontWeight: 'bold' }}>Активно</td>
+            return <td style={{ backgroundColor: 'orange', color: 'white', fontWeight: 'bold', width: '10rem' }}>Активно</td>
         } else if (status === 'cancelled') {
-            return <td style={{ backgroundColor: 'gray', color: 'white', fontWeight: 'bold' }}>Отменено</td>
+            return <td style={{ backgroundColor: 'gray', color: 'white', fontWeight: 'bold', width: '10rem' }}>Отменено</td>
         } else {
-            return <td style={{ backgroundColor: 'gray', color: 'white', fontWeight: 'bold' }}>Завершено</td>
+            return <td style={{ backgroundColor: 'gray', color: 'white', fontWeight: 'bold', width: '10rem' }}>Завершено</td>
         }
     };
 
@@ -87,6 +88,7 @@ function RentalsAndBookings() {
     const handleCloseModal = (e) => {
         if (e.target.classList.contains('modal')) {
             setModalAction(null);
+            setModalError(null);
         }
     };
 
@@ -102,14 +104,16 @@ function RentalsAndBookings() {
             } else if (modalAction === 'cancel') {
                 await axios.post('/manager/bookings/cancel', { booking_id: modalData.id });
             } else if (modalAction === 'book') {
-                await axios.post('/manager/bookings/book', { equipment_id: modalData.equipment_id, client_id: selectedClient });
+                await axios.post('/manager/bookings/activate', { booking_id: modalData.id });
             }
-            setModalData({});
             setModalAction(null);
+            setModalData({});
+            setModalError(null);
             fetchRentals();
             fetchBookings();
-        } catch (err) {
-            console.error('Ошибка при выполнении действия', err);
+        } catch (error) {
+            setModalError(error?.response?.data?.error);
+            console.error('Ошибка при выполнении действия', error);
         }
     };
 
@@ -156,7 +160,7 @@ function RentalsAndBookings() {
                                 <td>{rental.deposit_paid}</td>
                                 <td>{rental.penalty_amount}</td>
                                 <td>{rental.total_cost}</td>
-                                {rentalStatus(rental.status, rental.end_date)}
+                                {rentalStatus(rental.status, rental.extended_end_date || rental.end_date)}
                             </tr>
                         ))}
                         {bookings.map((booking) => (
@@ -182,10 +186,14 @@ function RentalsAndBookings() {
                     <div className="modal-content">
                         <h2>Действие по {modalAction === 'complete' || modalAction === 'extend' || modalAction === 'penalty' ? 'аренде' : 'брони'}</h2>
 
+                        {modalError !== null && (
+                            <p className='error-message'>{modalError}</p>
+                        )}
+
                         {/* Для аренды */}
                         {(modalAction === 'complete' || modalAction === 'extend' || modalAction === 'penalty') && (
                             <div>
-                                <select className='text-select' onChange={(e) => setModalAction(e.target.value)} value={modalAction}>
+                                <select className='text-select' onChange={(e) => { setModalAction(e.target.value); setModalError(null); }} value={modalAction}>
                                     <option value="complete">Завершить аренду</option>
                                     <option value="extend">Продлить аренду</option>
                                     <option value="penalty">Добавить штраф</option>
@@ -211,7 +219,7 @@ function RentalsAndBookings() {
                         {/* Для брони */}
                         {(modalAction === 'book' || modalAction === 'cancel') && (
                             <div>
-                                <select className='text-select' onChange={(e) => setModalAction(e.target.value)} value={modalAction}>
+                                <select className='text-select' onChange={(e) => { setModalAction(e.target.value); setModalError(null); }} value={modalAction}>
                                     <option value="book">Оформить аренду</option>
                                     <option value="cancel">Отменить</option>
                                 </select>
