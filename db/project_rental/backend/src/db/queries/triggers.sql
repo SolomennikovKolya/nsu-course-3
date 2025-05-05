@@ -1,8 +1,8 @@
+-- При добавлении брони, статус первого доступного айтема (оборудования, указанного в брони) меняем на 'booked'
 CREATE TRIGGER after_reservation_insert
 AFTER INSERT ON Reservations
 FOR EACH ROW
 BEGIN
-    -- Меняем статус первого доступного элемента на 'booked'
     UPDATE Items
     SET status = 'booked'
     WHERE equipment_id = NEW.equipment_id
@@ -10,12 +10,12 @@ BEGIN
     LIMIT 1;
 END//
 
+-- При отмени брони, статус первого забронированного айтема (оборудования, указанного в брони) меняем на 'available'
 CREATE TRIGGER after_reservation_cancelled
 AFTER UPDATE ON Reservations
 FOR EACH ROW
 BEGIN
     IF NEW.status = 'cancelled' THEN
-        -- Меняем статус первого элемента с оборудованием на 'available'
         UPDATE Items
         SET status = 'available'
         WHERE equipment_id = NEW.equipment_id
@@ -24,22 +24,30 @@ BEGIN
     END IF;
 END//
 
+-- При завершении брони (то есть перехода брони в аренду): 
+-- 1. Находится первый айтем оборудования, указанного в брони, со статусом 'booked'
+-- 2. Статус найденного айтема меняется на 'rented'
+-- 3. Добавляется соответствующая аренда
 CREATE TRIGGER after_reservation_completed
 AFTER UPDATE ON Reservations
 FOR EACH ROW
 BEGIN
     IF NEW.status = 'completed' THEN
-        -- Меняем статус первого элемента на 'rented'
-        UPDATE Items
-        SET status = 'rented'
+        DECLARE rented_item_id INT;
+
+        SELECT id INTO rented_item_id
+        FROM Items
         WHERE equipment_id = NEW.equipment_id
         AND status = 'booked'
         LIMIT 1;
 
-        -- Добавляем запись в Rentals
-        INSERT INTO Rentals (client_id, item_id, start_date, end_date, status)
-        VALUES (NEW.client_id, 
-                (SELECT id FROM Items WHERE equipment_id = NEW.equipment_id AND status = 'rented' LIMIT 1), 
-                NEW.start_date, NEW.end_date, 'active');
+        IF rented_item_id IS NOT NULL THEN
+            UPDATE Items
+            SET status = 'rented'
+            WHERE id = rented_item_id;
+
+            INSERT INTO Rentals (client_id, item_id, start_date, end_date, status)
+            VALUES (NEW.client_id, rented_item_id, NEW.start_date, NEW.end_date, 'active');
+        END IF;
     END IF;
 END//

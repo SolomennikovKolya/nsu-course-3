@@ -62,7 +62,6 @@ function Equipment() {
                 ...prevData,
                 available_count: prevData.available_count - 1
             }));
-            alert("Оборудование успешно забронировано");
         } catch (error) {
             console.error('Ошибка бронирования:', error);
             setBookingError(error?.response?.data?.error);

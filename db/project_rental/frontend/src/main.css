@@ -225,6 +225,11 @@ table th.no-hover:hover {
     cursor: default;
 }
 
+table tr.tr-hover:hover {
+    cursor: pointer;
+    background-color: #e8e8e8;
+}
+
 table td {
     border: 1px solid #ddd;
     padding: 0.5rem;

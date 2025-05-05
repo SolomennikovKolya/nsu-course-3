@@ -13,13 +13,13 @@ function RentalsAndBookings() {
 
     useEffect(() => {
         fetchClients();
+        fetchRentals();
+        fetchBookings();
     }, []);
 
     useEffect(() => {
-        if (selectedClient) {
-            fetchRentals();
-            fetchBookings();
-        }
+        fetchRentals();
+        fetchBookings();
     }, [selectedClient]);
 
     const fetchClients = async () => {
@@ -33,7 +33,7 @@ function RentalsAndBookings() {
 
     const fetchRentals = async () => {
         try {
-            const res = await axios.get('/rentals', { params: { client_id: selectedClient } });
+            const res = await axios.get('/manager/rentals', { params: { client_id: selectedClient } });
             setRentals(res.data);
         } catch (err) {
             console.error('Ошибка при загрузке аренд', err);
@@ -42,10 +42,38 @@ function RentalsAndBookings() {
 
     const fetchBookings = async () => {
         try {
-            const res = await axios.get('/bookings', { params: { client_id: selectedClient } });
+            const res = await axios.get('/manager/bookings', { params: { client_id: selectedClient } });
             setBookings(res.data);
         } catch (err) {
             console.error('Ошибка при загрузке броней', err);
+        }
+    };
+
+    const convertDate = (dateStr) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('ru-RU');
+    };
+
+    // Статус аренды
+    const rentalStatus = (status, endDate) => {
+        const currentDate = new Date();
+        if (status === 'completed') {
+            return <td style={{ backgroundColor: 'gray', color: 'white', fontWeight: 'bold' }}>Завершено</td>
+        } else if (status === 'active' && new Date(endDate) >= currentDate) {
+            return <td style={{ backgroundColor: 'orangered', color: 'white', fontWeight: 'bold' }}>Активно</td>
+        } else {
+            return <td style={{ backgroundColor: 'red', color: 'white', fontWeight: 'bold' }}>Просрочено</td>
+        }
+    };
+
+    // Функция для подсветки статуса брони
+    const reservationStatus = (status) => {
+        if (status === 'active') {
+            return <td style={{ backgroundColor: 'orange', color: 'white', fontWeight: 'bold' }}>Активно</td>
+        } else if (status === 'cancelled') {
+            return <td style={{ backgroundColor: 'gray', color: 'white', fontWeight: 'bold' }}>Отменено</td>
+        } else {
+            return <td style={{ backgroundColor: 'gray', color: 'white', fontWeight: 'bold' }}>Завершено</td>
         }
     };
 
@@ -55,19 +83,26 @@ function RentalsAndBookings() {
         setModalAction(type);
     };
 
+    // Обработчик для закрытия модального окна
+    const handleCloseModal = (e) => {
+        if (e.target.classList.contains('modal')) {
+            setModalAction(null);
+        }
+    };
+
     // Выполнение действия в модальном окне
     const handleModalSubmit = async () => {
         try {
             if (modalAction === 'complete') {
-                await axios.post('/rentals/complete', { rental_id: modalData.id });
+                await axios.post('/manager/rentals/complete', { rental_id: modalData.id });
             } else if (modalAction === 'extend') {
-                await axios.post('/rentals/extend', { rental_id: modalData.id, extend_date: extendDate });
+                await axios.post('/manager/rentals/extend', { rental_id: modalData.id, extend_date: extendDate });
             } else if (modalAction === 'penalty') {
-                await axios.post('/rentals/penalty', { rental_id: modalData.id, penalty_amount: penalty });
+                await axios.post('/manager/rentals/penalty', { rental_id: modalData.id, penalty_amount: penalty });
             } else if (modalAction === 'cancel') {
-                await axios.post('/bookings/cancel', { booking_id: modalData.id });
+                await axios.post('/manager/bookings/cancel', { booking_id: modalData.id });
             } else if (modalAction === 'book') {
-                await axios.post('/bookings/book', { equipment_id: modalData.equipment_id, client_id: selectedClient });
+                await axios.post('/manager/bookings/book', { equipment_id: modalData.equipment_id, client_id: selectedClient });
             }
             setModalData({});
             setModalAction(null);
@@ -78,115 +113,118 @@ function RentalsAndBookings() {
         }
     };
 
-    // Функция для подсветки статуса аренды
-    const rentalStatusStyle = (status, endDate) => {
-        const currentDate = new Date();
-        if (status === 'completed') {
-            return { backgroundColor: 'green' };
-        } else if (status === 'active' && new Date(endDate) >= currentDate) {
-            return { backgroundColor: 'orange' };
-        } else {
-            return { backgroundColor: 'red' };
-        }
-    };
-
     return (
         <div style={{ padding: '2rem' }}>
-            <h1>Аренды и брони</h1>
+            <h1 className="page-title">Аренды и брони</h1>
 
             {/* Селектор клиента */}
-            <select onChange={(e) => setSelectedClient(e.target.value)} value={selectedClient}>
-                <option value="">Выберите клиента</option>
+            <select className='text-select' onChange={(e) => setSelectedClient(e.target.value)} value={selectedClient}>
+                <option value="">Все клиенты</option>
                 {clients.map((client) => (
                     <option key={client.id} value={client.id}>{client.name}</option>
                 ))}
             </select>
 
-            {/* Таблица аренды */}
-            <h2>Аренды</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Клиент</th>
-                        <th>Оборудование</th>
-                        <th>ID айтема</th>
-                        <th>Начало</th>
-                        <th>Конец</th>
-                        <th>Залог</th>
-                        <th>Штраф</th>
-                        <th>Статус</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {rentals.map((rental) => (
-                        <tr key={rental.id} onClick={() => openModal(rental, 'complete')}>
-                            <td>{rental.client_name}</td>
-                            <td>{rental.equipment_name}</td>
-                            <td>{rental.item_id}</td>
-                            <td>{rental.start_date}</td>
-                            <td>{rental.status === 'completed' ? rental.actual_return_date : rental.end_date}</td>
-                            <td>{rental.deposit}</td>
-                            <td>{rental.penalty}</td>
-                            <td style={rentalStatusStyle(rental.status, rental.end_date)}>{rental.status}</td>
+            {/* Таблица аренд и броней */}
+            {(rentals.length === 0 && bookings.length === 0) ? (
+                <p className='subtext' style={{ marginTop: '1rem' }}>Аренд и броней ещё не было</p>
+            ) : (
+                <table>
+                    <thead>
+                        <tr>
+                            <th className='no-hover'>Тип</th>
+                            <th className='no-hover'>Клиент</th>
+                            <th className='no-hover'>Оборудование</th>
+                            <th className='no-hover'>Айтем</th>
+                            <th className='no-hover'>Начало</th>
+                            <th className='no-hover'>Конец</th>
+                            <th className='no-hover'>Залог</th>
+                            <th className='no-hover'>Штраф</th>
+                            <th className='no-hover'>Сумма</th>
+                            <th className='no-hover'>Статус</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-
-            {/* Таблица броней */}
-            <h2>Бронь</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Клиент</th>
-                        <th>Оборудование</th>
-                        <th>Начало</th>
-                        <th>Конец</th>
-                        <th>Статус</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {bookings.map((booking) => (
-                        <tr key={booking.id} onClick={() => openModal(booking, 'book')}>
-                            <td>{booking.client_name}</td>
-                            <td>{booking.equipment_name}</td>
-                            <td>{booking.start_date}</td>
-                            <td>{booking.end_date}</td>
-                            <td>{booking.status}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {rentals.map((rental) => (
+                            <tr className='tr-hover' key={rental.id} onClick={() => openModal(rental, 'complete')}>
+                                <td>Аренда</td>
+                                <td>{clients.find(client => client.id === rental.client_id)?.name ?? rental.client_id}</td>
+                                <td>{rental.equipment_name}</td>
+                                <td>{rental.item_id}</td>
+                                <td>{convertDate(rental.start_date)}</td>
+                                <td>{convertDate(rental.status === 'completed' ? rental.actual_return_date : rental.extended_end_date || rental.end_date)}</td>
+                                <td>{rental.deposit_paid}</td>
+                                <td>{rental.penalty_amount}</td>
+                                <td>{rental.total_cost}</td>
+                                {rentalStatus(rental.status, rental.end_date)}
+                            </tr>
+                        ))}
+                        {bookings.map((booking) => (
+                            <tr className='tr-hover' key={booking.id} onClick={() => openModal(booking, 'book')}>
+                                <td>Бронь</td>
+                                <td>{clients.find(client => client.id === booking.client_id)?.name ?? booking.client_id}</td>
+                                <td>{booking.equipment_name}</td>
+                                <td></td>
+                                <td>{convertDate(booking.start_date)}</td>
+                                <td>{convertDate(booking.end_date)}</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                {reservationStatus(booking.status)}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>)}
 
             {/* Модальное окно */}
             {modalAction && (
-                <div className="modal">
+                <div className="modal" onMouseDown={handleCloseModal}>
                     <div className="modal-content">
-                        <h2>Действие по {modalAction === 'complete' ? 'аренде' : 'брони'}</h2>
-                        {modalAction === 'penalty' && (
+                        <h2>Действие по {modalAction === 'complete' || modalAction === 'extend' || modalAction === 'penalty' ? 'аренде' : 'брони'}</h2>
+
+                        {/* Для аренды */}
+                        {(modalAction === 'complete' || modalAction === 'extend' || modalAction === 'penalty') && (
                             <div>
-                                <label>Сумма штрафа:</label>
-                                <input
-                                    type="number"
-                                    value={penalty}
-                                    onChange={(e) => setPenalty(e.target.value)}
-                                />
+                                <select className='text-select' onChange={(e) => setModalAction(e.target.value)} value={modalAction}>
+                                    <option value="complete">Завершить аренду</option>
+                                    <option value="extend">Продлить аренду</option>
+                                    <option value="penalty">Добавить штраф</option>
+                                </select>
                             </div>
                         )}
+
+                        {/* Для продления аренды */}
                         {modalAction === 'extend' && (
                             <div>
-                                <label>Дата продления:</label>
-                                <input
-                                    type="date"
-                                    value={extendDate}
-                                    onChange={(e) => setExtendDate(e.target.value)}
-                                />
+                                <label>Новая дата окончания аренды:</label>
+                                <input className='text-input' placeholder='Дата продления' type="date" value={extendDate} onChange={(e) => setExtendDate(e.target.value)} />
                             </div>
                         )}
-                        <button onClick={handleModalSubmit}>
-                            {modalAction === 'complete' ? 'Завершить аренду' : modalAction === 'extend' ? 'Продлить аренду' : modalAction === 'penalty' ? 'Начислить штраф' : modalAction === 'cancel' ? 'Отменить бронь' : 'Забронировать'}
+
+                        {/* Для добавления штрафа */}
+                        {modalAction === 'penalty' && (
+                            <div>
+                                <input className='text-input' placeholder='Сумма штрафа' type="number" value={penalty} onChange={(e) => setPenalty(e.target.value)} />
+                            </div>
+                        )}
+
+                        {/* Для брони */}
+                        {(modalAction === 'book' || modalAction === 'cancel') && (
+                            <div>
+                                <select className='text-select' onChange={(e) => setModalAction(e.target.value)} value={modalAction}>
+                                    <option value="book">Оформить аренду</option>
+                                    <option value="cancel">Отменить</option>
+                                </select>
+                            </div>
+                        )}
+
+                        {/* Кнопки */}
+                        <button className='action-button' onClick={handleModalSubmit}>
+                            {modalAction === 'complete' ? 'Завершить аренду' :
+                                modalAction === 'extend' ? 'Продлить аренду' :
+                                    modalAction === 'penalty' ? 'Начислить штраф' :
+                                        modalAction === 'cancel' ? 'Отменить бронь' : 'Оформить аренду'}
                         </button>
-                        <button onClick={() => setModalAction(null)}>Закрыть</button>
                     </div>
                 </div>
             )}

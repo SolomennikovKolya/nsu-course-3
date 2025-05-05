@@ -50,16 +50,6 @@ CREATE TABLE IF NOT EXISTS Rentals (
     FOREIGN KEY (item_id) REFERENCES Items(id)
 );
 
-CREATE TABLE IF NOT EXISTS Notifications (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    manager_id INT NOT NULL,
-    type ENUM('question', 'new booking', 'rental expiration') NOT NULL,
-    message TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    is_read BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (manager_id) REFERENCES Users(id)
-);
-
 CREATE TABLE IF NOT EXISTS Refresh_Tokens (
     token CHAR(36) PRIMARY KEY, 
     user_id INT NOT NULL,

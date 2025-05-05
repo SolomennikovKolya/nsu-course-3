@@ -3,6 +3,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 from functools import wraps
+from datetime import datetime
 
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
@@ -288,9 +289,61 @@ def book_equipment(equipment_name, client_name, client_phone, client_email, star
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
-def get_all_equipment(conn, cursor):
-    """Возвращает список всего оборудования."""
-    cursor.execute("SELECT id, name, category, description, rental_price_per_day, deposit_amount FROM Equipment")
+def get_rentals(client_id, conn, cursor):
+    """Получение всех аренд или аренд определённого клиента (если client_id указан)."""
+    cursor.execute("""
+        SELECT r.id, r.client_id, r.item_id, r.start_date, r.end_date, r.extended_end_date, 
+            r.actual_return_date, r.total_cost, r.deposit_paid, r.penalty_amount, r.status, i.equipment_id, 
+            e.name AS equipment_name, e.category AS equipment_category
+        FROM Rentals r
+        JOIN Items i ON r.item_id = i.id
+        JOIN Equipment e ON i.equipment_id = e.id
+        WHERE (r.client_id = %s OR %s IS NULL)
+    """, (client_id, client_id))
+    return cursor.fetchall()
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def complete_rental(rental_id, conn, cursor):
+    """Завершение аренды."""
+    # Получаем информацию о аренде и оборудовании
+    cursor.execute("""
+        SELECT r.start_date, e.rental_price_per_day
+        FROM Rentals r
+        JOIN Items i ON r.item_id = i.id
+        JOIN Equipment e ON i.equipment_id = e.id
+        WHERE r.id = %s
+    """, (rental_id,))
+
+    rental = cursor.fetchone()
+    if rental is None:
+        return {"error": "Аренда не найдена"}, 404
+    start_date = rental['start_date']
+    rental_price_per_day = rental['rental_price_per_day']
+
+    actual_return_date = datetime.now().date()
+    total_cost = (actual_return_date - start_date).days * rental_price_per_day
+
+    # Обновляем аренду
+    cursor.execute("""
+        UPDATE Rentals
+        SET actual_return_date = %s, total_cost = %s, status = 'completed'
+        WHERE id = %s
+    """, (actual_return_date, total_cost, rental_id))
+
+    return {"msg": "Аренда завершена успешно", "total_cost": total_cost}, 200
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_bookings(client_id, conn, cursor):
+    """Получение всех броней, либо броней определённого клиента (если указан client_id)."""
+    cursor.execute("""
+        SELECT r.id, r.client_id, r.equipment_id, r.start_date, r.end_date, r.status, 
+            e.name AS equipment_name, e.category AS equipment_category
+        FROM Reservations r
+        JOIN Equipment e ON r.equipment_id = e.id
+        WHERE (r.client_id = %s OR %s IS NULL)
+    """, (client_id, client_id))
     return cursor.fetchall()
 
 
@@ -347,12 +400,11 @@ def get_client_history(client_id, conn, cursor):
         COALESCE(Rentals.extended_end_date, Rentals.end_date) AS end_date,
         Rentals.total_cost,
         Rentals.deposit_paid,
-        Rentals.penalty_amount,
-        Rentals.status
+        Rentals.penalty_amount
     FROM Rentals
     JOIN Items ON Rentals.item_id = Items.id
     JOIN Equipment ON Items.equipment_id = Equipment.id
-    WHERE Rentals.client_id = %s
+    WHERE Rentals.client_id = %s AND Rentals.status = 'completed'
     ORDER BY Rentals.start_date DESC
     """
 
@@ -367,8 +419,7 @@ def get_client_history(client_id, conn, cursor):
             'end_date': record['end_date'].isoformat(),
             'rent_sum': record['total_cost'],
             'deposit': record['deposit_paid'],
-            'penalty': record['penalty_amount'],
-            'status': record['status'],
+            'penalty': record['penalty_amount']
         })
     return result
 

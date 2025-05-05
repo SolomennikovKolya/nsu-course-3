@@ -119,19 +119,18 @@ function Clients() {
                         ) : (
                             <>
                                 {clientHistory.length === 0 ? (
-                                    <p className='subtext' style={{ marginTop: '1rem' }}>Аренд ещё не было</p>
+                                    <p className='subtext' style={{ marginTop: '1rem' }}>Завершённых аренд ещё не было</p>
                                 ) : (
                                     <table>
                                         <thead>
                                             <tr>
                                                 <th>Оборудование</th>
                                                 <th>Айтем</th>
-                                                <th>С</th>
-                                                <th>До</th>
-                                                <th>Сумма аренды</th>
+                                                <th>Начало</th>
+                                                <th>Конец</th>
                                                 <th>Залог</th>
                                                 <th>Штраф</th>
-                                                <th>Статус</th>
+                                                <th>Сумма</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -141,10 +140,9 @@ function Clients() {
                                                     <td>{record.item}</td>
                                                     <td>{record.start_date}</td>
                                                     <td>{record.end_date}</td>
-                                                    <td>{record.rent_sum}</td>
                                                     <td>{record.deposit}</td>
                                                     <td>{record.penalty}</td>
-                                                    <td>{record.status}</td>
+                                                    <td>{record.rent_sum}</td>
                                                 </tr>
                                             ))}
                                         </tbody>

@@ -26,7 +26,6 @@ function Rentals() {
             setEquipment(res.data);
         } catch (err) {
             console.error('Ошибка загрузки оборудования:', err);
-            alert('Не удалось загрузить оборудование');
         }
     };
 
@@ -39,7 +38,6 @@ function Rentals() {
             setItems(res.data);
         } catch (err) {
             console.error('Ошибка загрузки айтемов:', err);
-            alert('Не удалось загрузить айтемы');
         }
     };
 
