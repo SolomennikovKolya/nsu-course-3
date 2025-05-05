@@ -7,10 +7,14 @@ from datetime import datetime
 
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
-DB_ROOT_NAME = os.getenv('DB_ROOT_NAME')
-DB_ROOT_PASSWORD = os.getenv('DB_ROOT_PASSWORD')
 DB_HOST = os.getenv('DB_HOST', 'localhost')
 DB_NAME = os.getenv('DB_NAME')
+DB_ROOT_NAME = os.getenv('DB_ROOT_NAME')
+DB_ROOT_PASSWORD = os.getenv('DB_ROOT_PASSWORD')
+DB_MANAGER_NAME = os.getenv('DB_MANAGER_NAME')
+DB_MANAGER_PASSWORD = os.getenv('DB_MANAGER_PASSWORD')
+DB_CLIENT_NAME = os.getenv('DB_CLIENT_NAME')
+DB_CLIENT_PASSWORD = os.getenv('DB_CLIENT_PASSWORD')
 
 
 def execute_query(query: str = None, filename: str = None, user: str = None, password: str = None,
@@ -131,10 +135,15 @@ def init_db():
     execute_query(query=f"CREATE DATABASE {DB_NAME}", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD)
     execute_query(filename="schema.sql", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
 
+    # Добавление триггеров
     execute_query(query=f"DELIMITER //", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
     for query in get_queries_from_file("triggers.sql", delimiter='//'):
         execute_query(query=query, user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
     execute_query(query=f"DELIMITER ;", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
+
+    # Создание пользователей БД
+    for query in get_queries_from_file("users.sql"):
+        execute_query(query=query, user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=False)
@@ -323,7 +332,7 @@ def delete_refresh_token(token, conn, cursor):
 # +====================================================================================================+
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_CLIENT_NAME, password=DB_CLIENT_PASSWORD, host=DB_HOST, database=DB_NAME)
 def get_categories(conn, cursor):
     """Возвращает список всех уникальных категорий оборудования."""
     cursor.execute("SELECT DISTINCT category FROM Equipment")
@@ -331,7 +340,7 @@ def get_categories(conn, cursor):
     return [{'name': category['category']} for category in categories]
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_CLIENT_NAME, password=DB_CLIENT_PASSWORD, host=DB_HOST, database=DB_NAME)
 def get_equipment_by_category(category_name, conn, cursor):
     """Возвращает список оборудования для заданной категории."""
     cursor.execute("""
@@ -343,7 +352,7 @@ def get_equipment_by_category(category_name, conn, cursor):
     return [{'name': item['name'], 'rental_price_per_day': item['rental_price_per_day']} for item in equipment]
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_CLIENT_NAME, password=DB_CLIENT_PASSWORD, host=DB_HOST, database=DB_NAME)
 def get_equipment_by_name(equipment_name, conn, cursor):
     """Возвращает список оборудования для заданной категории с количеством доступных единиц."""
     cursor.execute("""
@@ -355,7 +364,7 @@ def get_equipment_by_name(equipment_name, conn, cursor):
     return cursor.fetchone()
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=False)
+@with_db(user=DB_CLIENT_NAME, password=DB_CLIENT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=False)
 def book_equipment(equipment_name, client_name, client_phone, client_email, start_date, end_date, conn, cursor):
     """Бронирование оборудования."""
 
@@ -408,7 +417,7 @@ def book_equipment(equipment_name, client_name, client_phone, client_email, star
 # +====================================================================================================+
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_MANAGER_NAME, password=DB_MANAGER_PASSWORD, host=DB_HOST, database=DB_NAME)
 def get_rentals(client_id, conn, cursor):
     """Получение всех аренд или аренд определённого клиента (если client_id указан)."""
     cursor.execute("""
@@ -426,7 +435,7 @@ def get_rentals(client_id, conn, cursor):
     return cursor.fetchall()
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_MANAGER_NAME, password=DB_MANAGER_PASSWORD, host=DB_HOST, database=DB_NAME)
 def complete_rental(rental_id, conn, cursor):
     """Завершение аренды."""
     # Получаем информацию о аренде и оборудовании
@@ -457,7 +466,7 @@ def complete_rental(rental_id, conn, cursor):
     return {"msg": "Аренда успешно завершена", "total_cost": total_cost}, 200
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_MANAGER_NAME, password=DB_MANAGER_PASSWORD, host=DB_HOST, database=DB_NAME)
 def extend_rental(rental_id, extend_date, conn, cursor):
     """Продление аренды."""
     cursor.execute("SELECT end_date, extended_end_date FROM Rentals WHERE id = %s", (rental_id,))
@@ -474,7 +483,7 @@ def extend_rental(rental_id, extend_date, conn, cursor):
     return {"msg": "Аренда успешно продлена"}, 200
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_MANAGER_NAME, password=DB_MANAGER_PASSWORD, host=DB_HOST, database=DB_NAME)
 def penalty_rental(rental_id, penalty_amount, conn, cursor):
     """Начисление штрафа к аренде."""
     cursor.execute("""
@@ -489,7 +498,7 @@ def penalty_rental(rental_id, penalty_amount, conn, cursor):
     return {"msg": "Штраф успешно начислен"}, 200
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_MANAGER_NAME, password=DB_MANAGER_PASSWORD, host=DB_HOST, database=DB_NAME)
 def get_bookings(client_id, conn, cursor):
     """Получение всех броней, либо броней определённого клиента (если указан client_id)."""
     cursor.execute("""
@@ -503,7 +512,7 @@ def get_bookings(client_id, conn, cursor):
     return cursor.fetchall()
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_MANAGER_NAME, password=DB_MANAGER_PASSWORD, host=DB_HOST, database=DB_NAME)
 def cancel_booking(booking_id, conn, cursor):
     """Отмена брони."""
     cursor.execute("SELECT status FROM Reservations WHERE id = %s", (booking_id,))
@@ -520,7 +529,7 @@ def cancel_booking(booking_id, conn, cursor):
     return {"msg": "Бронь успешно отменена"}, 200
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_MANAGER_NAME, password=DB_MANAGER_PASSWORD, host=DB_HOST, database=DB_NAME)
 def activate_booking(booking_id, conn, cursor):
     """Переход от брони к аренде."""
     cursor.execute("SELECT status FROM Reservations WHERE id = %s", (booking_id,))
@@ -537,7 +546,7 @@ def activate_booking(booking_id, conn, cursor):
     return {"msg": "Бронь успешно отменена"}, 200
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_MANAGER_NAME, password=DB_MANAGER_PASSWORD, host=DB_HOST, database=DB_NAME)
 def get_items(equipment_id, conn, cursor):
     """Возвращает айтемов выбранного обрудования либо все айтемы."""
     if not equipment_id:
@@ -549,7 +558,7 @@ def get_items(equipment_id, conn, cursor):
     return cursor.fetchall()
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_MANAGER_NAME, password=DB_MANAGER_PASSWORD, host=DB_HOST, database=DB_NAME)
 def add_item(equipment_id, conn, cursor):
     """Добавление айтема."""
     cursor.execute("""
@@ -558,13 +567,13 @@ def add_item(equipment_id, conn, cursor):
     """, (equipment_id,))
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_MANAGER_NAME, password=DB_MANAGER_PASSWORD, host=DB_HOST, database=DB_NAME)
 def change_item_status(item_id, status, conn, cursor):
     """Изменение статуса айтема."""
     cursor.execute("UPDATE Items SET status = %s WHERE id = %s", (status, item_id))
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_MANAGER_NAME, password=DB_MANAGER_PASSWORD, host=DB_HOST, database=DB_NAME)
 def delete_item(item_id, conn, cursor):
     """Удаление айтема."""
     cursor.execute("SELECT status FROM Items WHERE id = %s", (item_id,))
@@ -583,14 +592,14 @@ def delete_item(item_id, conn, cursor):
     return {"msg": "Айтем успешно удалён"}, 200
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_MANAGER_NAME, password=DB_MANAGER_PASSWORD, host=DB_HOST, database=DB_NAME)
 def get_clients(conn, cursor):
     """Возвращает список всех клиентов."""
     cursor.execute("SELECT id, name, phone, email FROM Users WHERE user_role = 'client'")
     return cursor.fetchall()
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+@with_db(user=DB_MANAGER_NAME, password=DB_MANAGER_PASSWORD, host=DB_HOST, database=DB_NAME)
 def get_client_history(client_id, conn, cursor):
     """Возвращает историю аренд конкретного клиента."""
     query = """
