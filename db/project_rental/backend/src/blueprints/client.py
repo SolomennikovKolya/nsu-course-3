@@ -65,8 +65,8 @@ def book_equipment():
         return jsonify({'error': 'Неверный формат даты. Используйте формат YYYY-MM-DD.'}), 400
 
     now = datetime.now()
-    if start_date_obj < now:
-        return jsonify({'error': 'Дата начала аренды не может быть в прошлом'}), 400
+    # if start_date_obj < now:
+    #     return jsonify({'error': 'Дата начала аренды не может быть в прошлом'}), 400
     if end_date_obj < start_date_obj:
         return jsonify({'error': 'Дата окончания аренды не может быть раньше даты начала аренды'}), 400
 
