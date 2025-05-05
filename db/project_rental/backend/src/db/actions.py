@@ -713,8 +713,9 @@ def get_employee(conn, cursor):
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
-def add_employee(name, phone, email, role, conn, cursor):
+def add_employee(name, phone, email, password_hash, role, conn, cursor):
     """Добавляет нового сотрудника в таблицу Users. Если такой сотрудник уже есть, то ничего не меняется."""
+    print(name, phone, email, role)
     cursor.execute("""
         SELECT 1 FROM Users WHERE name = %s AND phone = %s AND email = %s AND user_role = %s
     """, (name, phone, email, role))
@@ -722,9 +723,9 @@ def add_employee(name, phone, email, role, conn, cursor):
         return
 
     cursor.execute("""
-        INSERT INTO Users (name, phone, email, user_role)
-        VALUES (%s, %s, %s, %s)
-    """, (name, phone, email, role))
+        INSERT INTO Users (name, phone, email, password_hash, user_role)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (name, phone, email, password_hash, role))
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=False)

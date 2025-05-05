@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from werkzeug.security import generate_password_hash
 import db.actions
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -19,6 +20,7 @@ def add_employee():
     name = data.get('name')
     phone = data.get('phone')
     email = data.get('email')
+    password = data.get('password')
     role = data.get('role')
 
     if not name:
@@ -29,8 +31,16 @@ def add_employee():
         return jsonify({"error": "Email - обязательное поле"}), 400
     if not role:
         return jsonify({"error": "Роль - обязательное поле"}), 400
+    if not password:
+        return jsonify({"error": "Пароль - обязательное поле"}), 400
 
-    db.actions.add_employee(name, phone, email, role)
+    password_hash = generate_password_hash(password=password)
+    if role == 'Менеджер':
+        role = 'manager'
+    elif role == 'Админ':
+        role = 'admin'
+
+    db.actions.add_employee(name, phone, email, password_hash, role)
     return jsonify({"msg": "Employee added successfully"})
 
 

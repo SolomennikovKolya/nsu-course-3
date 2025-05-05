@@ -137,6 +137,7 @@ function Employees() {
                                 <input className='text-input' placeholder='Имя' type="text" name="name" value={newEmployee.name} onChange={handleChange} required />
                                 <input className='text-input' placeholder='Телефон' type="tel" name="phone" value={newEmployee.phone} onChange={handleChange} required />
                                 <input className='text-input' placeholder='Email' type="email" name="email" value={newEmployee.email} onChange={handleChange} required />
+                                <input className='text-input' placeholder='Password' type="password" name="password" value={newEmployee.password} onChange={handleChange} required />
                                 <select className='text-select' name="role" value={newEmployee.role} onChange={handleChange} required>
                                     <option value="" disabled selected>Должность</option>
                                     <option value="manager">Менеджер</option>
