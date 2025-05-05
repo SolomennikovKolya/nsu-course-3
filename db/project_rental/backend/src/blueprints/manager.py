@@ -4,23 +4,12 @@ import db.actions
 manager_bp = Blueprint('manager', __name__, url_prefix='/manager')
 
 
-@manager_bp.route('/clients', methods=['GET'])
-def get_clients():
-    """Получение списка всех клиентов. Возвращаемые данные клиентов: id, name, phone, email."""
-    result = db.actions.get_clients()
-    return jsonify(result)
-
-
-@manager_bp.route('/client_history', methods=['GET'])
-def get_client_history():
-    """Получение истории аренд клиента по ID клиента."""
-    client_id = request.args.get('client_id')
-
-    if not client_id:
-        return jsonify({'error': 'client_id is required'}), 400
-
-    result = db.actions.get_client_history(client_id)
-    return jsonify(result)
+# @manager_bp.route('/rentals', methods=['GET'])
+# def get_rentals():
+#     """Получение всех аренд, либо аренд определённого клиента (если указан client_id)."""
+#     client_id = request.args.get('client_id')
+#     result = db.actions.get_rentals(client_id)
+#     return jsonify(result)
 
 
 @manager_bp.route('/all_equipment', methods=['GET'])
@@ -61,3 +50,22 @@ def delete_item():
     item_id = request.json.get('item_id')
     db.actions.delete_item(item_id)
     return jsonify({"msg": "Item deleted successfully"})
+
+
+@manager_bp.route('/clients', methods=['GET'])
+def get_clients():
+    """Получение списка всех клиентов. Возвращаемые данные клиентов: id, name, phone, email."""
+    result = db.actions.get_clients()
+    return jsonify(result)
+
+
+@manager_bp.route('/client_history', methods=['GET'])
+def get_client_history():
+    """Получение истории аренд клиента по ID клиента."""
+    client_id = request.args.get('client_id')
+
+    if not client_id:
+        return jsonify({'error': 'client_id is required'}), 400
+
+    result = db.actions.get_client_history(client_id)
+    return jsonify(result)

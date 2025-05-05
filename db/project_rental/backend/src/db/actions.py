@@ -119,13 +119,17 @@ def get_queries_from_file(filename: str, delimiter: str = ';'):
     return queries
 
 
+# +====================================================================================================+
+# |------------------------------------------- DEVELOPMENT --------------------------------------------|
+# +====================================================================================================+
+
+
 def init_db():
     """Создание (либо полное пересоздание) базы данных со всеми таблицами (создаёт только каркас без данных)."""
     execute_query(query=f"DROP DATABASE IF EXISTS {DB_NAME}", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD)
     execute_query(query=f"CREATE DATABASE {DB_NAME}", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD)
     execute_query(filename="schema.sql", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
 
-    # Создание триггеров
     execute_query(query=f"DELIMITER //", user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
     for query in get_queries_from_file("triggers.sql", delimiter='//'):
         execute_query(query=query, user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, database=DB_NAME)
@@ -152,6 +156,11 @@ def clear_db(conn, cursor):
 def drop_db(conn, cursor):
     """Полное удаление базы данных."""
     cursor.execute(f"DROP DATABASE IF EXISTS {DB_NAME}")
+
+
+# +====================================================================================================+
+# |------------------------------------------- АВТОРИЗАЦИЯ --------------------------------------------|
+# +====================================================================================================+
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
@@ -188,90 +197,9 @@ def delete_refresh_token(token, conn, cursor):
     cursor.execute("DELETE FROM refresh_tokens WHERE token = %s", (token,))
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
-def get_clients(conn, cursor):
-    """Возвращает список всех клиентов."""
-    cursor.execute("SELECT id, name, phone, email FROM Users WHERE user_role = 'client'")
-    return cursor.fetchall()
-
-
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
-def get_all_equipment(conn, cursor):
-    """Возвращает список всего оборудования."""
-    cursor.execute("SELECT id, name, category, description, rental_price_per_day, deposit_amount FROM Equipment")
-    return cursor.fetchall()
-
-
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
-def get_items(equipment_id, conn, cursor):
-    """Возвращает айтемов выбранного обрудования либо все айтемы."""
-    if not equipment_id:
-        cursor.execute("""SELECT i.id, e.name AS equipment_name, i.status 
-            FROM Items i LEFT JOIN Equipment e ON i.equipment_id = e.id""")
-    else:
-        cursor.execute("""SELECT i.id, e.name AS equipment_name, i.status 
-            FROM Items i LEFT JOIN Equipment e ON i.equipment_id = e.id WHERE i.equipment_id = %s""", (equipment_id,))
-    return cursor.fetchall()
-
-
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
-def add_item(equipment_id, conn, cursor):
-    """Добавление айтема."""
-    cursor.execute("""
-        INSERT INTO Items (equipment_id, status)
-        VALUES (%s, 'available')
-    """, (equipment_id,))
-
-
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
-def change_item_status(item_id, status, conn, cursor):
-    """Изменение статуса айтема."""
-    cursor.execute("UPDATE Items SET status = %s WHERE id = %s", (status, item_id))
-
-
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
-def delete_item(item_id, conn, cursor):
-    """Удаление айтема."""
-    cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
-    cursor.execute("""DELETE FROM Items WHERE id = %s""", (item_id,))
-    cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
-
-
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
-def get_client_history(client_id, conn, cursor):
-    """Возвращает историю аренд конкретного клиента."""
-    query = """
-    SELECT 
-        Equipment.name AS equipment_name,
-        Items.id AS item_id,
-        Rentals.start_date,
-        COALESCE(Rentals.extended_end_date, Rentals.end_date) AS end_date,
-        Rentals.total_cost,
-        Rentals.deposit_paid,
-        Rentals.penalty_amount,
-        Rentals.status
-    FROM Rentals
-    JOIN Items ON Rentals.item_id = Items.id
-    JOIN Equipment ON Items.equipment_id = Equipment.id
-    WHERE Rentals.client_id = %s
-    ORDER BY Rentals.start_date DESC
-    """
-
-    cursor.execute(query, (client_id,))
-    history = cursor.fetchall()
-    result = []
-    for record in history:
-        result.append({
-            'equipment': record['equipment_name'],
-            'item': record['item_id'],
-            'start_date': record['start_date'].isoformat(),
-            'end_date': record['end_date'].isoformat(),
-            'rent_sum': record['total_cost'],
-            'deposit': record['deposit_paid'],
-            'penalty': record['penalty_amount'],
-            'status': record['status'],
-        })
-    return result
+# +====================================================================================================+
+# |---------------------------------------------- КЛИЕНТ ----------------------------------------------|
+# +====================================================================================================+
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
@@ -354,34 +282,100 @@ def book_equipment(equipment_name, client_name, client_phone, client_email, star
     return {"message": "Бронирование успешно"}, 200
 
 
+# +====================================================================================================+
+# |--------------------------------------------- МЕНЕДЖЕР ---------------------------------------------|
+# +====================================================================================================+
+
+
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
-def get_employee(conn, cursor):
-    """Возвращает список всех сотрудников."""
-    cursor.execute("SELECT id, name, phone, email, user_role as role FROM Users WHERE user_role = 'manager' OR user_role = 'admin'")
+def get_all_equipment(conn, cursor):
+    """Возвращает список всего оборудования."""
+    cursor.execute("SELECT id, name, category, description, rental_price_per_day, deposit_amount FROM Equipment")
     return cursor.fetchall()
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
-def add_employee(name, phone, email, role, conn, cursor):
-    """Добавляет нового сотрудника в таблицу Users. Если такой сотрудник уже есть, то ничего не меняется."""
+def get_items(equipment_id, conn, cursor):
+    """Возвращает айтемов выбранного обрудования либо все айтемы."""
+    if not equipment_id:
+        cursor.execute("""SELECT i.id, e.name AS equipment_name, i.status 
+            FROM Items i LEFT JOIN Equipment e ON i.equipment_id = e.id""")
+    else:
+        cursor.execute("""SELECT i.id, e.name AS equipment_name, i.status 
+            FROM Items i LEFT JOIN Equipment e ON i.equipment_id = e.id WHERE i.equipment_id = %s""", (equipment_id,))
+    return cursor.fetchall()
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def add_item(equipment_id, conn, cursor):
+    """Добавление айтема."""
     cursor.execute("""
-        SELECT 1 FROM Users WHERE name = %s AND phone = %s AND email = %s AND user_role = %s
-    """, (name, phone, email, role))
-    if cursor.fetchone():
-        return
-
-    cursor.execute("""
-        INSERT INTO Users (name, phone, email, user_role)
-        VALUES (%s, %s, %s, %s)
-    """, (name, phone, email, role))
+        INSERT INTO Items (equipment_id, status)
+        VALUES (%s, 'available')
+    """, (equipment_id,))
 
 
-@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=False)
-def delete_employee(employee_id, conn, cursor):
-    """Удаляет сотрудника по ID из таблицы Users."""
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def change_item_status(item_id, status, conn, cursor):
+    """Изменение статуса айтема."""
+    cursor.execute("UPDATE Items SET status = %s WHERE id = %s", (status, item_id))
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def delete_item(item_id, conn, cursor):
+    """Удаление айтема."""
     cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
-    cursor.execute("DELETE FROM Users WHERE id = %s", (employee_id,))
+    cursor.execute("""DELETE FROM Items WHERE id = %s""", (item_id,))
     cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_clients(conn, cursor):
+    """Возвращает список всех клиентов."""
+    cursor.execute("SELECT id, name, phone, email FROM Users WHERE user_role = 'client'")
+    return cursor.fetchall()
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_client_history(client_id, conn, cursor):
+    """Возвращает историю аренд конкретного клиента."""
+    query = """
+    SELECT 
+        Equipment.name AS equipment_name,
+        Items.id AS item_id,
+        Rentals.start_date,
+        COALESCE(Rentals.extended_end_date, Rentals.end_date) AS end_date,
+        Rentals.total_cost,
+        Rentals.deposit_paid,
+        Rentals.penalty_amount,
+        Rentals.status
+    FROM Rentals
+    JOIN Items ON Rentals.item_id = Items.id
+    JOIN Equipment ON Items.equipment_id = Equipment.id
+    WHERE Rentals.client_id = %s
+    ORDER BY Rentals.start_date DESC
+    """
+
+    cursor.execute(query, (client_id,))
+    history = cursor.fetchall()
+    result = []
+    for record in history:
+        result.append({
+            'equipment': record['equipment_name'],
+            'item': record['item_id'],
+            'start_date': record['start_date'].isoformat(),
+            'end_date': record['end_date'].isoformat(),
+            'rent_sum': record['total_cost'],
+            'deposit': record['deposit_paid'],
+            'penalty': record['penalty_amount'],
+            'status': record['status'],
+        })
+    return result
+
+
+# +====================================================================================================+
+# |---------------------------------------------- АДМИН -----------------------------------------------|
+# +====================================================================================================+
 
 
 @with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
@@ -448,3 +442,33 @@ def delete_equipment(equipment_id, conn, cursor):
     except Exception as e:
         conn.rollback()
         return {"error": f"Ошибка при удалении: {str(e)}"}, 500
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def get_employee(conn, cursor):
+    """Возвращает список всех сотрудников."""
+    cursor.execute("SELECT id, name, phone, email, user_role as role FROM Users WHERE user_role = 'manager' OR user_role = 'admin'")
+    return cursor.fetchall()
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME)
+def add_employee(name, phone, email, role, conn, cursor):
+    """Добавляет нового сотрудника в таблицу Users. Если такой сотрудник уже есть, то ничего не меняется."""
+    cursor.execute("""
+        SELECT 1 FROM Users WHERE name = %s AND phone = %s AND email = %s AND user_role = %s
+    """, (name, phone, email, role))
+    if cursor.fetchone():
+        return
+
+    cursor.execute("""
+        INSERT INTO Users (name, phone, email, user_role)
+        VALUES (%s, %s, %s, %s)
+    """, (name, phone, email, role))
+
+
+@with_db(user=DB_ROOT_NAME, password=DB_ROOT_PASSWORD, host=DB_HOST, database=DB_NAME, autocommit=False)
+def delete_employee(employee_id, conn, cursor):
+    """Удаляет сотрудника по ID из таблицы Users."""
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
+    cursor.execute("DELETE FROM Users WHERE id = %s", (employee_id,))
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
