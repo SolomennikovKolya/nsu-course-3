@@ -1,0 +1,211 @@
+@prefix : <http://www.semanticweb.org/solom/ontologies/2025/4/relatives/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://www.semanticweb.org/solom/ontologies/2025/4/relatives/> .
+
+<http://www.semanticweb.org/solom/ontologies/2025/4/relatives> rdf:type owl:Ontology .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#являетсяПотомком
+:являетсяПотомком rdf:type owl:ObjectProperty ;
+                  owl:inverseOf :являетсяПредком ;
+                  rdf:type owl:TransitiveProperty .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#являетсяПредком
+:являетсяПредком rdf:type owl:ObjectProperty ,
+                          owl:TransitiveProperty .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#являетсяРебенком
+:являетсяРебенком rdf:type owl:ObjectProperty ;
+                  rdfs:subPropertyOf :являетсяПотомком ;
+                  owl:inverseOf :являетсяРодителем .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#являетсяРодителем
+:являетсяРодителем rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf :являетсяПредком .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#являетсяСупругом
+:являетсяСупругом rdf:type owl:ObjectProperty ,
+                           owl:FunctionalProperty ,
+                           owl:SymmetricProperty .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#имеетВозраст
+:имеетВозраст rdf:type owl:DatatypeProperty ,
+                       owl:FunctionalProperty ;
+              rdfs:domain :Человек ;
+              rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#имеетИмя
+:имеетИмя rdf:type owl:DatatypeProperty ,
+                   owl:FunctionalProperty ;
+          rdfs:domain :Человек ;
+          rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#имеетПол
+:имеетПол rdf:type owl:DatatypeProperty ;
+          rdfs:domain :Человек ;
+          rdfs:range xsd:string .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#Женщина
+:Женщина rdf:type owl:Class ;
+         owl:equivalentClass [ owl:intersectionOf ( :Человек
+                                                    [ rdf:type owl:Restriction ;
+                                                      owl:onProperty :имеетПол ;
+                                                      owl:hasValue "женский"
+                                                    ]
+                                                  ) ;
+                               rdf:type owl:Class
+                             ] ;
+         rdfs:subClassOf :Человек .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#Мужчина
+:Мужчина rdf:type owl:Class ;
+         owl:equivalentClass [ owl:intersectionOf ( :Человек
+                                                    [ rdf:type owl:Restriction ;
+                                                      owl:onProperty :имеетПол ;
+                                                      owl:hasValue "мужской"
+                                                    ]
+                                                  ) ;
+                               rdf:type owl:Class
+                             ] ;
+         rdfs:subClassOf :Человек .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#Человек
+:Человек rdf:type owl:Class .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#Александр
+:Александр rdf:type owl:NamedIndividual ,
+                    :Мужчина ;
+           :являетсяРебенком :Виктор ;
+           :являетсяРодителем :Николай ;
+           :являетсяСупругом :Лариса ;
+           :имеетВозраст 55 ;
+           :имеетИмя "Александр" ;
+           :имеетПол "мужской" .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#Вася
+:Вася rdf:type owl:NamedIndividual ,
+               :Мужчина ;
+      :являетсяРебенком :Маша ,
+                        :Юра ;
+      :имеетВозраст 25 ;
+      :имеетИмя "Вася" ;
+      :имеетПол "мужской" .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#Виктор
+:Виктор rdf:type owl:NamedIndividual ,
+                 :Мужчина ;
+        :являетсяРодителем :Александр ;
+        :имеетВозраст 82 ;
+        :имеетИмя "Виктор" ;
+        :имеетПол "мужской" .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#Галина
+:Галина rdf:type owl:NamedIndividual ,
+                 :Женщина ;
+        :являетсяРодителем :Лариса ,
+                           :Юра ;
+        :имеетВозраст 79 ;
+        :имеетИмя "Галина" ;
+        :имеетПол "женский" .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#Ефим
+:Ефим rdf:type owl:NamedIndividual ,
+               :Мужчина ;
+      :являетсяРебенком :Маша ,
+                        :Юра ;
+      :имеетВозраст 10 ;
+      :имеетИмя "Ефим" ;
+      :имеетПол "мужской" .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#Лариса
+:Лариса rdf:type owl:NamedIndividual ,
+                 :Женщина ;
+        :являетсяРебенком :Галина ;
+        :являетсяРодителем :Николай ;
+        :являетсяСупругом :Александр ;
+        :имеетВозраст 50 ;
+        :имеетИмя "Лариса" ;
+        :имеетПол "женский" .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#Маша
+:Маша rdf:type owl:NamedIndividual ,
+               :Женщина ;
+      :являетсяРодителем :Вася ,
+                         :Ефим ,
+                         :Полина ;
+      :являетсяСупругом :Юра ;
+      :имеетВозраст 45 ;
+      :имеетИмя "Маша" ;
+      :имеетПол "женский" .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#Николай
+:Николай rdf:type owl:NamedIndividual ,
+                  :Мужчина ;
+         :являетсяРебенком :Александр ,
+                           :Лариса ;
+         :имеетВозраст 21 ;
+         :имеетИмя "Николай" ;
+         :имеетПол "мужской" .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#Полина
+:Полина rdf:type owl:NamedIndividual ,
+                 :Женщина ;
+        :являетсяРебенком :Маша ,
+                          :Юра ;
+        :имеетВозраст 16 ;
+        :имеетИмя "Полина" ;
+        :имеетПол "женский" .
+
+
+###  http://www.semanticweb.org/solom/ontologies/2025/4/relatives#Юра
+:Юра rdf:type owl:NamedIndividual ,
+              :Мужчина ;
+     :являетсяРебенком :Галина ;
+     :являетсяРодителем :Вася ,
+                        :Ефим ,
+                        :Полина ;
+     :являетсяСупругом :Маша ;
+     :имеетВозраст 47 ;
+     :имеетИмя "Юра" ;
+     :имеетПол "мужской" .
+
+
+###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi
