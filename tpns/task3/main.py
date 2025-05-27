@@ -23,13 +23,13 @@ def main() -> None:
     X_seq, y_seq = create_sequences(X, y, SEQ_LEN)
     train_dl, test_dl, y_test_scaled, y_test_orig = get_dataloaders(X_seq, y_seq, BATCH_SIZE)
 
-    # model = LibRNN(input_size=X.shape[1], hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS)
+    model = LibRNN(input_size=X.shape[1], hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS)
     # model = LibGRU(input_size=X.shape[1], hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS)
-    # model = LibLSTM(input_size=X.shape[1], hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS)
+    # model = LibLSTM(input_size=X.shape[1], hidden_size=HIDDEN_SIZE, num_layers=NUM_LsSAYERS)
 
     # model = ManRNN(input_size=X.shape[1], hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS)
     # model = ManGRU(input_size=X.shape[1], hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS)
-    model = ManLSTM(input_size=X.shape[1], hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS)
+    # model = ManLSTM(input_size=X.shape[1], hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS)
 
     train_model(model, train_dl, learning_rate=LEARNING_RATE, num_epochs=NUM_EPOCHS)
 
