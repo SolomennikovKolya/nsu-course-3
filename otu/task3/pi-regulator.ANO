@@ -3,20 +3,20 @@
 ***                                                                          ***
 ***                                                                          ***
 ***                       AC Analysis of pi-regulator                        ***
-***                           23.05.2025 21:50:34                            ***
+***                            31.05.2025 0:41:47                            ***
 ********************************************************************************
 Limits
 ======
-Frequency Range          Log 1E8,1Meg
+Frequency Range          Auto 1,1e-3
 Number of Points         1001
 Temperature              Linear 27
-Maximum Change %         5
+Maximum Change %         0.02
 Noise Input              NONE
 Noise Output             2
 Run Options              Normal
 State Variables          Zero
 Operating Point          On
-Auto Scale Ranges        On
+Auto Scale Ranges        Off
 Accumulate Plots         Off
 Ignore Expression Errors Off
 
