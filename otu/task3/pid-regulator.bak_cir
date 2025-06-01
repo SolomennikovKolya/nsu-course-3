@@ -7,7 +7,7 @@ Shape Version=11.00
 Screen=1536,960
 MCAPVersion=12.2.0.5
 Key ID=Demo
-NLCnt=22
+NLCnt=20
 TXCnt=7
 
 [shapedef]
@@ -146,6 +146,7 @@ PathDelayFormat=3
 WarningFormat=3
 GridTextFormulaFormat=3
 Window Placement in Transient Analysis=2,3, -1,-1, -8,-31, 26,26,1319,548
+Window Placement in AC Analysis=2,3, -1,-1, -8,-31, 104,104,1397,626
 SpiceType=AMBIGUOUS
 Title_Block_Border=None
 Title_Block=False
@@ -204,18 +205,12 @@ ON=0,0,PACKAGE
 V
 
 [Wire]
-Pxs=72,232,352,232
-
-[Wire]
-Pxs=72,232,72,288
+Pxs=272,232,272,288
 
 [Comp]
 Name=Ground
-Px=72,400
+Px=272,336
 Rot=7
-
-[Wire]
-Pxs=72,336,72,400
 
 [Wire]
 Pxs=728,232,776,232
@@ -322,12 +317,9 @@ Pxs=352,168,360,168
 [Wire]
 Pxs=632,232,656,232
 
-[Wire]
-Pxs=936,232,1016,232
-
 [Comp]
 Name=Sine Source
-Px=72,336
+Px=272,336
 Rot=3
 
 [Attr]
@@ -343,9 +335,12 @@ V=AC
 ON=0,0,PACKAGE
 V
 
+[Wire]
+Pxs=272,232,352,232
+
 [Grid Text]
 Text=".define Ts Td/8"
-Px=344,560
+Px=112,288
 GridSnap=True
 JustifyH=Left
 JustifyV=Bottom
@@ -353,7 +348,7 @@ CBorder=None
 
 [Grid Text]
 Text=".define Td Ti/4"
-Px=344,536
+Px=112,272
 GridSnap=True
 JustifyH=Left
 JustifyV=Bottom
@@ -361,7 +356,7 @@ CBorder=None
 
 [Grid Text]
 Text=".define n 4"
-Px=152,488
+Px=112,192
 GridSnap=True
 JustifyH=Left
 JustifyV=Bottom
@@ -369,31 +364,31 @@ CBorder=None
 
 [Grid Text]
 Text=".define T0 1.26"
-Px=152,512
+Px=112,208
 GridSnap=True
 JustifyH=Left
 JustifyV=Bottom
 CBorder=None
 
 [Grid Text]
-Text=".define Ti 8.23"
-Px=344,512
+Text=".define Ti 4.9"
+Px=112,256
 GridSnap=True
 JustifyH=Left
 JustifyV=Bottom
 CBorder=None
 
 [Grid Text]
-Text=".define T1 10"
-Px=152,536
+Text=".define T1 0"
+Px=112,224
 GridSnap=True
 JustifyH=Left
 JustifyV=Bottom
 CBorder=None
 
 [Grid Text]
-Text=".define K 0.386"
-Px=344,488
+Text=".define K 1"
+Px=112,240
 GridSnap=True
 JustifyH=Left
 JustifyV=Bottom
@@ -595,8 +590,9 @@ PrinterScale=1
 Scale 0=1
 Scale 1=1
 Scale 2=1
+SB 3=0,7
 Scale 3=1
-Px=257,298
+Px=593,449
 WinBackGround Color=#FFFFFF
 Select Color=#FF0000
 Anchor Color=#000000
@@ -660,7 +656,7 @@ Type=Text
 Print=False
 Enable=True
 Name=Models
-SB 0=16,1
+SB 0=16,0
 Font=Height=-15,FStyle=0,Color=#000000,Name=Courier New
 Comment Color=#008000
 WinBackGround Color=#FFFFFF
@@ -937,6 +933,7 @@ Name="MAIN"
 
 [AC]
 WinID=2
+Window Placement=2,3, -1,-1, -8,-31, 104,104,1397,626
 Font=Height=-19,FStyle=0,Color=#0000FF,Name=Arial
 WinBackGround Color=#FFFFFF
 Select Color=#FF0000
@@ -988,12 +985,19 @@ Cursor Select Color Secondary=#FF0000
 Data Point Labels Color Fore=Height=-15,FStyle=0,Color=#000000,Name=Arial
 Data Point Labels Color Back=#FFFF00
 OperPoint=True
-AutoScaleRanges=True
+AutoScaleRanges=False
 FFT_NPts="8192"
 FFT_IncludeDCHarmonic=False
 FFT_AutoScale_Harmonics="10"
 PrinterAutoTile=No
 PrinterBlackBorder=No
+MonMaxShow=3
+MonPageWidth=66
+MonPlotWidth=21
+MonExprXWidth=142
+MonExprYWidth=260
+MonRangeXWidth=90
+MonRangeYWidth=90
 AnimateWait=None
 AnimateWaitTime=500
 AnimatePressAfter=0
@@ -1143,6 +1147,18 @@ ALIGNTOP=No
 ALIGNMIDDLES=No
 ALIGNBOTTOM=No
 
+[APage]
+Analysis=AC
+Name="MAIN"
+
+[AObject]
+Analysis=AC
+Object=Ellipse
+CBorder=#000080
+w=0
+AliasID1=1
+Pos=-0.99888116420651663,-1.0048154093097896,0.99834875269099155,0.99197431781701462
+
 [Monte Carlo Options]
 Analysis=Transient
 Status=Off
@@ -1251,13 +1267,13 @@ NOFmtY=3E
 
 [Limits]
 Analysis=AC
-FRange=1E8,1Meg
+FRange=1,1e-5
 NPts=1001
 Temp=27
 MaxChng=5
 NInput=NONE
 NOutput=2
-Sweep type=Log
+Sweep type=Auto
 StateVar=Zero
 RunOption=Normal
 Temperature Type=Linear
@@ -1271,11 +1287,13 @@ DisplayValuesInProbe=DC
 Analysis=AC
 Plt=1
 AliasID=1
-XExp=F
-YExp=dB(v(1))
-XRng=Auto
-YRng=Auto
-Options=LINEARY
+XExp=re(v(2))
+YExp=im(v(2))
+XRng=1,-1
+YRng=1,-1
+Options=LINEARX,LINEARY
+Range Grid X=0.5
+Range Grid Y=0.5
 Enable=Enable
 Line Color=#0000FF
 Text Color=#0000FF
@@ -1296,11 +1314,11 @@ Analysis=AC
 Plt=2
 AliasID=2
 XExp=F
-YExp=ph(v(1))
-XRng=Auto
-YRng=Auto
-Options=LINEARY
-Enable=Enable
+YExp=sqrt(im(v(2))^2+re(v(2))^2)
+XRng=AutoAlways
+YRng=AutoAlways
+Options=LINEARX,LINEARY
+Enable=DontRun
 Line Color=#FF0000
 Text Color=#FF0000
 Rainbow=False
@@ -1317,9 +1335,14 @@ NOFmtY=3E
 
 [WaveForm]
 Analysis=AC
-AliasID=-1
-Options=LINEARY
-Enable=Enable
+Plt=3
+AliasID=3
+XExp=F
+YExp=ph(v(2))
+XRng=AutoAlways
+YRng=AutoAlways
+Options=LINEARX,LINEARY
+Enable=DontRun
 Line Color=#008000
 Text Color=#008000
 Rainbow=False
@@ -1350,6 +1373,7 @@ CurrentPage 0="MAIN"
 
 [Pane]
 Analysis=AC
+CurrentPage 0="MAIN"
 
 [Pane]
 Analysis=DC

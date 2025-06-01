@@ -11,7 +11,7 @@ import db.actions
 
 general_bp = Blueprint('general', __name__, url_prefix='/')
 
-load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
+load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent.parent / '.env')
 SECRET_KEY = os.getenv('SECRET_KEY')
 REFRESH_SECRET_KEY = os.getenv('REFRESH_SECRET_KEY')
 ACCESS_EXPIRES_MIN = int(os.getenv('ACCESS_EXPIRES_MIN'))

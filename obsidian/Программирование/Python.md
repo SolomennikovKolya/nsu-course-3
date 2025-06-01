@@ -15,6 +15,7 @@
 - `pip freeze > requirements.txt` - генерация файла текущих зависимостей
 - `pip install pip-autoremove` - удаление неиспользуемых зависимостей
 - `pip-autoremove -r requirements.txt -y`
+- `python -c "import sys; print(sys.prefix)"` - путь до активного окружения
 
 ### Окружение
 
