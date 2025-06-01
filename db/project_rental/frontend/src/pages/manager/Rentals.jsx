@@ -68,9 +68,9 @@ function RentalsAndBookings() {
     };
 
     // Функция для подсветки статуса брони
-    const reservationStatus = (status, endDate) => {
+    const reservationStatus = (status, startDate) => {
         const currentDate = new Date();
-        if (status === 'active' && new Date(endDate) < currentDate) {
+        if (status === 'active' && new Date(startDate) < currentDate) {
             return <td style={{ backgroundColor: 'gray', color: 'white', fontWeight: 'bold', width: '10rem' }}>Пропущено</td>
         } else if (status === 'active') {
             return <td style={{ backgroundColor: 'orange', color: 'white', fontWeight: 'bold', width: '10rem' }}>Активно</td>
@@ -177,7 +177,7 @@ function RentalsAndBookings() {
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                {reservationStatus(booking.status, booking.end_date)}
+                                {reservationStatus(booking.status, booking.start_date)}
                             </tr>
                         ))}
                     </tbody>
