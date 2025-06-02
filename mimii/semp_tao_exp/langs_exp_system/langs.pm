@@ -1,17 +1,20 @@
 module Langs;
 
-var $min_diff, $max_diff : integer;     // Выбранные границы сложности
-var $min_pop, $max_pop : integer;       // Выбранные границы популярности
-var $Win_lang, $Win_desc : integer;     // Окна для подходящих языков и выбранных критериев
-var $y_lang, $y_desc : integer;         // Координаты для печати текста в этих окнах
-var $descMenu : set of string;          // Множество критериев для выбора в меню
-var $descChoise : set of string;        // Множество выбранных критериев
-var $tupleMenu : tuple of string;       // Преобразованный $descMenu
-var $choice : string;                   // Только что сделаный выбор
-var $langs : integer;                   // Кол-во подходящих языков
-var $t: tuple of string := string[];    // Временный tuple of string
-var $flag : integer;                    // Флаг для выхода из цикла
-var $selected_n : integer;              // Номер выбранного варианта из меню
+var $min_diff, $max_diff : integer;          // Выбранные границы сложности
+var $min_pop, $max_pop : integer;            // Выбранные границы популярности
+var $Win_lang, $Win_desc : integer;          // Окна для подходящих языков и выбранных критериев
+var $y_lang, $y_desc : integer;              // Координаты для печати текста в этих окнах
+var $descMenu : set of string;               // Множество критериев для выбора в меню
+var $descChoise : set of string;             // Множество выбранных критериев
+var $tupleMenu : tuple of string;            // Преобразованный $descMenu
+var $choice : string;                        // Только что сделаный выбор
+var $langs : integer;                        // Кол-во подходящих языков
+var $t: tuple of string := string[];         // Временный tuple of string
+var $flag : integer;                         // Флаг для выхода из цикла
+var $selected_n : integer;                   // Номер выбранного варианта из меню
+var $allLangs : tuple of string := string[]; // Все языки
+var $selectedLang : string;                  // Выбранный язык
+var $Win_info, $y_info : integer;            // Окни для вывода информации о языке и координата
 
 // Преобразование set в tuple
 function SetToTuple($S: set of string): tuple of string
@@ -45,6 +48,28 @@ rule New_Descs =>
   $descChoise := $descChoise + string{$choice};
   OutText($Win_desc, 10, $y_desc, $choice);
   $y_desc := $y_desc + 15;
+end;
+
+// Получение списка всех языков
+rule GetAllLangs
+  forall $l: lang(name: $n)
+=>
+  $allLangs := $allLangs + string[$n];
+end;
+
+// Вывод информации о языке
+rule PrintLangInfo
+  forall $l: lang(name: $name, features: $f, difficulty: $d, popularity: $p) when $name = $selectedLang
+=>
+  OutText($Win_info, 10, $y_info, "Название: " + $selectedLang); $y_info := $y_info + 15;
+  OutText($Win_info, 10, $y_info, "Сложность: " + ToString($d)); $y_info := $y_info + 15;
+  OutText($Win_info, 10, $y_info, "Популярность: " + ToString($p)); $y_info := $y_info + 15;
+  OutText($Win_info, 10, $y_info, "Критерии:"); $y_info := $y_info + 15;
+
+  for $feat in $f loop
+      OutText($Win_info, 20, $y_info, "- " + $feat);
+      $y_info := $y_info + 15;
+  end;
 end;
 
 begin
@@ -178,52 +203,68 @@ begin
       "функциональный", "интерпретируемый", "менеджер пакетов"
     }, difficulty: 5, popularity: 50);
 
-  $descMenu := string{};
-  $descChoise := string{};
+  if Ask("", "Хотите ли вы просмотреть информацию о языке?") then
+    call group(GetAllLangs, Stop);
 
-  // Создание окон
-  $Win_lang := MakeWindow("Подходящие языки", 450, 20, 300, 430);
-  $Win_desc := MakeWindow("Выбранные критерии", 20, 20, 420, 170);
-  TextColor($Win_lang, 3);
-  TextColor($Win_desc, 1);
-  $y_lang := 10;
-  $y_desc := 10;
-
-  // Выбор сложности
-  $min_diff := GetNumber(100, 100, "Сложность", "Минимум от 1 до 10:", 1);
-  $max_diff := GetNumber(100, 100, "Сложность", "Максимум от 1 до 10:", 10);
-  OutText($Win_desc, 10, $y_desc, "Сложность: " + ToString($min_diff) + "–" + ToString($max_diff));
-  $y_desc := $y_desc + 15;
-
-  // Выбор популярности
-  $min_pop := GetNumber(100, 100, "Популярность", "Минимум от 1 до 100:", 1);
-  $max_pop := GetNumber(100, 100, "Популярность", "Максимум от 1 до 100:", 100);
-  OutText($Win_desc, 10, $y_desc, "Популярность: " + ToString($min_pop) + "–" + ToString($max_pop));
-  $y_desc := $y_desc + 15;
-
-  $langs := 0;
-  call group(Print_Langs, Stop);
-
-  $flag := 1;
-  while ($flag != 0 & $langs > 1) loop
-    $tupleMenu := SetToTuple($descMenu);
-    $selected_n := Menu(20, 200, "Выберите критерии", $tupleMenu, 0);
-
+    $selected_n := Menu(20, 100, "Выберите язык", $allLangs, 0);
     if $selected_n != 0 then
-      $choice := $tupleMenu[$selected_n];
-      WriteLn($tupleMenu);
-      WriteLn($choice);
-
-      ClearWindow($Win_lang);
-      $y_lang := 10;
-      $descMenu := string{};
-      $langs := 0;
-      call group(New_Descs, Print_Langs, Stop);
-      if #$descMenu = 0 then $flag := 0; end;
+      $selectedLang := $allLangs[$selected_n];
+      $Win_info := MakeWindow("Информация о " + $selectedLang, 100, 100, 450, 400);
+      TextColor($Win_info, 4);
+      $y_info := 10;
+      call group(PrintLangInfo, Stop);
+      Message("", "Нажмите OK для завершения.");
+      CloseWindow($Win_info);
     end;
-  end;
 
-  Message("", "Выбор завершён");
-  CloseWindow($Win_lang);
-  CloseWindow($Win_desc);
+  else
+    $descMenu := string{};
+    $descChoise := string{};
+
+    // Создание окон
+    $Win_lang := MakeWindow("Подходящие языки", 450, 20, 300, 430);
+    $Win_desc := MakeWindow("Выбранные критерии", 20, 20, 420, 170);
+    TextColor($Win_lang, 3);
+    TextColor($Win_desc, 1);
+    $y_lang := 10;
+    $y_desc := 10;
+
+    // Выбор сложности
+    $min_diff := GetNumber(100, 100, "Сложность", "Минимум от 1 до 10:", 1);
+    $max_diff := GetNumber(100, 100, "Сложность", "Максимум от 1 до 10:", 10);
+    OutText($Win_desc, 10, $y_desc, "Сложность: " + ToString($min_diff) + "–" + ToString($max_diff));
+    $y_desc := $y_desc + 15;
+
+    // Выбор популярности
+    $min_pop := GetNumber(100, 100, "Популярность", "Минимум от 1 до 100:", 1);
+    $max_pop := GetNumber(100, 100, "Популярность", "Максимум от 1 до 100:", 100);
+    OutText($Win_desc, 10, $y_desc, "Популярность: " + ToString($min_pop) + "–" + ToString($max_pop));
+    $y_desc := $y_desc + 15;
+
+    $langs := 0;
+    call group(Print_Langs, Stop);
+
+    $flag := 1;
+    while ($flag != 0 & $langs > 1) loop
+      $tupleMenu := SetToTuple($descMenu);
+      $selected_n := Menu(20, 200, "Выберите критерии", $tupleMenu, 0);
+
+      if $selected_n != 0 then
+        $choice := $tupleMenu[$selected_n];
+        WriteLn($tupleMenu);
+        WriteLn($choice);
+
+        ClearWindow($Win_lang);
+        $y_lang := 10;
+        $descMenu := string{};
+        $langs := 0;
+        call group(New_Descs, Print_Langs, Stop);
+        if #$descMenu = 0 then $flag := 0; end;
+      end;
+    end;
+
+    Message("", "Выбор завершён");
+    CloseWindow($Win_lang);
+    CloseWindow($Win_desc);
+  end;
 end.
