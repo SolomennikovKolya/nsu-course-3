@@ -7,14 +7,8 @@ Shape Version=11.00
 Screen=1536,960
 MCAPVersion=12.2.0.5
 Key ID=Demo
-NLCnt=32
+NLCnt=27
 TXCnt=7
-
-[shapedef]
-Name=Absolute
-Root="Plt.root",0,0,0
-Line=40,0,56,-16
-Line=40,0,24,-16
 
 [shapedef]
 Name=Amp
@@ -59,15 +53,6 @@ Line=24,0,24,0
 [shapedef]
 Name=Minus.root
 Line=-2,0,2,0
-
-[shapedef]
-Name=Plt.root
-Rectangle=16,-24,64,24
-FColor=None
-Line=0,0,16,0
-Line=22,0,58,0
-Line=40,-18,40,18
-Line=64,0,80,0
 
 [shapedef]
 Name=Plus.root
@@ -168,18 +153,6 @@ PinCnt=3
 Pin="PinA",a,0,0,-9,18
 Pin="PinB",a,4,4,9,4
 Pin="PinC",a,8,0,-8,-4
-
-[compdef]
-Name=Abs
-Definition=Macro
-Shape=Absolute
-Mask=20480
-Used=3
-memo=Absolute Value Macro
-Label Offset=20,25,28,28
-PinCnt=2
-Pin="PinA",a,0,0,-11,-3
-Pin="PinB",a,10,0,-6,-3
 
 [compdef]
 Name=Sum3
@@ -355,59 +328,10 @@ V
 Pxs=352,232,520,232
 
 [Wire]
-Pxs=232,232,280,232
+Pxs=232,232,352,232
 
 [Wire]
 Pxs=352,232,352,304
-
-[Wire]
-Pxs=280,232,352,232
-
-[Comp]
-Name=F
-Style=ShowPinText
-Px=400,72
-
-[Attr]
-ON=22,-14,PART
-V=X6
-
-[Attr]
-ON=22,0,FILE
-V=F
-
-[Attr]
-ON=54,32,Param:FS
-V=1/(S)
-Style=8192
-
-[Attr]
-ON=0,0,PACKAGE
-V
-
-[Comp]
-Name=Abs
-Style=ShowPinText
-Px=280,72
-
-[Attr]
-ON=20,25,PART
-V=X7
-
-[Attr]
-ON=30,32,FILE
-V=Abs
-Style=8192
-
-[Attr]
-ON=0,0,PACKAGE
-V
-
-[Wire]
-Pxs=360,72,400,72
-
-[Wire]
-Pxs=280,72,280,232
 
 [Comp]
 Name=F
@@ -497,7 +421,7 @@ Pxs=200,264,200,392
 
 [Grid Text]
 Text=".define Ts Td/8"
-Px=344,560
+Px=384,520
 GridSnap=True
 JustifyH=Left
 JustifyV=Bottom
@@ -505,7 +429,7 @@ CBorder=None
 
 [Grid Text]
 Text=".define Td Ti/4"
-Px=344,536
+Px=384,496
 GridSnap=True
 JustifyH=Left
 JustifyV=Bottom
@@ -513,7 +437,7 @@ CBorder=None
 
 [Grid Text]
 Text=".define n 4"
-Px=152,488
+Px=192,448
 GridSnap=True
 JustifyH=Left
 JustifyV=Bottom
@@ -521,31 +445,31 @@ CBorder=None
 
 [Grid Text]
 Text=".define T0 1.26"
-Px=152,512
+Px=192,472
 GridSnap=True
 JustifyH=Left
 JustifyV=Bottom
 CBorder=None
 
 [Grid Text]
-Text=".define Ti 8.23"
-Px=344,512
+Text=".define Ti 4.9"
+Px=384,472
 GridSnap=True
 JustifyH=Left
 JustifyV=Bottom
 CBorder=None
 
 [Grid Text]
-Text=".define T1 10"
-Px=152,536
+Text=".define T1 0"
+Px=192,496
 GridSnap=True
 JustifyH=Left
 JustifyV=Bottom
 CBorder=None
 
 [Grid Text]
-Text=".define K 0.386"
-Px=344,488
+Text=".define K 1"
+Px=384,448
 GridSnap=True
 JustifyH=Left
 JustifyV=Bottom
@@ -748,7 +672,7 @@ Scale 0=1
 Scale 1=1
 Scale 2=1
 Scale 3=1
-Px=511,508
+Px=543,475
 WinBackGround Color=#FFFFFF
 Select Color=#FF0000
 Anchor Color=#000000
@@ -925,7 +849,7 @@ FFT_IncludeDCHarmonic=False
 FFT_AutoScale_Harmonics="10"
 PrinterAutoTile=No
 PrinterBlackBorder=No
-MonMaxShow=3
+MonMaxShow=2
 MonPageWidth=66
 MonPlotWidth=21
 MonExprXWidth=142
@@ -961,7 +885,7 @@ Num Out High="TMAX"
 Num Out Font=Height=-15,FStyle=0,Color=#000000,Name=Courier New
 Num Out Format=3
 Num Out HideNonSelected=False
-Num Out UseActualDataPoints=False
+Num Out UseActualDataPoints=True
 AutoSaveWave=False
 Wave Format=16E
 State Variables Format=5E
@@ -1360,32 +1284,6 @@ Options=OUTPUT,LINEARX,LINEARY
 Enable=Enable
 Line Color=#009F00
 Text Color=#009F00
-Rainbow=False
-VFmtX=3
-VFmtY=3
-ScaleFactorX="None"
-ScaleFactorY="None"
-ScaleUnitsX="Auto"
-ScaleUnitsY="Auto"
-SFmtX=2
-SFmtY=2
-NOFmtX=3E
-NOFmtY=3E
-
-[WaveForm]
-Analysis=Transient
-Plt=1
-AliasID=3
-XExp=T
-YExp=v(8)
-XRng=100
-YRng=32,-8
-Options=LINEARX,LINEARY
-Range Grid X=20
-Range Grid Y=8
-Enable=Enable
-Line Color=#FF0000
-Text Color=#FF0000
 Rainbow=False
 VFmtX=3
 VFmtY=3

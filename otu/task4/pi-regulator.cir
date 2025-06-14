@@ -370,7 +370,7 @@ Pxs=336,224,464,224
 
 [Grid Text]
 Text=".define T0 1.26"
-Px=128,496
+Px=224,448
 Color=#DE0CBE
 GridSnap=True
 JustifyH=Left
@@ -379,7 +379,7 @@ CBorder=None
 
 [Grid Text]
 Text=".define n 4"
-Px=128,472
+Px=224,424
 Color=#DE0CBE
 GridSnap=True
 JustifyH=Left
@@ -388,7 +388,7 @@ CBorder=None
 
 [Grid Text]
 Text=".define Ti 5.6"
-Px=280,496
+Px=376,448
 Color=#DE0CBE
 GridSnap=True
 JustifyH=Left
@@ -397,7 +397,7 @@ CBorder=None
 
 [Grid Text]
 Text=".define K 0.66"
-Px=280,472
+Px=376,424
 Color=#DE0CBE
 GridSnap=True
 JustifyH=Left
@@ -406,7 +406,7 @@ CBorder=None
 
 [Grid Text]
 Text=".define T1 0"
-Px=128,520
+Px=224,472
 Color=#DE0CBE
 GridSnap=True
 JustifyH=Left
@@ -609,9 +609,9 @@ PrinterScale=1
 Scale 0=1
 Scale 1=1
 Scale 2=1
-SB 3=2,0
+SB 3=2,48
 Scale 3=1
-Px=521,527
+Px=503,558
 WinBackGround Color=#FFFFFF
 Select Color=#FF0000
 Anchor Color=#000000
@@ -824,7 +824,7 @@ Num Out High="TMAX"
 Num Out Font=Height=-15,FStyle=0,Color=#000000,Name=Courier New
 Num Out Format=3
 Num Out HideNonSelected=False
-Num Out UseActualDataPoints=False
+Num Out UseActualDataPoints=True
 AutoSaveWave=False
 Wave Format=16E
 State Variables Format=5E
@@ -961,7 +961,7 @@ Analysis=Transient
 TMax=100
 TStart=0
 TStep=0
-NPts=51
+NPts=100
 Temp=27
 RetraceRuns=1
 StateVar=Zero
@@ -980,6 +980,7 @@ XRng=AutoAlways
 YRng=AutoAlways
 Options=LINEARX,LINEARY
 Enable=Enable
+CS=Normal
 Line Color=#0000FF
 Text Color=#0000FF
 Rainbow=False
@@ -1002,8 +1003,9 @@ XExp=T
 YExp=v(3)
 XRng=AutoAlways
 YRng=AutoAlways
-Options=LINEARX,LINEARY
+Options=OUTPUT,LINEARX,LINEARY
 Enable=Enable
+CS=Normal
 Line Color=#36C25C
 Text Color=#36C25C
 Rainbow=False
