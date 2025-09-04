@@ -1,10 +1,4 @@
-/obsidian/*
-!/obsidian/Учёба/
-!/obsidian/Учёба/**
-!/obsidian/Программирование/
-!/obsidian/Программирование/**
-!/obsidian/README.md
-
+.obsidian/
 myenv/
 .venv/
 __pycache__
