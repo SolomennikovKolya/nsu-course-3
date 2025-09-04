@@ -1,0 +1,11 @@
+{
+  "obsidian-file-cleaner:clean-files": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "R"
+    }
+  ]
+}
