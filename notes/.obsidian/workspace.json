@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Предметы/БД.md",
+                "file": "Предметы/МиМИИ.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "БД"
+              "title": "МиМИИ"
             }
           }
         ]
@@ -142,13 +142,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Предметы/БД.md",
+                "file": "Предметы/МиМИИ.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of БД"
+              "title": "Outline of МиМИИ"
             }
           }
         ],
@@ -173,6 +173,7 @@
   },
   "active": "750e75507155b96c",
   "lastOpenFiles": [
+    "Предметы/БД.md",
     "Предметы/МТК.md",
     "Предметы/Маркетинг.md",
     "Предметы/УППРПО.md",
@@ -196,7 +197,6 @@
     "Предметы/ОСи.md",
     "Предметы/ООАиД.md",
     "Предметы/Вычи.md",
-    "Предметы/БД.md",
     "Работа/ЛЕДАС.md",
     "Работа/Документация.md",
     "Работа/Резюме.md",
